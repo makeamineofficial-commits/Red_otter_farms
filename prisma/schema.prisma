@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Collection {
+  id        String   @id @default(uuid())
+  publicId  String   @unique @default(dbgenerated("concat('collection_', gen_random_uuid())"))
+  name      String
+  slug      String   @unique
+  description String?
+  isActive  Boolean  @default(true)
+  products  CollectionProduct[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isActive])
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  publicId  String   @unique @default(dbgenerated("concat('product_', gen_random_uuid())"))
+  sku       String   @unique
+  name      String
+  slug      String   @unique
+  price     Int  
+  currency  String  @default("INR")
+  description String?
+  inStock    Boolean @default(true)
+  isFeatured  Boolean @default(false)
+  images     ProductImage[]
+  collections CollectionProduct[]
+  orderedIn  OrderProduct[]
+  addedToCart CartProduct[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([sku])
+  @@index([inStock])
+  @@index([isFeatured])
+}
+
+model CollectionProduct {
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String
+  product      Product @relation(fields: [productId], references: [id])
+  productId    String
+
+  @@id([collectionId, productId])
+  @@index([productId])
+  @@index([collectionId])
+}
+
+model ProductImage {
+  id String @id @default(uuid())
+  product      Product @relation(fields: [productId], references: [id])
+  productId    String
+  imageUrl     String
+  position     Int @default(0)
+  isPrimary    Boolean @default(false)
+
+  @@index([productId])
+  @@index([isPrimary])
+}
+
+enum CartStatus{
+  ACTIVE 
+  CONVERTED
+}
+
+model Cart{
+  id String @id @default(uuid())
+  publicId String @unique @default(dbgenerated("concat('cart_', gen_random_uuid())"))
+  userIdentifier  String?
+  status CartStatus @default(ACTIVE)
+  products CartProduct[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userIdentifier, status])
+}
+
+model CartProduct{
+  cart        Cart @relation(fields: [cartId], references: [id])
+  cartId      String
+  product      Product @relation(fields: [productId], references: [id])
+  productId    String
+  quantity  Int     @default(1)
+
+  @@id([cartId, productId])
+  @@index([productId])
+  @@index([cartId])
+}
+
+enum OrderStatus {
+  PENDING      
+  FAILED       
+  ON_HOLD      
+  PROCESSING   
+  SHIPPED      
+  DELIVERED    
+  CANCELLED    
+  REFUNDED     
+}
+
+model Order{
+  id String @id @default(uuid())
+  publicId String @unique @default(dbgenerated("concat('order_', gen_random_uuid())"))
+  products OrderProduct[]
+  status OrderStatus @default(PENDING)
+
+  
+
+  deliveryFee Int
+  subTotal Int
+  tax Int
+  total Int 
+  currency  String @default("INR")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model OrderProduct {
+  orderId   String
+  productId String
+
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity  Int     @default(1)
+  price     Int     
+  currency  String @default("INR")
+
+  @@id([orderId, productId])
+  @@index([productId])
+  @@index([orderId])
+}
