@@ -1,11 +1,12 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
+
 
 model Collection {
   id        String   @id @default(uuid())
@@ -13,37 +14,96 @@ model Collection {
   name      String
   slug      String   @unique
   description String?
-  isActive  Boolean  @default(true)
+
+  isPublished  Boolean  @default(true)
   products  CollectionProduct[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([publicId])
   @@index([slug])
-  @@index([isActive])
+  @@index([isPublished])
 }
 
+
+
 model Product {
+  // identifier
   id        String   @id @default(uuid())
   publicId  String   @unique @default(dbgenerated("concat('product_', gen_random_uuid())"))
   sku       String   @unique
-  name      String
   slug      String   @unique
-  price     Int  
-  currency  String  @default("INR")
+
+  //  about the product
+  name      String
+  displayName String
+  type       String
   description String?
-  inStock    Boolean @default(true)
-  isFeatured  Boolean @default(false)
   images     ProductImage[]
   collections CollectionProduct[]
   orderedIn  OrderProduct[]
   addedToCart CartProduct[]
+
+
+
+  // pricing
+  price     Int   // selling price
+  mrp       Int   // original price
+  currency  String  @default("INR")
+  
+  
+  // weight 
+  weight    Int @default(0)
+  weightUnit  String @default("g")
+
+  // dimension
+  height    Int @default(0)
+  width     Int @default(0)
+  breadth   Int @default(0)
+  dimension  String @default("cm")
+
+  /// serving size value
+  servingSize Int @default(0)
+
+  /// serving unit (g / ml)
+  servingUnit String @default("g")
+
+
+  // benefits
+  healthBenefits String[]
+  
+  // nutrition (per serving or per 100g)
+  /// calories in kilocalories (kcal)
+  calories   Int @default(0)
+  /// protein in grams (g)
+  protein     Float @default(0)
+  /// fiber in grams (g)
+  fiber       Float @default(0)
+  /// fat in grams (g)
+  fat        Float @default(0)
+  /// carbohydrates in grams (g)
+  carbs       Float @default(0)
+  /// sugar in grams (g)
+  sugar       Float @default(0)
+  /// potassium in milligrams (mg)
+  potassium Int @default(0)
+  /// sodium in milligrams (mg)
+  sodium     Int @default(0)
+  // visibility
+  inStock    Boolean @default(true)
+  isPublished Boolean @default(true)
+  isFeatured  Boolean @default(false)
+
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([publicId])
   @@index([slug])
   @@index([sku])
   @@index([inStock])
+  @@index([isPublished])
   @@index([isFeatured])
 }
 
@@ -63,6 +123,7 @@ model ProductImage {
   product      Product @relation(fields: [productId], references: [id])
   productId    String
   imageUrl     String
+  thumbnail    String
   position     Int @default(0)
   isPrimary    Boolean @default(false)
 
@@ -84,7 +145,8 @@ model Cart{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userIdentifier, status])
+  @@index([publicId])
+  @@index([status])
 }
 
 model CartProduct{
@@ -115,9 +177,6 @@ model Order{
   publicId String @unique @default(dbgenerated("concat('order_', gen_random_uuid())"))
   products OrderProduct[]
   status OrderStatus @default(PENDING)
-
-  
-
   deliveryFee Int
   subTotal Int
   tax Int
@@ -126,6 +185,8 @@ model Order{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+
+  @@index([publicId])
   @@index([createdAt])
 }
 
