@@ -69,3 +69,10 @@ export const isValidateAdmin = async () => {
 
   return true;
 };
+
+export async function adminLogout() {
+  const cookieStore = await cookies();
+  cookieStore.delete("admin-access-token");
+  cookieStore.delete("admin-refresh-token");
+  redirect("/");
+}

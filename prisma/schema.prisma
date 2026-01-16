@@ -8,15 +8,37 @@ datasource db {
 }
 
 
+model AdminUser{
+  id String @id @default(uuid())
+  email String @unique
+  passwordHash String
+
+  lastUpdatedCollections Collection[]
+  lastUpdatedProducts    Product[]
+  lastUpdatedPosts       Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
 model Collection {
   id        String   @id @default(uuid())
   publicId  String   @unique @default(dbgenerated("concat('collection_', gen_random_uuid())"))
   name      String
+  displayName String
   slug      String   @unique
   description String?
 
-  isPublished  Boolean  @default(true)
   products  CollectionProduct[]
+
+  lastUpdatedById String?
+  lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
+
+
+  isPublished  Boolean  @default(true)
+  isDeleted Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -39,8 +61,8 @@ model Product {
   name      String
   displayName String
   type       String
-  description String?
-  images     ProductImage[]
+  description String? @default("")
+  assets     ProductAsset[]
   collections CollectionProduct[]
   orderedIn  OrderProduct[]
   addedToCart CartProduct[]
@@ -94,6 +116,10 @@ model Product {
   inStock    Boolean @default(true)
   isPublished Boolean @default(true)
   isFeatured  Boolean @default(false)
+  isDeleted Boolean @default(false)
+
+  lastUpdatedById String?
+  lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
 
 
   createdAt DateTime @default(now())
@@ -118,12 +144,13 @@ model CollectionProduct {
   @@index([collectionId])
 }
 
-model ProductImage {
+model ProductAsset {
   id String @id @default(uuid())
   product      Product @relation(fields: [productId], references: [id])
   productId    String
-  imageUrl     String
+  url     String
   thumbnail    String
+  type AssetType @default(IMAGE)
   position     Int @default(0)
   isPrimary    Boolean @default(false)
 
@@ -204,4 +231,46 @@ model OrderProduct {
   @@id([orderId, productId])
   @@index([productId])
   @@index([orderId])
+}
+
+
+enum AssetType{
+  IMAGE 
+  VIDEO
+}
+model Post{
+  id String @id @default(uuid())
+  publicId String @unique  @default(dbgenerated("concat('post_', gen_random_uuid())"))
+  slug String @unique
+
+  title String @db.Text
+  summary String @db.Text
+  contentHTML String @db.Text
+  
+  assets PostAsset[]
+  sharableLink String @unique
+
+  isPublished Boolean @default(true)
+  isDeleted Boolean @default(false)
+
+  lastUpdatedById String? 
+
+  lastUpdatedBy AdminUser? @relation(fields: [lastUpdatedById],references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([publicId])
+  @@index([isPublished])
+}
+
+
+model PostAsset{
+  id String @id @default(uuid())
+  postId String 
+  post Post @relation(fields: [postId],references: [id])
+  url String
+  thumbnail String
+  type AssetType @default(IMAGE)
 }

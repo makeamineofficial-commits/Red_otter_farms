@@ -123,3 +123,67 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  font-family: "Poppins", sans-serif;
+  font-style: normal;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-tailwind {
+  all: unset; /* Removes inherited styles from Tailwind */
+  display: block;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: inherit;
+}
+
+.no-tailwind p,
+.no-tailwind h1,
+.no-tailwind h2,
+.no-tailwind h3,
+.no-tailwind h4,
+.no-tailwind h5,
+.no-tailwind h6,
+.no-tailwind ul,
+.no-tailwind ol,
+.no-tailwind li,
+.no-tailwind blockquote,
+.no-tailwind pre,
+.no-tailwind code,
+.no-tailwind a,
+.no-tailwind img {
+  all: unset; /* Reset Tailwind styles */
+  display: revert; /* Restore default browser display */
+  margin: revert; /* Default margin */
+  padding: revert; /* Default padding */
+  font-weight: revert; /* Default font weight */
+  color: revert; /* Default text color */
+  line-height: revert; /* Default line height */
+  list-style: revert; /* Default list style */
+  text-decoration: revert; /* Default links */
+}
+.no-tailwind img {
+  max-width: 100%;
+  height: auto;
+}
+
+.no-tailwind a {
+  color: blue;
+  text-decoration: underline;
+}
+
+.no-tailwind blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 1em;
+  color: #555;
+}
