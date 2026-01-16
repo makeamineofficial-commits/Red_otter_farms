@@ -59,7 +59,7 @@ export function useArchivePost() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { publicId: string }) => {
+    mutationFn: async (data: { slug: string }) => {
       return await archivePost(data);
     },
     onSuccess: (res) => {
@@ -80,7 +80,7 @@ export function useDeletePost() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { publicId: string }) => {
+    mutationFn: async (data: { slug: string }) => {
       return await deletePost(data);
     },
     onSuccess: (res) => {

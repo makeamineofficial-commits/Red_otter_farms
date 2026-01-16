@@ -4,15 +4,15 @@ import { Prisma } from "../../../../generated/prisma/browser";
 import { validateAdmin } from "../../auth/admin.action";
 
 interface DeletePostProps {
-  publicId: string;
+  slug: string;
 }
 export const deletePost = async (Post: DeletePostProps) => {
   await validateAdmin();
-  const { publicId } = Post;
+  const { slug } = Post;
   try {
     const check = await db.post.findFirst({
       where: {
-        AND: [{ publicId }],
+        AND: [{ slug }],
       },
     });
 

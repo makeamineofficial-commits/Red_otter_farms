@@ -5,17 +5,16 @@ import { validateAdmin } from "../../auth/admin.action";
 import { Post, PostProps } from "@/types/post";
 
 export interface UpdatePostProps extends PostProps {
-  publicId: string;
   slug: string;
 }
 
 export const updatePost = async (post: UpdatePostProps) => {
   await validateAdmin();
-  const { slug, publicId } = post;
+  const { slug } = post;
   try {
     const check = await db.post.findFirst({
       where: {
-        AND: [{ slug }, { publicId }],
+        AND: [{ slug }],
       },
     });
 
@@ -26,10 +25,10 @@ export const updatePost = async (post: UpdatePostProps) => {
       };
     const updatedPost = await db.$transaction(
       async (tx: Prisma.TransactionClient): Promise<Post> => {
-        const { assets, slug, publicId, ...rest } = post;
+        const { assets, slug, ...rest } = post;
         const newPost = await tx.post.update({
           data: { ...rest },
-          where: { publicId: check.publicId },
+          where: { id: check.id },
         });
 
         await tx.postAsset.createMany({

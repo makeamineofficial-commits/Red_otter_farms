@@ -5,17 +5,16 @@ import { validateAdmin } from "../../auth/admin.action";
 import { Collection, CollectionProps } from "@/types/collection";
 
 export interface UpdateCollectionProps extends CollectionProps {
-  publicId: string;
   slug: string;
 }
 
 export const updateCollection = async (collection: UpdateCollectionProps) => {
   await validateAdmin();
-  const { slug, publicId } = collection;
+  const { slug } = collection;
   try {
     const check = await db.collection.findFirst({
       where: {
-        AND: [{ slug }, { publicId }],
+        AND: [{ slug }],
       },
     });
 
@@ -26,12 +25,15 @@ export const updateCollection = async (collection: UpdateCollectionProps) => {
       };
     const updatedCollection = await db.$transaction(
       async (tx: Prisma.TransactionClient): Promise<Collection> => {
-        const { slug, publicId, ...rest } = collection;
-        const newCollection = await tx.collection.update({
+        const { slug, ...rest } = collection;
+        const updatedCollection = await tx.collection.update({
           data: { ...rest },
           where: { publicId: check.publicId },
         });
-        return updatedCollection;
+        return {
+          ...updatedCollection,
+          description: updatedCollection.description ?? undefined,
+        };
       }
     );
 

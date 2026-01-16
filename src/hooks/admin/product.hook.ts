@@ -59,7 +59,7 @@ export function useArchiveproduct() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { publicId: string }) => {
+    mutationFn: async (data: { slug: string }) => {
       return await archiveProduct(data);
     },
     onSuccess: (res) => {
@@ -82,7 +82,7 @@ export function useDeleteproduct() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { publicId: string }) => {
+    mutationFn: async (data: { slug: string }) => {
       return await deleteProduct(data);
     },
     onSuccess: (res) => {

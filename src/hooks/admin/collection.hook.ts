@@ -59,7 +59,7 @@ export function useArchiveCollection() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { publicId: string }) => {
+    mutationFn: async (data: { slug: string }) => {
       return await archiveCollection(data);
     },
     onSuccess: (res) => {
@@ -82,7 +82,7 @@ export function useDeleteCollection() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { publicId: string }) => {
+    mutationFn: async (data: { slug: string }) => {
       return await deleteCollection(data);
     },
     onSuccess: (res) => {

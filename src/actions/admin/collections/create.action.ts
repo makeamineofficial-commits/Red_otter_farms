@@ -35,7 +35,7 @@ export const createCollection = async (collection: CollectionProps) => {
     return {
       success: true,
       message: "New collection added to store",
-      Collection: newCollection,
+      collection: newCollection,
     };
   } catch (err) {
     return { success: false, message: "Failed to create new collection" };

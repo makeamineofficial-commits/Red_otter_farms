@@ -10,8 +10,8 @@ export const generateSlug = (prefix: string, content: string) => {
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .replace(/\s+/g, "_")
+    .replace(/-+/g, "_");
 
   const randomNumber = Math.floor(1000 + Math.random() * 9000);
 

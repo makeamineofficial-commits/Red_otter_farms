@@ -34,7 +34,7 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
     PaginatedResponse<Collection> | undefined
   >({
-    queryKey: ["posts", filter],
+    queryKey: ["collections", filter],
     queryFn: async () => {
       const res = await listCollection(filter);
 

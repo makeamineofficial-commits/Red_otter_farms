@@ -8,8 +8,8 @@ export interface CollectionProps {
 export interface Collection {
   publicId: string;
   name: string;
-  slug: string;
   displayName: string;
   description?: string;
+  slug: string;
   isPublished: boolean;
 }

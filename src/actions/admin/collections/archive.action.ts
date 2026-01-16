@@ -4,15 +4,15 @@ import { Prisma } from "../../../../generated/prisma/browser";
 import { validateAdmin } from "../../auth/admin.action";
 
 interface ArchiveCollectionProps {
-  publicId: string;
+  slug: string;
 }
-export const archiveCollection = async (Collection: ArchiveCollectionProps) => {
+export const archiveCollection = async (collection: ArchiveCollectionProps) => {
   await validateAdmin();
-  const { publicId } = Collection;
+  const { slug } = collection;
   try {
     const check = await db.collection.findFirst({
       where: {
-        AND: [{ publicId }],
+        AND: [{ slug }],
       },
     });
 
