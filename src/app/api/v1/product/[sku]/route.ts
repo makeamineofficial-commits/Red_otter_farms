@@ -3,10 +3,10 @@ import { db } from "@/lib/db";
 import { Prisma } from "../../../../../../generated/prisma/client";
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { sku: string } }
+  context: { params: Promise<{ sku: string }> }
 ) {
   const { price, inStock } = await req.json();
-  const { sku } = params;
+  const { sku } = await context.params;
 
   try {
     const check = await db.product.findFirst({

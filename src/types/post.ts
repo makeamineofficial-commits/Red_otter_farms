@@ -8,8 +8,8 @@ export interface PostProps {
   assets: {
     url: string;
     thumbnail: string;
-    position: number;
-    isPrimary: boolean;
+    // position: number;
+    // isPrimary: boolean;
     type: AssetType;
   }[];
   isPublished: boolean;
