@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { useArchiveCollection } from "@/hooks/admin/collection.hook";
+import { useArchiveProduct } from "@/hooks/admin/product.hook";
 import { Archive, Loader2, ArchiveRestore } from "lucide-react";
-import { Collection } from "@/types/collection";
+import { Product } from "@/types/product";
 
-export function ArchiveCollection({ collection }: { collection: Collection }) {
+export function ArchiveProduct({ product }: { product: Product }) {
   const [open, setOpen] = React.useState(false);
-  const { publicId, isPublished } = collection;
-  const { mutateAsync, isPending } = useArchiveCollection();
+  const { publicId, isPublished } = product;
+  const { mutateAsync, isPending } = useArchiveProduct();
   const handleAction = async () => {
     await mutateAsync({ publicId });
   };
@@ -42,18 +42,18 @@ export function ArchiveCollection({ collection }: { collection: Collection }) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {isPublished ? "Archive Collection" : "Publish Collection"}
+            {isPublished ? "Archive Product" : "Publish Product"}
           </DialogTitle>
           <DialogDescription>
             {isPublished ? (
               <>
-                This will archive the post from your collection. This action can
-                have direct effect on your collection. Please choose carefully.
+                This will archive the product from your app. This action can
+                have direct effect on your app. Please choose carefully.
               </>
             ) : (
               <>
-                This will publish the post to your collection. This action can
-                have direct effect on your collection. Please choose carefully.
+                This will publish the product to your app. This action can have
+                direct effect on your app. Please choose carefully.
               </>
             )}
           </DialogDescription>
@@ -68,7 +68,7 @@ export function ArchiveCollection({ collection }: { collection: Collection }) {
           {isPending ? (
             <Loader2 className="animate-spin duration-200" />
           ) : (
-            <>{isPublished ? "Archive Collection" : "Publish Collection"}</>
+            <>{isPublished ? "Archive Product" : "Publish Product"}</>
           )}
         </Button>
       </DialogContent>

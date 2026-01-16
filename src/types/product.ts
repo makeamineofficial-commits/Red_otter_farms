@@ -50,6 +50,8 @@ export interface Product {
   name: string;
   displayName: string;
   sku: string;
+  slug: string;
+  
   collections: { publicId: string; name: string; slug: string }[];
   healthBenefits: string[];
   type: string;

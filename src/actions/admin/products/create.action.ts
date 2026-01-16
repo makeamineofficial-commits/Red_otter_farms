@@ -27,7 +27,7 @@ export const createProduct = async (product: ProductProps) => {
         const newProduct = await tx.product.create({ data: { slug, ...rest } });
         const collections = await tx.collection.findMany({
           where: {
-            slug: {
+            publicId: {
               in: col,
             },
           },

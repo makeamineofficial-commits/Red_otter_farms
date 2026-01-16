@@ -1,44 +1,33 @@
 "use client";
-
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-
-import { useSearchParams } from "next/navigation";
-import { listProduct } from "@/actions/admin/products/list.action";
-import { PaginatedResponse } from "@/types/common";
+import { getProduct } from "@/actions/admin/products/get.action";
 import { Product } from "@/types/product";
+import { useParams } from "next/navigation";
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: PaginatedResponse<Product> | undefined;
+  data: Product | undefined;
   error: Error | null;
 }
 
 const StoreContext = createContext<StoreInterface | null>(null);
 
 function StoreContent({ children }: { children: React.ReactNode }) {
-  const searchParams = useSearchParams();
-
-  const filter = useMemo(() => {
-    return {
-      page: Number(searchParams.get("page") || "1"),
-      limit: Number(searchParams.get("limit") || "10"),
-      q: searchParams.get("q") || undefined,
-      showPublishedOnly:
-        searchParams.get("showPublishedOnly") === "true" || false,
-    };
-  }, [searchParams]);
-
+  const { publicId } = useParams();
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    PaginatedResponse<Product> | undefined
+    Product | undefined
   >({
-    queryKey: ["products", filter],
+    queryKey: ["product", publicId],
     queryFn: async () => {
-      const res = await listProduct(filter);
-
-      return res;
+      if (!publicId) return;
+      const product = await getProduct({
+        publicId: publicId?.toString(),
+      });
+      return product.product;
     },
+    enabled: !!publicId,
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -53,7 +42,11 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const ProductStore = ({ children }: { children: React.ReactNode }) => {
+export const ProductDetailsStore = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   return (
     <Suspense fallback={<></>}>
       <StoreContent>{children}</StoreContent>
@@ -61,8 +54,8 @@ export const ProductStore = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useProductStore = () => {
+export const useProductDetailsStore = () => {
   const ctx = useContext(StoreContext);
-  if (!ctx) throw new Error("useProductStore must be used inside ProductStore");
+  if (!ctx) throw new Error("useAdminStore must be used inside AdminStore");
   return ctx;
 };

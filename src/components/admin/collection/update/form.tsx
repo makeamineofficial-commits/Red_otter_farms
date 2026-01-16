@@ -44,7 +44,7 @@ export default function UpdateCollectionForm({
   const onSubmit = async (values: FormValues) => {
     await mutateAsync({
       ...values,
-      slug: collection.slug,
+      publicId: collection.publicId,
     });
   };
   return (

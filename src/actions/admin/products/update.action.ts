@@ -4,15 +4,15 @@ import { Prisma } from "../../../../generated/prisma/browser";
 import { validateAdmin } from "../../auth/admin.action";
 import { ProductProps } from "@/types/product";
 export interface UpdateProductProps extends ProductProps {
-  slug: string;
+  publicId: string;
 }
 export const updateProduct = async (product: UpdateProductProps) => {
   await validateAdmin();
-  const { sku, slug } = product;
+  const { sku, publicId } = product;
   try {
     const check = await db.product.findFirst({
       where: {
-        AND: [{ sku }, { slug }],
+        AND: [{ sku }, { publicId }],
       },
     });
 
@@ -25,7 +25,8 @@ export const updateProduct = async (product: UpdateProductProps) => {
       async (tx: Prisma.TransactionClient) => {
         const {
           sku,
-          slug,
+
+          publicId,
           assets,
           collections: col,
           ...rest
@@ -37,7 +38,7 @@ export const updateProduct = async (product: UpdateProductProps) => {
 
         const collections = await tx.collection.findMany({
           where: {
-            slug: {
+            publicId: {
               in: col,
             },
           },

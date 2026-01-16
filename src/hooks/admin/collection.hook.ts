@@ -46,7 +46,7 @@ export function useUpdateCollection() {
       }
       queryClient.invalidateQueries({ queryKey: ["collections"] });
       queryClient.invalidateQueries({
-        queryKey: ["collection", res.collection?.slug],
+        queryKey: ["collection", res.collection?.publicId],
       });
       toast.success(res.message ?? "Collection updated successfully");
     },
@@ -59,7 +59,7 @@ export function useArchiveCollection() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { slug: string }) => {
+    mutationFn: async (data: { publicId: string }) => {
       return await archiveCollection(data);
     },
     onSuccess: (res) => {
@@ -69,7 +69,7 @@ export function useArchiveCollection() {
       }
       queryClient.invalidateQueries({ queryKey: ["collections"] });
       queryClient.invalidateQueries({
-        queryKey: ["collection", res.Collection?.slug],
+        queryKey: ["collection", res.Collection?.publicId],
       });
       toast.success(res.message ?? "Collection status changes successfully");
     },
@@ -82,7 +82,7 @@ export function useDeleteCollection() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { slug: string }) => {
+    mutationFn: async (data: { publicId: string }) => {
       return await deleteCollection(data);
     },
     onSuccess: (res) => {
@@ -92,7 +92,7 @@ export function useDeleteCollection() {
       }
       queryClient.invalidateQueries({ queryKey: ["collections"] });
       queryClient.invalidateQueries({
-        queryKey: ["collection", res.collection?.slug],
+        queryKey: ["collection", res.collection?.publicId],
       });
       toast.success(res.message ?? "Collection deleted successfully");
     },

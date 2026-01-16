@@ -46,7 +46,7 @@ export function useUpdatePost() {
       }
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({
-        queryKey: ["post", res.post?.slug],
+        queryKey: ["post", res.post?.publicId],
       });
       toast.success(res.message ?? "Post updated successfully");
     },
@@ -59,7 +59,7 @@ export function useArchivePost() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { slug: string }) => {
+    mutationFn: async (data: { publicId: string }) => {
       return await archivePost(data);
     },
     onSuccess: (res) => {
@@ -68,7 +68,7 @@ export function useArchivePost() {
         return;
       }
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post", res.post?.slug] });
+      queryClient.invalidateQueries({ queryKey: ["post", res.post?.publicId] });
       toast.success(res.message ?? "Post status changes successfully");
     },
   });
@@ -80,7 +80,7 @@ export function useDeletePost() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { slug: string }) => {
+    mutationFn: async (data: { publicId: string }) => {
       return await deletePost(data);
     },
     onSuccess: (res) => {
@@ -89,7 +89,7 @@ export function useDeletePost() {
         return;
       }
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post", res.post?.slug] });
+      queryClient.invalidateQueries({ queryKey: ["post", res.post?.publicId] });
       toast.success(res.message ?? "Post deleted successfully");
     },
   });

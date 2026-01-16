@@ -13,7 +13,7 @@ import { deleteProduct } from "@/actions/admin/products/delete.action";
 import { ProductProps } from "@/types/product";
 import { toast } from "sonner";
 
-export function useCreateproduct() {
+export function useCreateProduct() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -32,7 +32,7 @@ export function useCreateproduct() {
 
   return { ...mutation };
 }
-export function useUpdateproduct() {
+export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -46,7 +46,7 @@ export function useUpdateproduct() {
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({
-        queryKey: ["product", res.product?.slug],
+        queryKey: ["product", res.product?.publicId],
       });
       toast.success(res.message ?? "product updated successfully");
     },
@@ -55,11 +55,11 @@ export function useUpdateproduct() {
   return { ...mutation };
 }
 
-export function useArchiveproduct() {
+export function useArchiveProduct() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { slug: string }) => {
+    mutationFn: async (data: { publicId: string }) => {
       return await archiveProduct(data);
     },
     onSuccess: (res) => {
@@ -69,7 +69,7 @@ export function useArchiveproduct() {
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({
-        queryKey: ["product", res.product?.slug],
+        queryKey: ["product", res.product?.publicId],
       });
       toast.success(res.message ?? "product status changes successfully");
     },
@@ -78,11 +78,11 @@ export function useArchiveproduct() {
   return { ...mutation };
 }
 
-export function useDeleteproduct() {
+export function useDeleteProduct() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { slug: string }) => {
+    mutationFn: async (data: { publicId: string }) => {
       return await deleteProduct(data);
     },
     onSuccess: (res) => {
@@ -92,7 +92,7 @@ export function useDeleteproduct() {
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({
-        queryKey: ["product", res.product?.slug],
+        queryKey: ["product", res.product?.publicId],
       });
       toast.success(res.message ?? "product deleted successfully");
     },

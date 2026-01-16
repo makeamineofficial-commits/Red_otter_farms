@@ -10,7 +10,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { Button } from "@/components/ui/button";
 import { Collection } from "@/types/collection";
 import UpdateCollectionForm from "./form";
 import { Pencil } from "lucide-react";
@@ -26,7 +25,7 @@ export function UpdateCollection({ collection }: { collection: Collection }) {
 
       <DialogContent className="w-[95%] sm:min-w-150">
         <DialogHeader>
-          <DialogTitle>Update Post</DialogTitle>
+          <DialogTitle>Update Collection</DialogTitle>
         </DialogHeader>
         <UpdateCollectionForm collection={collection} />
       </DialogContent>

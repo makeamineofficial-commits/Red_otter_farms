@@ -18,12 +18,12 @@ export default function CreateCollection() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Create Post</Button>
+        <Button>Create Collection</Button>
       </DialogTrigger>
 
       <DialogContent className="w-[95%] sm:min-w-150">
         <DialogHeader>
-          <DialogTitle>Create New Post</DialogTitle>
+          <DialogTitle>Create New Collection</DialogTitle>
         </DialogHeader>
         <CreateCollectionForm />
       </DialogContent>

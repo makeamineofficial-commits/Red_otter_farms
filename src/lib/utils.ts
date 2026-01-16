@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import React from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -25,5 +26,34 @@ export const nullToUndefined = <T extends Record<string, any>>(obj: T) => {
     ])
   ) as {
     [K in keyof T]: T[K] extends null ? undefined : T[K];
+  };
+};
+
+export const numberField = (field: any) => {
+  const [inputValue, setInputValue] = React.useState<string>(
+    field.value !== undefined && field.value !== null ? String(field.value) : ""
+  );
+
+  React.useEffect(() => {
+    setInputValue(
+      field.value !== undefined && field.value !== null
+        ? String(field.value)
+        : ""
+    );
+  }, [field.value]);
+
+  return {
+    value: inputValue,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInputValue(e.target.value);
+      const val = e.target.value;
+
+      field.onChange(val === "" ? undefined : Number(val));
+    },
+    onBlur: () => {
+      if (inputValue === "") {
+        field.onChange(undefined);
+      }
+    },
   };
 };

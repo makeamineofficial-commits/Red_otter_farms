@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
-import { useDeleteCollection } from "@/hooks/admin/collection.hook";
 import { Loader2, Trash2 } from "lucide-react";
-import { Collection } from "@/types/collection";
+import { useDeleteProduct } from "@/hooks/admin/product.hook";
+import { Product } from "@/types/product";
 
-export function DeleteCollection({ collection }: { collection: Collection }) {
+export function DeleteProduct({ product }: { product: Product }) {
   const [open, setOpen] = React.useState(false);
-  const { publicId } = collection;
-  const { mutateAsync, isPending } = useDeleteCollection();
+  const { publicId } = product;
+  const { mutateAsync, isPending } = useDeleteProduct();
   const handleAction = async () => {
     await mutateAsync({ publicId });
   };
@@ -31,9 +31,9 @@ export function DeleteCollection({ collection }: { collection: Collection }) {
 
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Delete Collection</DialogTitle>
+          <DialogTitle>Delete Product</DialogTitle>
           <DialogDescription>
-            This will permanently remove the collection from your app. These
+            This will permanently remove the product from your app. These
             actions are irreversible. Please choose carefully.
           </DialogDescription>
         </DialogHeader>
@@ -47,7 +47,7 @@ export function DeleteCollection({ collection }: { collection: Collection }) {
           {isPending ? (
             <Loader2 className="animate-spin duration-200" />
           ) : (
-            "Delete Collection"
+            "Delete Product"
           )}
         </Button>
       </DialogContent>
