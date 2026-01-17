@@ -10,11 +10,9 @@ export default function TableSkeleton() {
       </TableCell>
 
       <TableCell>
-        <Skeleton className="h-3 w-36"></Skeleton>
+        <Skeleton className="h-3 w-96"></Skeleton>
       </TableCell>
-      <TableCell>
-        <Skeleton className="h-3 w-36"></Skeleton>
-      </TableCell>
+
       <TableCell>
         <Skeleton className="h-3 w-40"></Skeleton>
       </TableCell>

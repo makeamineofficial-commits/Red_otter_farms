@@ -10,23 +10,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useCollectionStore } from "@/store/admin/collection.store";
+import { usePostStore } from "@/store/admin/post.store";
 import { Pagination } from "@/components/common/pagination";
-import { UpdateCollection } from "../update";
-import { ArchiveCollection } from "../archive";
-import { DeleteCollection } from "../delete";
-import { CircleCheck } from "lucide-react";
+
+import { ArchivePost } from "../archive";
+import { DeletePost } from "../delete";
+import { CircleCheck, Pencil } from "lucide-react";
 import TableSkeleton from "./skeleton";
-export function CollectionTable() {
-  const { data, isLoading, isFetching } = useCollectionStore();
+import Link from "next/link";
+export function PostTable() {
+  const { data, isLoading, isFetching } = usePostStore();
 
   return (
     <Table className="w-full">
       <TableHeader>
         <TableRow>
           <TableHead className="w-25">ID</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Display Name</TableHead>
+          <TableHead>Title</TableHead>
           <TableHead>Slug</TableHead>
           <TableHead>Is Published</TableHead>
           <TableHead className="text-right">Action</TableHead>
@@ -41,28 +41,28 @@ export function CollectionTable() {
           </>
         ) : (
           <>
-            {data.data.map((collection) => (
-              <TableRow key={collection.publicId}>
+            {data.data.map((post) => (
+              <TableRow key={post.publicId}>
                 <TableCell className="font-medium max-w-40 truncate whitespace-nowrap">
-                  {collection.publicId}
+                  {post.publicId}
                 </TableCell>
-
-                <TableCell>{collection.name}</TableCell>
-                <TableCell>{collection.displayName}</TableCell>
-                <TableCell>{collection.slug}</TableCell>
+                <TableCell className="font-medium max-w-96 truncate whitespace-nowrap">
+                  {post.title}
+                </TableCell>
+                <TableCell>{post.slug}</TableCell>
                 <TableCell>
-                  {collection.isPublished ? (
+                  {post.isPublished ? (
                     <CircleCheck className="stroke-green-500" size={15} />
                   ) : (
                     <CircleCheck size={15} />
                   )}
                 </TableCell>
                 <TableCell className="flex gap-2 justify-end">
-                  <UpdateCollection collection={collection}></UpdateCollection>
-                  <ArchiveCollection
-                    collection={collection}
-                  ></ArchiveCollection>
-                  <DeleteCollection collection={collection}></DeleteCollection>
+                  <Link href={`/admin/dashboard/post/${post.publicId}/update`}>
+                    <Pencil size={15} />
+                  </Link>
+                  <ArchivePost post={post}></ArchivePost>
+                  <DeletePost post={post}></DeletePost>
                 </TableCell>
               </TableRow>
             ))}

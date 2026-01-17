@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { ProductDetailsStore } from "@/store/admin/productDetail.store";
+import { PostDetailsStore } from "@/store/admin/postDetail.store";
 export default function layout({ children }: { children: ReactNode }) {
-  return <ProductDetailsStore>{children}</ProductDetailsStore>;
+  return <PostDetailsStore>{children}</PostDetailsStore>;
 }

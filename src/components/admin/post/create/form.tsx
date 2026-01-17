@@ -14,7 +14,6 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Editor } from "@/components/common/editor";
-import { useCreateCollection } from "@/hooks/admin/collection.hook";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import FileUpload from "@/components/common/fileUpload";
@@ -31,7 +30,7 @@ const postSchema = z.object({
       url: z.string(),
       thumbnail: z.string(),
       type: z.nativeEnum(AssetType),
-    })
+    }),
   ),
 });
 

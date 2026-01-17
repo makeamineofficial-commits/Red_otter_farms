@@ -12,7 +12,7 @@ export const createProduct = async (product: ProductProps) => {
 
     const check = await db.product.findFirst({
       where: {
-        OR: [{ slug }, { sku }],
+        OR: [{ sku }],
       },
     });
 
@@ -47,7 +47,7 @@ export const createProduct = async (product: ProductProps) => {
           }),
         });
         return newProduct;
-      }
+      },
     );
 
     return {

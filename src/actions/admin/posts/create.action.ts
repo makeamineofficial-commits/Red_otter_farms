@@ -12,15 +12,16 @@ export const createPost = async (post: PostProps) => {
 
     const check = await db.post.findFirst({
       where: {
-        OR: [{ slug }],
+        OR: [{ sharableLink: post.sharableLink }],
       },
     });
 
     if (check)
       return {
         success: false,
-        message: "Post with this slug already exist",
+        message: "Post with this shared link already exist",
       };
+
     const newPost = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
         const { assets, ...rest } = post;
@@ -38,7 +39,7 @@ export const createPost = async (post: PostProps) => {
         });
 
         return newPost;
-      }
+      },
     );
 
     return {

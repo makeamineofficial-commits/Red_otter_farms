@@ -1,32 +1,12 @@
 "use client";
 
-import * as React from "react";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import CreateCollectionForm from "./form";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-export default function CreateCollection() {
-  const [open, setOpen] = React.useState(false);
-
+export default function CreatePost() {
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>Create Collection</Button>
-      </DialogTrigger>
-
-      <DialogContent className="w-[95%] sm:min-w-150">
-        <DialogHeader>
-          <DialogTitle>Create New Collection</DialogTitle>
-        </DialogHeader>
-        <CreateCollectionForm />
-      </DialogContent>
-    </Dialog>
+    <Link href="/admin/dashboard/post/create">
+      <Button>Create Post</Button>;
+    </Link>
   );
 }

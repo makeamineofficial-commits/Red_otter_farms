@@ -1,3 +1,4 @@
+"use client";
 import {
   Form,
   FormControl,
@@ -12,99 +13,166 @@ import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUpdateCollection } from "@/hooks/admin/collection.hook";
+import { Editor } from "@/components/common/editor";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { Collection } from "@/types/collection";
-const collectionSchema = z.object({
-  name: z.string().min(5).max(120),
-  displayName: z.string().min(5).max(120),
-  description: z.string().optional(),
+import FileUpload from "@/components/common/fileUpload";
+import { AssetType } from "@/types/common";
+import { useUpdatePost } from "@/hooks/admin/post.hook";
+import { Product } from "@/types/product";
+import { Post } from "@/types/post";
+const postSchema = z.object({
+  title: z.string().min(5).max(120),
+  summary: z.string().min(5).max(120),
+  contentHTML: z.string(),
   isPublished: z.boolean(),
+  sharableLink: z.string().url(),
+  slug: z.string(),
+  assets: z.array(
+    z.object({
+      url: z.string(),
+      thumbnail: z.string(),
+      type: z.nativeEnum(AssetType),
+    }),
+  ),
 });
 
-type FormValues = z.infer<typeof collectionSchema>;
+type FormValues = z.infer<typeof postSchema>;
 
-export default function UpdateCollectionForm({
-  collection,
-}: {
-  collection: Collection;
-}) {
+export default function UpdatePostForm({ post }: { post: Post }) {
   const form = useForm<FormValues>({
-    resolver: zodResolver(collectionSchema),
+    resolver: zodResolver(postSchema),
     defaultValues: {
-      name: collection.name,
-      displayName: collection.displayName,
-      description: collection.description,
-      isPublished: collection.isPublished,
+      title: post.title,
+      summary: post.summary,
+      contentHTML: post.contentHTML,
+      sharableLink: post.sharableLink,
+      isPublished: post.isPublished,
+      assets: post.assets,
+      slug: post.slug,
     },
   });
 
-  const { mutateAsync, isPending } = useUpdateCollection();
+  const { mutateAsync, isPending } = useUpdatePost();
   const onSubmit = async (values: FormValues) => {
     await mutateAsync({
+      publicId: post.publicId,
       ...values,
-      publicId: collection.publicId,
     });
+  };
+  const onError = (errors: any) => {
+    console.error("Validation errors:", errors);
   };
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 overflow-hidden"
+        onSubmit={form.handleSubmit(onSubmit, onError)}
+        className="space-y-4 "
       >
-        <div className="flex gap-2 items-center flex-col md:flex-row">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input
-                    className="w-full"
-                    placeholder="Enter collection name..."
-                    {...field}
-                  />
-                </FormControl>{" "}
-                <FormMessage />
-              </FormItem>
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-lg">Update Post</h2>
+          <Button type="submit" disabled={isPending}>
+            {isPending ? (
+              <Loader2 className="animate-spin duration-200" />
+            ) : (
+              "Update Post"
             )}
-          />
-
-          <FormField
-            control={form.control}
-            name="displayName"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Display Name</FormLabel>
-                <FormControl>
-                  <Input
-                    className="w-full"
-                    placeholder="Enter collection display name..."
-                    {...field}
-                  />
-                </FormControl>{" "}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          </Button>
         </div>
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input
+                  className="w-full"
+                  placeholder="Title for the post..."
+                  {...field}
+                />
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Slug</FormLabel>
+              <FormControl>
+                <Input
+                  className="w-full"
+                  placeholder="Slug for the post..."
+                  {...field}
+                />
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="assets"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Assets</FormLabel>
+              <FormControl>
+                <FileUpload value={field.value} onChange={field.onChange} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
-          name="description"
+          name="summary"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
+            <FormItem className="w-full">
+              <FormLabel>Summary</FormLabel>
               <FormControl>
                 <Textarea
                   className="h-48"
                   rows={20}
-                  placeholder="Enter collection description..."
+                  placeholder="What the post all about..."
                   {...field}
                 />
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="contentHTML"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Body</FormLabel>
+              <FormControl>
+                <Editor {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="sharableLink"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Sharable Link</FormLabel>
+              <FormControl>
+                <Input
+                  className="w-full"
+                  placeholder="Sharable link for the post..."
+                  {...field}
+                />
+              </FormControl>{" "}
               <FormMessage />
             </FormItem>
           )}
@@ -122,18 +190,11 @@ export default function UpdateCollectionForm({
                 />
               </FormControl>
 
-              <FormLabel>Publish Collection</FormLabel>
+              <FormLabel>Publish Post</FormLabel>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? (
-            <Loader2 className="animate-spin duration-200" />
-          ) : (
-            "Update Collection"
-          )}
-        </Button>
       </form>
     </Form>
   );

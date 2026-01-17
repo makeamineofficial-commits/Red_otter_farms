@@ -1,14 +1,14 @@
 "use client";
 import React from "react";
-import { useProductDetailsStore } from "@/store/admin/productDetail.store";
-import UpdateProductForm from "@/components/admin/product/update/form";
+import { usePostDetailsStore } from "@/store/admin/postDetail.store";
+import UpdatePostForm from "@/components/admin/post/update/form";
 export default function page() {
-  const { data, isFetching, isLoading } = useProductDetailsStore();
+  const { data, isFetching, isLoading } = usePostDetailsStore();
 
   if (!data || isFetching || isLoading) return <>Loading</>;
   return (
     <>
-      <UpdateProductForm product={data}></UpdateProductForm>
+      <UpdatePostForm post={data}></UpdatePostForm>
     </>
   );
 }

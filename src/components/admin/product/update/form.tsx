@@ -19,21 +19,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { TagInput } from "@/components/common/tagInput";
 import FileUpload from "@/components/common/fileUpload";
-import { productSchema } from "../schema";
+
 import { useUpdateProduct } from "@/hooks/admin/product.hook";
 import { useAdminStore } from "@/store/admin/admin.store";
 import { numberField } from "@/lib/utils";
-import { NUTRITION_FIELDS } from "../schema";
+import { NUTRITION_FIELDS, updateProductSchema } from "../schema";
 import { Product } from "@/types/product";
 
-type FormValues = z.infer<typeof productSchema>;
+type FormValues = z.infer<typeof updateProductSchema>;
 
 export default function UpdateProductForm({ product }: { product: Product }) {
   const form = useForm({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(updateProductSchema),
     defaultValues: {
       name: product.name,
       displayName: product.displayName,
+      slug: product.slug,
       sku: product.sku,
       type: product.type,
       description: product.description,
@@ -70,7 +71,11 @@ export default function UpdateProductForm({ product }: { product: Product }) {
   const { mutateAsync, isPending } = useUpdateProduct();
   const { data, isLoading, isFetching } = useAdminStore();
   const onSubmit = async (values: FormValues) => {
-    await mutateAsync({ publicId: product.publicId, ...values });
+    await mutateAsync({
+      publicId: product.publicId,
+
+      ...values,
+    });
   };
 
   return (
@@ -164,27 +169,40 @@ export default function UpdateProductForm({ product }: { product: Product }) {
               )}
             />
             <FormField
-              name="collections"
+              name="slug"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Collections</FormLabel>
+                  <FormLabel>Slug</FormLabel>
                   <FormControl>
-                    <MultiSelect
-                      {...field}
-                      loading={isLoading || isFetching}
-                      options={
-                        data?.collections.map((ele) => {
-                          return { label: ele.name, value: ele.publicId };
-                        }) ?? []
-                      }
-                    ></MultiSelect>
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
+          <FormField
+            name="collections"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Collections</FormLabel>
+                <FormControl>
+                  <MultiSelect
+                    {...field}
+                    loading={isLoading || isFetching}
+                    options={
+                      data?.collections.map((ele) => {
+                        return { label: ele.name, value: ele.publicId };
+                      }) ?? []
+                    }
+                  ></MultiSelect>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             name="description"
@@ -273,7 +291,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
                           ...f,
                           position: i,
                           isPrimary: i === 0,
-                        }))
+                        })),
                       )
                     }
                   />

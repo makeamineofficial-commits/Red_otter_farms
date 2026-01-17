@@ -10,17 +10,6 @@ export const createCollection = async (collection: CollectionProps) => {
   try {
     const slug = generateSlug("collection", collection.name);
 
-    const check = await db.collection.findFirst({
-      where: {
-        OR: [{ slug }],
-      },
-    });
-
-    if (check)
-      return {
-        success: false,
-        message: "Collection with this slug already exist",
-      };
     const newCollection = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
         const { ...rest } = collection;
@@ -29,7 +18,7 @@ export const createCollection = async (collection: CollectionProps) => {
         });
 
         return newCollection;
-      }
+      },
     );
 
     return {

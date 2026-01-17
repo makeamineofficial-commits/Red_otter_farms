@@ -1,14 +1,14 @@
 "use client";
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getProduct } from "@/actions/admin/products/get.action";
-import { Product } from "@/types/product";
+import { getPost } from "@/actions/admin/posts/get.action";
+import { Post } from "@/types/post";
 import { useParams } from "next/navigation";
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: Product | undefined;
+  data: Post | undefined;
   error: Error | null;
 }
 
@@ -17,15 +17,15 @@ const StoreContext = createContext<StoreInterface | null>(null);
 function StoreContent({ children }: { children: React.ReactNode }) {
   const { publicId } = useParams();
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    Product | undefined
+    Post | undefined
   >({
-    queryKey: ["product", publicId],
+    queryKey: ["post", publicId],
     queryFn: async () => {
       if (!publicId) return;
-      const product = await getProduct({
+      const res = await getPost({
         publicId: publicId?.toString(),
       });
-      return product.product;
+      return res.post;
     },
     enabled: !!publicId,
     staleTime: 1000 * 60 * 5,
@@ -42,7 +42,7 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const ProductDetailsStore = ({
+export const PostDetailsStore = ({
   children,
 }: {
   children: React.ReactNode;
@@ -54,11 +54,9 @@ export const ProductDetailsStore = ({
   );
 };
 
-export const useProductDetailsStore = () => {
+export const usePostDetailsStore = () => {
   const ctx = useContext(StoreContext);
   if (!ctx)
-    throw new Error(
-      "useProductDetailsStore must be used inside ProductDetailsStore",
-    );
+    throw new Error("usePostDetailsStore must be used inside PostDetailsStore");
   return ctx;
 };

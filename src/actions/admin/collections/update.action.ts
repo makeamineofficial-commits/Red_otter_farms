@@ -6,11 +6,12 @@ import { Collection, CollectionProps } from "@/types/collection";
 
 export interface UpdateCollectionProps extends CollectionProps {
   publicId: string;
+  slug: string;
 }
 
 export const updateCollection = async (collection: UpdateCollectionProps) => {
   await validateAdmin();
-  const { publicId } = collection;
+  const { publicId, slug } = collection;
   try {
     const check = await db.collection.findFirst({
       where: {
@@ -23,6 +24,18 @@ export const updateCollection = async (collection: UpdateCollectionProps) => {
         success: false,
         message: "Collection with this publicId doesn't exist",
       };
+
+    const exist = await db.collection.findFirst({
+      where: {
+        OR: [{ slug }],
+      },
+    });
+
+    if (exist && exist.id !== check.id)
+      return {
+        success: false,
+        message: "Collection with this slug already exist",
+      };
     const updatedCollection = await db.$transaction(
       async (tx: Prisma.TransactionClient): Promise<Collection> => {
         const { publicId, ...rest } = collection;
@@ -34,7 +47,7 @@ export const updateCollection = async (collection: UpdateCollectionProps) => {
           ...updatedCollection,
           description: updatedCollection.description ?? undefined,
         };
-      }
+      },
     );
 
     return {

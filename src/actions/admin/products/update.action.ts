@@ -5,14 +5,15 @@ import { validateAdmin } from "../../auth/admin.action";
 import { ProductProps } from "@/types/product";
 export interface UpdateProductProps extends ProductProps {
   publicId: string;
+  slug: string;
 }
 export const updateProduct = async (product: UpdateProductProps) => {
   await validateAdmin();
-  const { sku, publicId } = product;
+  const { sku, slug, publicId } = product;
   try {
     const check = await db.product.findFirst({
       where: {
-        AND: [{ sku }, { publicId }],
+        AND: [{ publicId }],
       },
     });
 
@@ -21,16 +22,21 @@ export const updateProduct = async (product: UpdateProductProps) => {
         success: false,
         message: "Product details not found",
       };
+
+    const exist = await db.product.findFirst({
+      where: {
+        OR: [{ sku }, { slug }],
+      },
+    });
+
+    if (exist && exist.id !== check.id)
+      return {
+        success: false,
+        message: "sku or slug already in use",
+      };
     const updatedProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const {
-          sku,
-
-          publicId,
-          assets,
-          collections: col,
-          ...rest
-        } = product;
+        const { sku, publicId, assets, collections: col, ...rest } = product;
         const updatedProduct = await tx.product.update({
           data: { ...rest },
           where: { id: check.id },
@@ -68,7 +74,7 @@ export const updateProduct = async (product: UpdateProductProps) => {
           }),
         });
         return updatedProduct;
-      }
+      },
     );
 
     return {

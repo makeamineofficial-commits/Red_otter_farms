@@ -21,6 +21,7 @@ const collectionSchema = z.object({
   displayName: z.string().min(5).max(120),
   description: z.string().optional(),
   isPublished: z.boolean(),
+  slug: z.string(),
 });
 
 type FormValues = z.infer<typeof collectionSchema>;
@@ -37,6 +38,7 @@ export default function UpdateCollectionForm({
       displayName: collection.displayName,
       description: collection.description,
       isPublished: collection.isPublished,
+      slug: collection.slug,
     },
   });
 
@@ -90,6 +92,24 @@ export default function UpdateCollectionForm({
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Slug</FormLabel>
+              <FormControl>
+                <Input
+                  className="w-full"
+                  placeholder="Enter collection slug..."
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
