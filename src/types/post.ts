@@ -8,12 +8,9 @@ export interface PostProps {
   assets: {
     url: string;
     thumbnail: string;
-    // position: number;
-    // isPrimary: boolean;
     type: AssetType;
   }[];
   isPublished: boolean;
-  isDeleted: boolean;
 }
 
 export interface Post extends PostProps {

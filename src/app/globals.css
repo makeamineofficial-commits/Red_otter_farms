@@ -187,3 +187,23 @@ body {
   padding-left: 1em;
   color: #555;
 }
+
+/* editor */
+
+.w-md-editor-toolbar {
+  background-color: var(--card) !important;
+}
+
+.w-md-editor-toolbar li > button {
+  color: var(--muted-foreground) !important;
+}
+
+.wmde-markdown {
+  background-color: var(--card) !important;
+  color: var(--color-primary) !important;
+}
+.wmde-markdown-color,
+.w-md-editor-text-input,
+.w-md-editor-text-pre {
+  color: var(--color-primary) !important;
+}

@@ -44,9 +44,10 @@ export const createPost = async (post: PostProps) => {
     return {
       success: true,
       message: "New post added to store",
-      Blog: newPost,
+      post: newPost,
     };
   } catch (err) {
+    console.log(err);
     return { success: false, message: "Failed to create new post" };
   }
 };
