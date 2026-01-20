@@ -36,7 +36,7 @@ export function NavItem({
           ? "bg-muted text-foreground font-medium"
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
         disable && "pointer-events-none opacity-50",
-        className
+        className,
       )}
     >
       {/* Active indicator */}
@@ -50,7 +50,7 @@ export function NavItem({
           "flex h-9 w-9 items-center justify-center rounded-md",
           active
             ? "bg-primary/10 text-primary"
-            : "bg-muted/50 text-muted-foreground group-hover:text-foreground"
+            : "bg-muted/50 text-muted-foreground group-hover:text-foreground",
         )}
       >
         {icon}
@@ -67,7 +67,7 @@ export default function Sidebar() {
 
   const isActive = useCallback(
     (path: string) => pathname.startsWith(path),
-    [pathname]
+    [pathname],
   );
 
   return (
@@ -75,10 +75,10 @@ export default function Sidebar() {
       <div className="flex flex-col gap-1 p-3">
         <NavItem
           icon={<Folder size={18} />}
-          href="/admin/dashboard/collection"
-          active={isActive("/admin/dashboard/collection")}
+          href="/admin/dashboard/category"
+          active={isActive("/admin/dashboard/category")}
         >
-          Collection
+          Category
         </NavItem>
 
         <NavItem
@@ -91,10 +91,10 @@ export default function Sidebar() {
 
         <NavItem
           icon={<FileText size={18} />}
-          href="/admin/dashboard/post"
-          active={isActive("/admin/dashboard/post")}
+          href="/admin/dashboard/recipe"
+          active={isActive("/admin/dashboard/recipe")}
         >
-          Post
+          Recipe
         </NavItem>
 
         <NavItem

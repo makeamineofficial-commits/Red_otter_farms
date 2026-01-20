@@ -13,9 +13,9 @@ model AdminUser{
   email String @unique
   passwordHash String
 
-  lastUpdatedCollections Collection[]
+  lastUpdatedCategory Category[]
   lastUpdatedProducts    Product[]
-  lastUpdatedPosts       Post[]
+  lastUpdatedPosts       Recipe[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -23,15 +23,15 @@ model AdminUser{
   @@index([email])
 }
 
-model Collection {
+model Category {
   id        String   @id @default(uuid())
-  publicId  String   @unique @default(dbgenerated("concat('collection_', gen_random_uuid())"))
+  publicId  String   @unique @default(dbgenerated("concat('category_', gen_random_uuid())"))
   name      String
   displayName String
   slug      String   @unique
   description String?
 
-  products  CollectionProduct[]
+  products  CategoryProduct[] 
 
   lastUpdatedById String?
   lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
@@ -63,7 +63,7 @@ model Product {
   type       String
   description String? @default("")
   assets     ProductAsset[]
-  collections CollectionProduct[]
+  categories CategoryProduct[]
   orderedIn  OrderProduct[]
   addedToCart CartProduct[]
 
@@ -97,21 +97,7 @@ model Product {
   
   // nutrition (per serving or per 100g)
   /// calories in kilocalories (kcal)
-  calories   Int @default(0)
-  /// protein in grams (g)
-  protein     Float @default(0)
-  /// fiber in grams (g)
-  fiber       Float @default(0)
-  /// fat in grams (g)
-  fat        Float @default(0)
-  /// carbohydrates in grams (g)
-  carbs       Float @default(0)
-  /// sugar in grams (g)
-  sugar       Float @default(0)
-  /// potassium in milligrams (mg)
-  potassium Int @default(0)
-  /// sodium in milligrams (mg)
-  sodium     Int @default(0)
+  nutritionalInfo Json?
   // visibility
   inStock    Boolean @default(true)
   isPublished Boolean @default(true)
@@ -133,20 +119,20 @@ model Product {
   @@index([isFeatured])
 }
 
-model CollectionProduct {
-  collection   Collection @relation(fields: [collectionId], references: [id])
-  collectionId String
-  product      Product @relation(fields: [productId], references: [id])
+model CategoryProduct {
+  category   Category @relation(fields: [categoryId], references: [id],onDelete: Cascade)
+  categoryId String
+  product      Product @relation(fields: [productId], references: [id],onDelete: Cascade)
   productId    String
 
-  @@id([collectionId, productId])
+  @@id([categoryId, productId])
   @@index([productId])
-  @@index([collectionId])
+  @@index([categoryId])
 }
 
 model ProductAsset {
   id String @id @default(uuid())
-  product      Product @relation(fields: [productId], references: [id])
+  product      Product @relation(fields: [productId], references: [id],onDelete: Cascade)
   productId    String
   url     String
   thumbnail    String
@@ -238,7 +224,7 @@ enum AssetType{
   IMAGE 
   VIDEO
 }
-model Post{
+model Recipe{
   id String @id @default(uuid())
   publicId String @unique  @default(dbgenerated("concat('post_', gen_random_uuid())"))
   slug String @unique
@@ -247,7 +233,7 @@ model Post{
   summary String @db.Text
   contentHTML String @db.Text
   
-  assets PostAsset[]
+  assets RecipeAsset[]
   sharableLink String @unique
 
   isPublished Boolean @default(true)
@@ -266,11 +252,13 @@ model Post{
 }
 
 
-model PostAsset{
+model RecipeAsset{
   id String @id @default(uuid())
-  postId String 
-  post Post @relation(fields: [postId],references: [id])
+  recipeId String 
+  recipe Recipe @relation(fields: [recipeId],references: [id],onDelete: Cascade)
   url String
   thumbnail String
+  position     Int @default(0)
+  isPrimary    Boolean @default(false)
   type AssetType @default(IMAGE)
 }

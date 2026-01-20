@@ -36,13 +36,13 @@ export const updateProduct = async (product: UpdateProductProps) => {
       };
     const updatedProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const { sku, publicId, assets, collections: col, ...rest } = product;
+        const { sku, publicId, assets, categories: col, ...rest } = product;
         const updatedProduct = await tx.product.update({
           data: { ...rest },
           where: { id: check.id },
         });
 
-        const collections = await tx.collection.findMany({
+        const categorys = await tx.category.findMany({
           where: {
             publicId: {
               in: col,
@@ -50,14 +50,14 @@ export const updateProduct = async (product: UpdateProductProps) => {
           },
         });
 
-        await tx.collectionProduct.deleteMany({
+        await tx.categoryProduct.deleteMany({
           where: {
             productId: check.id,
           },
         });
-        await tx.collectionProduct.createMany({
-          data: collections.map((ele) => {
-            return { collectionId: ele.id, productId: updatedProduct.id };
+        await tx.categoryProduct.createMany({
+          data: categorys.map((ele) => {
+            return { categoryId: ele.id, productId: updatedProduct.id };
           }),
         });
         await tx.productAsset.deleteMany({

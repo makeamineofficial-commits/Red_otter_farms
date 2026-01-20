@@ -24,6 +24,7 @@ import { useCreateProduct } from "@/hooks/admin/product.hook";
 import { useAdminStore } from "@/store/admin/admin.store";
 import { numberField } from "@/lib/utils";
 import { NUTRITION_FIELDS } from "../schema";
+import { KeyValueArrayField } from "@/components/common/keyValueArrayField";
 
 type FormValues = z.infer<typeof productSchema>;
 
@@ -36,7 +37,7 @@ export default function CreateProductForm() {
       sku: "",
       type: "",
       description: "",
-      collections: [],
+      categories: [],
       healthBenefits: [],
       weightUnit: "gm",
       dimension: "cm",
@@ -52,14 +53,8 @@ export default function CreateProductForm() {
       width: 0,
       breadth: 0,
       servingSize: 0,
-      calories: 0,
-      protein: 0,
-      fiber: 0,
-      fat: 0,
-      carbs: 0,
-      sugar: 0,
-      potassium: 0,
-      sodium: 0,
+      // @ts-ignore
+      nutritionalInfo: { key: 0 },
     },
   });
   const onError = (errors: any) => {
@@ -69,7 +64,14 @@ export default function CreateProductForm() {
   const { mutateAsync, isPending } = useCreateProduct();
   const { data, isLoading, isFetching } = useAdminStore();
   const onSubmit = async (values: FormValues) => {
-    await mutateAsync(values);
+    await mutateAsync({
+      // @ts-ignore
+      nutritionalInfo: values.nutritionalInfo as unknown as Record<
+        string,
+        number
+      >,
+      ...values,
+    });
   };
 
   return (
@@ -163,17 +165,17 @@ export default function CreateProductForm() {
               )}
             />
             <FormField
-              name="collections"
+              name="categories"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Collections</FormLabel>
+                  <FormLabel>Categories</FormLabel>
                   <FormControl>
                     <MultiSelect
                       {...field}
                       loading={isLoading || isFetching}
                       options={
-                        data?.collections.map((ele) => {
+                        data?.categories.map((ele) => {
                           return { label: ele.name, value: ele.publicId };
                         }) ?? []
                       }
@@ -272,7 +274,7 @@ export default function CreateProductForm() {
                           ...f,
                           position: i,
                           isPrimary: i === 0,
-                        }))
+                        })),
                       )
                     }
                   />
@@ -378,33 +380,23 @@ export default function CreateProductForm() {
           <h3 className="font-medium ">Nutrition Facts</h3>
 
           <div className="grid md:grid-cols-4 gap-4">
-            {NUTRITION_FIELDS.map((key) => (
-              <FormField
-                key={key.key}
-                name={key.key as any}
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="capitalize">
-                      <span>
-                        {key.key}
-                        <span className="lowercase">({key.unit})</span>
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder={`Enter ${key.key.toLowerCase()} in (${key.unit.toLowerCase()}s)`}
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            ))}
+            <FormField
+              key={"nutritionalInfo"}
+              name={"nutritionalInfo"}
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <KeyValueArrayField
+                      value={field.value as Record<string, string>}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           </div>
         </section>
-
         {/* ================= FLAGS ================= */}
         <section className="space-y-3">
           <h3 className="font-medium ">Product Status</h3>

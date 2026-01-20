@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { TagInput } from "@/components/common/tagInput";
 import FileUpload from "@/components/common/fileUpload";
-
+import { KeyValueArrayField } from "@/components/common/keyValueArrayField";
 import { useUpdateProduct } from "@/hooks/admin/product.hook";
 import { useAdminStore } from "@/store/admin/admin.store";
 import { numberField } from "@/lib/utils";
@@ -38,7 +38,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
       sku: product.sku,
       type: product.type,
       description: product.description,
-      collections: product.collections.map((ele) => ele.publicId),
+      categories: product.categories.map((ele) => ele.publicId),
       healthBenefits: product.healthBenefits,
       weightUnit: product.weightUnit,
       dimension: product.dimension,
@@ -54,14 +54,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
       width: product.width,
       breadth: product.breadth,
       servingSize: product.servingSize,
-      calories: product.calories,
-      protein: product.protein,
-      fiber: product.fiber,
-      fat: product.fat,
-      carbs: product.carbs,
-      sugar: product.sugar,
-      potassium: product.potassium,
-      sodium: product.sodium,
+      nutritionalInfo: product.nutritionalInfo,
     },
   });
   const onError = (errors: any) => {
@@ -73,7 +66,11 @@ export default function UpdateProductForm({ product }: { product: Product }) {
   const onSubmit = async (values: FormValues) => {
     await mutateAsync({
       publicId: product.publicId,
-
+      // @ts-ignore
+      nutritionalInfo: values.nutritionalInfo as unknown as Record<
+        string,
+        number
+      >,
       ...values,
     });
   };
@@ -183,17 +180,17 @@ export default function UpdateProductForm({ product }: { product: Product }) {
             />
           </div>
           <FormField
-            name="collections"
+            name="categories"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Collections</FormLabel>
+                <FormLabel>Categories</FormLabel>
                 <FormControl>
                   <MultiSelect
                     {...field}
                     loading={isLoading || isFetching}
                     options={
-                      data?.collections.map((ele) => {
+                      data?.categories.map((ele) => {
                         return { label: ele.name, value: ele.publicId };
                       }) ?? []
                     }
@@ -384,30 +381,21 @@ export default function UpdateProductForm({ product }: { product: Product }) {
           <h3 className="font-medium ">Nutrition Facts</h3>
 
           <div className="grid md:grid-cols-4 gap-4">
-            {NUTRITION_FIELDS.map((key) => (
-              <FormField
-                key={key.key}
-                name={key.key as any}
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="capitalize">
-                      <span>
-                        {key.key}
-                        <span className="lowercase">({key.unit})</span>
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder={`Enter ${key.key.toLowerCase()} in (${key.unit.toLowerCase()}s)`}
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            ))}
+            <FormField
+              key={"nutritionalInfo"}
+              name={"nutritionalInfo"}
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <KeyValueArrayField
+                      value={field.value as Record<string, string>}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           </div>
         </section>
 

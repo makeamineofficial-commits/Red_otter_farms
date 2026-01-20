@@ -17,9 +17,9 @@ export const getProduct = async ({
       publicId,
     },
     include: {
-      collections: {
+      categories: {
         include: {
-          collection: {
+          category: {
             select: {
               name: true,
               slug: true,
@@ -42,7 +42,7 @@ export const getProduct = async ({
   if (!product) return { success: true, message: "Product details found" };
   const data = nullToUndefined({
     ...product,
-    collections: product.collections.map((c) => c.collection),
+    categories: product.categories.map((c) => c.category),
     description: product.description ?? undefined,
     assets: product.assets.map((ele) => {
       return { ...ele, type: ele.type as AssetType };
@@ -50,7 +50,10 @@ export const getProduct = async ({
   });
 
   return {
-    product: data,
+    product: {
+      ...data,
+      nutritionalInfo: data.nutritionalInfo as Record<string, number>,
+    },
     success: true,
     message: "Product details found",
   };

@@ -10,7 +10,7 @@ export const productSchema = z.object({
 
   description: z.string().optional(),
 
-  collections: z.array(z.string()),
+  categories: z.array(z.string()),
   healthBenefits: z.array(z.string()),
 
   // ===== PRICING =====
@@ -32,15 +32,7 @@ export const productSchema = z.object({
   servingUnit: z.string(),
 
   // ===== NUTRITION =====
-  calories: z.coerce.number().min(0),
-  protein: z.coerce.number().min(0),
-  fiber: z.coerce.number().min(0),
-  fat: z.coerce.number().min(0),
-  carbs: z.coerce.number().min(0),
-  sugar: z.coerce.number().min(0),
-  potassium: z.coerce.number().min(0),
-  sodium: z.coerce.number().min(0),
-
+  nutritionalInfo: z.json(),
   // ===== ASSETS =====
   assets: z.array(
     z.object({
@@ -70,7 +62,7 @@ export const updateProductSchema = z.object({
 
   description: z.string().optional(),
 
-  collections: z.array(z.string()),
+  categories: z.array(z.string()),
   healthBenefits: z.array(z.string()),
 
   // ===== PRICING =====
@@ -92,14 +84,7 @@ export const updateProductSchema = z.object({
   servingUnit: z.string(),
 
   // ===== NUTRITION =====
-  calories: z.coerce.number().min(0),
-  protein: z.coerce.number().min(0),
-  fiber: z.coerce.number().min(0),
-  fat: z.coerce.number().min(0),
-  carbs: z.coerce.number().min(0),
-  sugar: z.coerce.number().min(0),
-  potassium: z.coerce.number().min(0),
-  sodium: z.coerce.number().min(0),
+  nutritionalInfo: z.unknown().optional(),
 
   // ===== ASSETS =====
   assets: z.array(

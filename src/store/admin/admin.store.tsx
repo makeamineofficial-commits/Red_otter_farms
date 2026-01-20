@@ -1,14 +1,14 @@
 "use client";
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAllCollection } from "@/actions/admin/collections/getAll.action";
+import { getAllCategory } from "@/actions/admin/category/getAll.action";
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
   data:
     | {
-        collections: { publicId: string; name: string }[];
+        categories: { publicId: string; name: string }[];
       }
     | undefined;
   error: Error | null;
@@ -19,14 +19,15 @@ const StoreContext = createContext<StoreInterface | null>(null);
 function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
     | {
-        collections: { publicId: string; name: string }[];
+        categories: { publicId: string; name: string }[];
       }
     | undefined
   >({
     queryKey: ["admin"],
     queryFn: async () => {
-      const collections = await getAllCollection();
-      return { collections };
+      const categories = await getAllCategory();
+
+      return { categories };
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,

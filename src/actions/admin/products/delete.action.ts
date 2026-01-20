@@ -23,13 +23,11 @@ export const deleteProduct = async (product: DeleteProductProps) => {
       };
     const deletedProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const deletedProduct = await tx.product.update({
-          data: { isDeleted: true },
+        const deletedProduct = await tx.product.delete({
           where: { id: check.id },
         });
-
         return deletedProduct;
-      }
+      },
     );
 
     return {

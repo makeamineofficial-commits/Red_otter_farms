@@ -13,7 +13,7 @@ interface Filters {
 }
 
 export const listProduct = async (
-  filters: Filters = {}
+  filters: Filters = {},
 ): Promise<PaginatedResponse<Product>> => {
   await validateAdmin();
   const { showPublishedOnly = false, q, limit = 10, page = 1 } = filters;
@@ -37,9 +37,9 @@ export const listProduct = async (
       skip,
       take: safeLimit,
       include: {
-        collections: {
+        categories: {
           include: {
-            collection: {
+            category: {
               select: {
                 name: true,
                 slug: true,
@@ -66,7 +66,7 @@ export const listProduct = async (
   const data = products.map((product) => {
     return nullToUndefined({
       ...product,
-      collections: product.collections.map((c) => c.collection),
+      categories: product.categories.map((c) => c.category),
       description: product.description ?? undefined,
       assets: product.assets.map((ele) => {
         return { ...ele, type: ele.type as AssetType };

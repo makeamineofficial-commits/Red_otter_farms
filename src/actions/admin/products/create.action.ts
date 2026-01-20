@@ -23,18 +23,18 @@ export const createProduct = async (product: ProductProps) => {
       };
     const newProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const { assets, collections: col, ...rest } = product;
+        const { assets, categories: col, ...rest } = product;
         const newProduct = await tx.product.create({ data: { slug, ...rest } });
-        const collections = await tx.collection.findMany({
+        const categorys = await tx.category.findMany({
           where: {
             publicId: {
               in: col,
             },
           },
         });
-        await tx.collectionProduct.createMany({
-          data: collections.map((ele) => {
-            return { collectionId: ele.id, productId: newProduct.id };
+        await tx.categoryProduct.createMany({
+          data: categorys.map((ele) => {
+            return { categoryId: ele.id, productId: newProduct.id };
           }),
         });
 
