@@ -8,7 +8,7 @@ export default function page() {
   if (!data || isFetching || isLoading) return <>Loading</>;
   return (
     <>
-      <UpdateRecipeForm post={data}></UpdateRecipeForm>
+      <UpdateRecipeForm recipe={data}></UpdateRecipeForm>
     </>
   );
 }

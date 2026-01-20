@@ -80,6 +80,7 @@ export const listProduct = async (
     next: safePage < totalPages ? safePage + 1 : null,
     total,
     totalPages,
+    // @ts-ignore
     data,
   };
 };

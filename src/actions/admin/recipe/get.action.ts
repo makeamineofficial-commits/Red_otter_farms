@@ -22,6 +22,8 @@ export const getRecipe = async ({
           url: true,
           thumbnail: true,
           type: true,
+          isPrimary: true,
+          position: true,
         },
       },
     },
