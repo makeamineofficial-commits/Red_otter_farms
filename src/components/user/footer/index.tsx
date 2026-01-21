@@ -7,7 +7,7 @@ export default function Footer() {
         <h2 className="text-[1.175rem] uppercase">About Us</h2>
         <ul className="text-[1.375rem] flex flex-col">
           <Link href="#">OtterN</Link>
-          <Link href="#">Convenience & DeLinkvery</Link>
+          <Link href="#">Convenience & Delivery</Link>
           <Link href="#">Contact Us</Link>
           <Link href="#">Instagram</Link>
           <Link href="#">Facebook</Link>

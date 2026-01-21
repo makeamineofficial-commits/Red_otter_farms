@@ -1,5 +1,8 @@
-import React from "react";
-
+import { Grid } from "@/components/user/collections/grid";
 export default function page() {
-  return <div>collection page</div>;
+  return (
+    <>
+      <Grid></Grid>
+    </>
+  );
 }
