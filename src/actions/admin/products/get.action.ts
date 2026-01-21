@@ -16,6 +16,7 @@ export const getProduct = async ({
     where: {
       publicId,
     },
+
     include: {
       categories: {
         include: {
@@ -52,6 +53,7 @@ export const getProduct = async ({
   return {
     product: {
       ...data,
+
       nutritionalInfo: data.nutritionalInfo as Record<string, number>,
     },
     success: true,

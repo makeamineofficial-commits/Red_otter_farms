@@ -6,6 +6,7 @@ export interface RecipePropsBase {
   ingredients: string[];
   chefTips: string[];
   instructions: string[];
+  tags: string[];
   nutritionalInfo?: any;
   assets: Asset[];
   isPublished: boolean;
@@ -21,6 +22,5 @@ export interface Recipe extends RecipePropsBase {
   linkedProducts: {
     name: string;
     publicId: string;
-    assets: Asset[];
   }[];
 }

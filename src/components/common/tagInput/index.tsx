@@ -6,13 +6,13 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  value: string[];
+  value?: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
 };
 
 export function TagInput({
-  value,
+  value = [],
   onChange,
   placeholder = "Type and press Enter",
 }: Props) {

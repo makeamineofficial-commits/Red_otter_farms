@@ -25,6 +25,7 @@ import { ArrayField } from "@/components/common/arrayField";
 import { ProductMultiSelect } from "@/components/common/productMultiSelect";
 import { useAdminStore } from "@/store/admin/admin.store";
 import { useEffect } from "react";
+import { TagInput } from "@/components/common/tagInput";
 export const recipeSchema = z.object({
   title: z.string().trim().min(5).max(120),
   summary: z.string().trim().min(5).max(120),
@@ -36,6 +37,7 @@ export const recipeSchema = z.object({
       publicId: z.string(),
     }),
   ),
+  tags: z.array(z.string().min(1)) ?? [],
   instructions: z.array(z.string().min(1)),
   ingredients: z.array(z.string().min(1)),
   chefTips: z.array(z.string().min(1)),
@@ -68,6 +70,7 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
       isPublished: recipe.isPublished,
       assets: recipe.assets,
       slug: recipe.slug,
+      tags: recipe.tags,
     },
   });
 
@@ -130,6 +133,20 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
                   placeholder="Slug for the recipe..."
                   {...field}
                 />
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Tags</FormLabel>
+              <FormControl>
+                <TagInput placeholder="Tags for the recipe..." {...field} />
               </FormControl>{" "}
               <FormMessage />
             </FormItem>

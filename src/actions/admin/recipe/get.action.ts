@@ -1,7 +1,6 @@
 "use server";
 import { db } from "@/lib/db";
 import { Recipe } from "@/types/recipe";
-import { AssetType } from "@/types/common";
 import { nullToUndefined } from "@/lib/utils";
 import { validateAdmin } from "@/actions/auth/admin.action";
 
@@ -23,15 +22,6 @@ export const getRecipe = async ({
             select: {
               name: true,
               publicId: true,
-              assets: {
-                select: {
-                  url: true,
-                  thumbnail: true,
-                  type: true,
-                  isPrimary: true,
-                  position: true,
-                },
-              },
             },
           },
         },
@@ -48,6 +38,7 @@ export const getRecipe = async ({
     },
   });
   if (!product) return { success: false, message: "Recipe details not found" };
+
   const data = nullToUndefined({
     ...product,
     linkedProducts: product.linkedProducts.map((ele) => {

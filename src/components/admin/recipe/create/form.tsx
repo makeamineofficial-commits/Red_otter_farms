@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Editor } from "@/components/common/editor";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import FileUpload from "@/components/common/fileUpload";
@@ -23,6 +22,7 @@ import { KeyValueArrayField } from "@/components/common/keyValueArrayField";
 import { ArrayField } from "@/components/common/arrayField";
 import { ProductMultiSelect } from "@/components/common/productMultiSelect";
 import { useAdminStore } from "@/store/admin/admin.store";
+import { TagInput } from "@/components/common/tagInput";
 export const recipeSchema = z.object({
   title: z.string().trim().min(5).max(120),
   summary: z.string().trim().min(5).max(120),
@@ -34,6 +34,7 @@ export const recipeSchema = z.object({
     }),
   ),
   instructions: z.array(z.string().min(1)),
+  tags: z.array(z.string().min(1)),
   ingredients: z.array(z.string().min(1)),
   chefTips: z.array(z.string().min(1)),
   nutritionalInfo: z.unknown(),
@@ -63,6 +64,7 @@ export default function CreateRecipeForm() {
       ingredients: [],
       isPublished: false,
       assets: [],
+      tags: [],
     },
   });
 
@@ -107,6 +109,19 @@ export default function CreateRecipeForm() {
               <FormMessage />
             </FormItem>
           )}
+        />{" "}
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Tags</FormLabel>
+              <FormControl>
+                <TagInput placeholder="Tags for the recipe..." {...field} />
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
         />
         <FormField
           control={form.control}
@@ -121,7 +136,6 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="summary"
@@ -140,7 +154,6 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="linkedProducts"
@@ -165,7 +178,6 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="instructions"
@@ -182,7 +194,6 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="ingredients"
@@ -199,7 +210,6 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="chefTips"
@@ -216,7 +226,6 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="nutritionalInfo"
@@ -233,7 +242,6 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="isPublished"
