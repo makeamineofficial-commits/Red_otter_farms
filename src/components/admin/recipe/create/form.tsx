@@ -19,16 +19,28 @@ import { Loader2 } from "lucide-react";
 import FileUpload from "@/components/common/fileUpload";
 import { AssetType } from "@/types/common";
 import { useCreateRecipe } from "@/hooks/admin/recipe.hook";
-const recipeSchema = z.object({
-  title: z.string().min(5).max(120),
-  summary: z.string().min(5).max(120),
-  contentHTML: z.string(),
+import { KeyValueArrayField } from "@/components/common/keyValueArrayField";
+import { ArrayField } from "@/components/common/arrayField";
+import { ProductMultiSelect } from "@/components/common/productMultiSelect";
+import { useAdminStore } from "@/store/admin/admin.store";
+export const recipeSchema = z.object({
+  title: z.string().trim().min(5).max(120),
+  summary: z.string().trim().min(5).max(120),
   isPublished: z.boolean(),
-  sharableLink: z.string().url(),
+  linkedProducts: z.array(
+    z.object({
+      quantity: z.number().min(1),
+      publicId: z.string(),
+    }),
+  ),
+  instructions: z.array(z.string().min(1)),
+  ingredients: z.array(z.string().min(1)),
+  chefTips: z.array(z.string().min(1)),
+  nutritionalInfo: z.unknown(),
   assets: z.array(
     z.object({
-      url: z.string(),
-      thumbnail: z.string(),
+      url: z.string().url(),
+      thumbnail: z.string().url(),
       type: z.nativeEnum(AssetType),
       position: z.number().int().nonnegative(),
       isPrimary: z.boolean(),
@@ -39,13 +51,16 @@ const recipeSchema = z.object({
 type FormValues = z.infer<typeof recipeSchema>;
 
 export default function CreateRecipeForm() {
+  const { data, isLoading } = useAdminStore();
   const form = useForm<FormValues>({
     resolver: zodResolver(recipeSchema),
     defaultValues: {
       title: "",
       summary: "",
-      contentHTML: "",
-      sharableLink: "",
+      linkedProducts: [],
+      instructions: [],
+      chefTips: [],
+      ingredients: [],
       isPublished: false,
       assets: [],
     },
@@ -128,12 +143,23 @@ export default function CreateRecipeForm() {
 
         <FormField
           control={form.control}
-          name="contentHTML"
+          name="linkedProducts"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Body</FormLabel>
+            <FormItem className="w-full">
+              <FormLabel>Linked Products</FormLabel>
               <FormControl>
-                <Editor {...field} />
+                <ProductMultiSelect
+                  loading={isLoading}
+                  options={
+                    data?.products.map((ele) => {
+                      return {
+                        label: ele.name,
+                        value: ele.publicId,
+                      };
+                    }) ?? []
+                  }
+                  {...field}
+                ></ProductMultiSelect>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -142,16 +168,66 @@ export default function CreateRecipeForm() {
 
         <FormField
           control={form.control}
-          name="sharableLink"
+          name="instructions"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instructions</FormLabel>
+              <FormControl>
+                <ArrayField
+                  value={field.value}
+                  onChange={field.onChange}
+                ></ArrayField>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ingredients"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>Sharable Link</FormLabel>
+              <FormLabel></FormLabel>
               <FormControl>
-                <Input
-                  className="w-full"
-                  placeholder="Sharable link for the recipe..."
-                  {...field}
-                />
+                <ArrayField
+                  value={field.value}
+                  onChange={field.onChange}
+                ></ArrayField>
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="chefTips"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel></FormLabel>
+              <FormControl>
+                <ArrayField
+                  value={field.value}
+                  onChange={field.onChange}
+                ></ArrayField>
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="nutritionalInfo"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel></FormLabel>
+              <FormControl>
+                <KeyValueArrayField
+                  value={field.value as Record<string, string>}
+                  onChange={field.onChange}
+                ></KeyValueArrayField>
               </FormControl>{" "}
               <FormMessage />
             </FormItem>

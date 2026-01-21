@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllCategory } from "@/actions/admin/category/getAll.action";
+import { getAllProducts } from "@/actions/admin/products/getAll.action";
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
@@ -9,6 +10,7 @@ interface StoreInterface {
   data:
     | {
         categories: { publicId: string; name: string }[];
+        products: { publicId: string; name: string }[];
       }
     | undefined;
   error: Error | null;
@@ -20,14 +22,15 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
     | {
         categories: { publicId: string; name: string }[];
+        products: { publicId: string; name: string }[];
       }
     | undefined
   >({
     queryKey: ["admin"],
     queryFn: async () => {
       const categories = await getAllCategory();
-
-      return { categories };
+      const products = await getAllProducts();
+      return { categories, products };
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,

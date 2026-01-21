@@ -10,21 +10,9 @@ export const createRecipe = async (recipe: RecipeProps) => {
   try {
     const slug = generateSlug("recipe", recipe.title);
 
-    const check = await db.recipe.findFirst({
-      where: {
-        OR: [{ sharableLink: recipe.sharableLink }],
-      },
-    });
-
-    if (check)
-      return {
-        success: false,
-        message: "Recipe with this shared link already exist",
-      };
-
     const newRecipe = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const { assets, ...rest } = recipe;
+        const { assets, linkedProducts, ...rest } = recipe;
         const newRecipe = await tx.recipe.create({
           data: { slug, ...rest },
         });
@@ -34,6 +22,26 @@ export const createRecipe = async (recipe: RecipeProps) => {
             return {
               recipeId: newRecipe.id,
               ...ele,
+            };
+          }),
+        });
+        const products = await tx.product.findMany({
+          where: {
+            publicId: {
+              in: linkedProducts.map((ele) => ele.publicId),
+            },
+          },
+        });
+
+        await tx.recipeProduct.createMany({
+          data: products.map((ele) => {
+            return {
+              productId: ele.id,
+              quantity:
+                linkedProducts.find(
+                  (product) => product.publicId === ele.publicId,
+                )?.quantity || 1,
+              recipeId: newRecipe.id,
             };
           }),
         });

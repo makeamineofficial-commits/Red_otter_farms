@@ -38,7 +38,6 @@ model Category {
 
 
   isPublished  Boolean  @default(true)
-  isDeleted Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -66,6 +65,7 @@ model Product {
   categories CategoryProduct[]
   orderedIn  OrderProduct[]
   addedToCart CartProduct[]
+  linkedRecipes RecipeProduct[] 
 
 
 
@@ -102,7 +102,6 @@ model Product {
   inStock    Boolean @default(true)
   isPublished Boolean @default(true)
   isFeatured  Boolean @default(false)
-  isDeleted Boolean @default(false)
 
   lastUpdatedById String?
   lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
@@ -124,7 +123,7 @@ model CategoryProduct {
   categoryId String
   product      Product @relation(fields: [productId], references: [id],onDelete: Cascade)
   productId    String
-
+  
   @@id([categoryId, productId])
   @@index([productId])
   @@index([categoryId])
@@ -231,16 +230,19 @@ model Recipe{
 
   title String @db.Text
   summary String @db.Text
-  contentHTML String @db.Text
+  
+  instructions String[]
+  chefTips    String[]
+  ingredients String[]
+  nutritionalInfo Json?
+  
+  linkedProducts RecipeProduct[] 
   
   assets RecipeAsset[]
-  sharableLink String @unique
 
   isPublished Boolean @default(true)
-  isDeleted Boolean @default(false)
 
   lastUpdatedById String? 
-
   lastUpdatedBy AdminUser? @relation(fields: [lastUpdatedById],references: [id])
 
   createdAt DateTime @default(now())
@@ -250,6 +252,18 @@ model Recipe{
   @@index([publicId])
   @@index([isPublished])
 }
+
+model RecipeProduct {
+  recipe       Recipe @relation(fields: [recipeId], references: [id],onDelete: Cascade)
+  recipeId     String
+  product      Product @relation(fields: [productId], references: [id],onDelete: Cascade)
+  productId    String
+  quantity     Int      @default(1)
+  @@id([recipeId, productId])
+  @@index([productId])
+  @@index([recipeId])
+}
+
 
 
 model RecipeAsset{

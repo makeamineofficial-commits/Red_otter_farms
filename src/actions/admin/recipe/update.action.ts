@@ -11,7 +11,7 @@ export interface UpdateRecipeProps extends RecipeProps {
 
 export const updateRecipe = async (recipe: UpdateRecipeProps) => {
   await validateAdmin();
-  const { publicId, sharableLink, slug } = recipe;
+  const { publicId, slug } = recipe;
   try {
     const check = await db.recipe.findFirst({
       where: {
@@ -25,21 +25,9 @@ export const updateRecipe = async (recipe: UpdateRecipeProps) => {
         message: "Recipe doesn't exist",
       };
 
-    const exist = await db.recipe.findFirst({
-      where: {
-        OR: [{ sharableLink }, { slug }],
-      },
-    });
-
-    if (exist && exist.id !== check.id)
-      return {
-        success: false,
-        message: "Shared link or slug already in use",
-      };
-
     const updatedRecipe = await db.$transaction(
       async (tx: Prisma.TransactionClient): Promise<Recipe> => {
-        const { assets, publicId, ...rest } = recipe;
+        const { assets, publicId, linkedProducts, ...rest } = recipe;
         const updatedRecipe = await tx.recipe.update({
           data: { ...rest },
           where: { id: check.id },
@@ -66,6 +54,32 @@ export const updateRecipe = async (recipe: UpdateRecipeProps) => {
             };
           }),
         });
+        await tx.recipeProduct.deleteMany({
+          where: {
+            recipeId: updatedRecipe.id,
+          },
+        });
+        const products = await tx.product.findMany({
+          where: {
+            publicId: {
+              in: linkedProducts.map((ele) => ele.publicId),
+            },
+          },
+        });
+
+        await tx.recipeProduct.createMany({
+          data: products.map((ele) => {
+            return {
+              productId: ele.id,
+              quantity:
+                linkedProducts.find(
+                  (product) => product.publicId === ele.publicId,
+                )?.quantity || 1,
+              recipeId: updatedRecipe.id,
+            };
+          }),
+        });
+
         // @ts-ignore
         return updatedRecipe;
       },

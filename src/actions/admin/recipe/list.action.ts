@@ -12,7 +12,7 @@ interface Filters {
 }
 
 export const listRecipe = async (
-  filters: Filters = {}
+  filters: Filters = {},
 ): Promise<PaginatedResponse<Recipe>> => {
   const { showPublishedOnly = false, q, limit = 10, page = 1 } = filters;
 
@@ -21,18 +21,36 @@ export const listRecipe = async (
   const skip = (safePage - 1) * safeLimit;
 
   const where: Prisma.RecipeWhereInput = {
-    isDeleted: false,
     ...(showPublishedOnly && { isPublished: true }),
     ...(q && {
       OR: [{ title: { contains: q, mode: "insensitive" } }],
     }),
   };
 
-  const [total, collections] = await db.$transaction([
+  const [total, recipes] = await db.$transaction([
     db.recipe.count({ where }),
     db.recipe.findMany({
       where,
       include: {
+        linkedProducts: {
+          select: {
+            product: {
+              select: {
+                name: true,
+                publicId: true,
+                assets: {
+                  select: {
+                    url: true,
+                    thumbnail: true,
+                    type: true,
+                    isPrimary: true,
+                    position: true,
+                  },
+                },
+              },
+            },
+          },
+        },
         assets: {
           select: {
             url: true,
@@ -50,12 +68,14 @@ export const listRecipe = async (
   ]);
 
   const totalPages = Math.ceil(total / safeLimit);
-  const data = collections.map((collection) => {
+  const data = recipes.map((recipe) => {
     return nullToUndefined({
-      ...collection,
-      assets: collection.assets.map((ele) => {
-        const { type, ...rest } = ele;
-        return { type: ele.type as AssetType, ...rest };
+      ...recipe,
+      linkedProducts: recipe.linkedProducts.map((ele) => {
+        return { ...ele.product };
+      }),
+      assets: recipe.assets.map((ele) => {
+        return { ...ele };
       }),
     });
   });

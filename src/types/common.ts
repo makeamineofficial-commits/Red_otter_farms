@@ -24,3 +24,10 @@ export type PreviewFile = {
   type: AssetType;
 };
 
+export type Asset = {
+  url: string;
+  thumbnail: string;
+  position: number;
+  isPrimary: boolean;
+  type: any;
+};

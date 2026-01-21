@@ -12,20 +12,13 @@ type Props = {
   onChange: (value: Record<string, string>) => void;
 };
 
-export function KeyValueArrayField({ value, onChange }: Props) {
-  const [preview, setPreview] = useState<{ key: string; val: string }[]>([
-    { key: "random_key", val: "0" },
-  ]);
-  // initial update
-  useEffect(() => {
-    if (!value) return;
+export function KeyValueArrayField({ value = {}, onChange }: Props) {
+  const [preview, setPreview] = useState<{ key: string; val: string }[]>(
+    Object.keys(value).map((key) => {
+      return { key, val: value[key] };
+    }),
+  );
 
-    setPreview(
-      Object.keys(value).map((key) => {
-        return { key, val: value[key] };
-      }),
-    );
-  }, []);
   const addField = () => {
     const randomNumber = Math.floor(1000 + Math.random() * 9000);
     const newKey = `random_${randomNumber}`;

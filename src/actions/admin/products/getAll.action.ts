@@ -1,12 +1,13 @@
 "use server";
 import { validateAdmin } from "@/actions/auth/admin.action";
 import { db } from "@/lib/db";
-export const getAllCategory = async (): Promise<
+import { Asset } from "@/types/common";
+export const getAllProducts = async (): Promise<
   { publicId: string; name: string }[]
 > => {
   try {
     await validateAdmin();
-    return db.category.findMany({
+    return db.product.findMany({
       select: {
         publicId: true,
         name: true,

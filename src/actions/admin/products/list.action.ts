@@ -23,7 +23,6 @@ export const listProduct = async (
   const skip = (safePage - 1) * safeLimit;
 
   const where: Prisma.ProductWhereInput = {
-    isDeleted: false,
     ...(showPublishedOnly && { isPublished: true }),
     ...(q && {
       OR: [{ name: { contains: q, mode: "insensitive" } }],
@@ -68,8 +67,9 @@ export const listProduct = async (
       ...product,
       categories: product.categories.map((c) => c.category),
       description: product.description ?? undefined,
+      nutritionalInfo: product.nutritionalInfo as any,
       assets: product.assets.map((ele) => {
-        return { ...ele, type: ele.type as AssetType };
+        return { ...ele };
       }),
     });
   });
@@ -80,7 +80,6 @@ export const listProduct = async (
     next: safePage < totalPages ? safePage + 1 : null,
     total,
     totalPages,
-    // @ts-ignore
     data,
   };
 };

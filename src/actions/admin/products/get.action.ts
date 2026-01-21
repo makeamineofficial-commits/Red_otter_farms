@@ -45,7 +45,7 @@ export const getProduct = async ({
     categories: product.categories.map((c) => c.category),
     description: product.description ?? undefined,
     assets: product.assets.map((ele) => {
-      return { ...ele, type: ele.type as AssetType };
+      return { ...ele };
     }),
   });
 

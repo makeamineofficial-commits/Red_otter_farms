@@ -1,5 +1,5 @@
 import z from "zod";
-import { AssetType } from "./common";
+import { Asset, AssetType } from "./common";
 
 export interface ProductPropsBase {
   name: string;
@@ -25,13 +25,7 @@ export interface ProductPropsBase {
   servingUnit: string;
 
   nutritionalInfo: Record<string, number>;
-  assets: {
-    url: string;
-    thumbnail: string;
-    position: number;
-    isPrimary: boolean;
-    type: AssetType;
-  }[];
+  assets: Asset[];
 
   inStock: boolean;
   isPublished: boolean;

@@ -17,6 +17,25 @@ export const getRecipe = async ({
       publicId,
     },
     include: {
+      linkedProducts: {
+        select: {
+          product: {
+            select: {
+              name: true,
+              publicId: true,
+              assets: {
+                select: {
+                  url: true,
+                  thumbnail: true,
+                  type: true,
+                  isPrimary: true,
+                  position: true,
+                },
+              },
+            },
+          },
+        },
+      },
       assets: {
         select: {
           url: true,
@@ -31,10 +50,11 @@ export const getRecipe = async ({
   if (!product) return { success: false, message: "Recipe details not found" };
   const data = nullToUndefined({
     ...product,
-
-    description: product.contentHTML ?? undefined,
+    linkedProducts: product.linkedProducts.map((ele) => {
+      return { ...ele.product };
+    }),
     assets: product.assets.map((ele) => {
-      return { ...ele, type: ele.type as AssetType };
+      return { ...ele };
     }),
   });
 

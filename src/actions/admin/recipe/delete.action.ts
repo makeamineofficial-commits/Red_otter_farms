@@ -26,6 +26,16 @@ export const deleteRecipe = async (Recipe: DeleteRecipeProps) => {
         const deletedRecipe = await tx.recipe.delete({
           where: { id: check.id },
         });
+        await tx.recipeAsset.deleteMany({
+          where: {
+            recipeId: deletedRecipe.id,
+          },
+        });
+        await tx.recipeProduct.deleteMany({
+          where: {
+            recipeId: deletedRecipe.id,
+          },
+        });
         return deletedRecipe;
       },
     );

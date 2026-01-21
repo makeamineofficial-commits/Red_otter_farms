@@ -21,7 +21,6 @@ export const listCategories = async (
   const skip = (safePage - 1) * safeLimit;
 
   const where: Prisma.CategoryWhereInput = {
-    isDeleted: false,
     ...(showPublishedOnly && { isPublished: true }),
     ...(q && {
       OR: [{ name: { contains: q, mode: "insensitive" } }],

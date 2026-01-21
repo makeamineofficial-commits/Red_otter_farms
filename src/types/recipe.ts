@@ -1,21 +1,26 @@
-import { AssetType } from "./common";
+import { Asset, AssetType } from "./common";
 
-export interface RecipeProps {
+export interface RecipePropsBase {
   title: string;
   summary: string;
-  contentHTML: string;
-  sharableLink: string;
-  assets: {
-    url: string;
-    thumbnail: string;
-    position: number;
-    isPrimary: boolean;
-    type: AssetType;
-  }[];
+  ingredients: string[];
+  chefTips: string[];
+  instructions: string[];
+  nutritionalInfo?: any;
+  assets: Asset[];
   isPublished: boolean;
 }
 
-export interface Recipe extends RecipeProps {
+export interface RecipeProps extends RecipePropsBase {
+  linkedProducts: { publicId: string; quantity: number }[];
+}
+export interface Recipe extends RecipePropsBase {
   publicId: string;
   slug: string;
+
+  linkedProducts: {
+    name: string;
+    publicId: string;
+    assets: Asset[];
+  }[];
 }
