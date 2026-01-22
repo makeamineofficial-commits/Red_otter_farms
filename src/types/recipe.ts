@@ -10,6 +10,11 @@ export interface RecipePropsBase {
   nutritionalInfo?: any;
   assets: Asset[];
   isPublished: boolean;
+
+  cookingTime: string;
+  difficulty: string;
+  serving: string;
+  prepTime: string;
 }
 
 export interface RecipeProps extends RecipePropsBase {

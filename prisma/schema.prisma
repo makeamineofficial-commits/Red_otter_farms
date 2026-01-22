@@ -103,6 +103,8 @@ model Product {
   isPublished Boolean @default(true)
   isFeatured  Boolean @default(false)
 
+  quantity Int @default(0)
+
   lastUpdatedById String?
   lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
 
@@ -237,6 +239,12 @@ model Recipe{
   chefTips    String[]
   ingredients String[]
   nutritionalInfo Json?
+
+
+  cookingTime String @default("")
+  difficulty String @default("")
+  serving String @default("") 
+  prepTime String @default("")
   
   linkedProducts RecipeProduct[] 
   

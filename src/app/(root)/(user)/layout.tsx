@@ -10,6 +10,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
       {children}
       <Newsletter></Newsletter>
       <Footer></Footer>
+
       <Toaster></Toaster>
     </body>
   );

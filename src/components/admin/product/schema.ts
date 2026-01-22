@@ -12,7 +12,7 @@ export const productSchema = z.object({
 
   categories: z.array(z.string()),
   healthBenefits: z.array(z.string()),
-
+  quantity: z.coerce.number().min(0),
   // ===== PRICING =====
   mrp: z.coerce.number().min(0),
   price: z.coerce.number().min(0),
@@ -64,7 +64,7 @@ export const updateProductSchema = z.object({
 
   categories: z.array(z.string()),
   healthBenefits: z.array(z.string()),
-
+  quantity: z.coerce.number().min(0),
   // ===== PRICING =====
   mrp: z.coerce.number().min(0),
   price: z.coerce.number().min(0),

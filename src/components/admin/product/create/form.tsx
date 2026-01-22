@@ -49,6 +49,7 @@ export default function CreateProductForm() {
       mrp: 0,
       price: 0,
       weight: 0,
+      quantity: 0,
       height: 0,
       width: 0,
       breadth: 0,
@@ -150,7 +151,7 @@ export default function CreateProductForm() {
               )}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <FormField
               name="type"
               control={form.control}
@@ -164,6 +165,21 @@ export default function CreateProductForm() {
                 </FormItem>
               )}
             />
+
+            <FormField
+              name="quantity"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantity</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...numberField(field)} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               name="categories"
               control={form.control}

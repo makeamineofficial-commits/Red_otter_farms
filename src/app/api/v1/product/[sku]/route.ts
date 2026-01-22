@@ -3,9 +3,9 @@ import { db } from "@/lib/db";
 import { Prisma } from "../../../../../../generated/prisma/client";
 export async function PATCH(
   req: NextRequest,
-  context: { params: Promise<{ sku: string }> }
+  context: { params: Promise<{ sku: string }> },
 ) {
-  const { price, inStock } = await req.json();
+  const { price, inStock, quantity } = await req.json();
   const { sku } = await context.params;
 
   try {
@@ -21,16 +21,16 @@ export async function PATCH(
           success: false,
           message: "Product details not found",
         },
-        { status: 404 }
+        { status: 404 },
       );
     const updatedProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
         const updatedProduct = await tx.product.update({
-          data: { inStock, price },
+          data: { inStock, price, quantity },
           where: { id: check.id },
         });
         return updatedProduct;
-      }
+      },
     );
 
     return NextResponse.json(
@@ -39,12 +39,12 @@ export async function PATCH(
         message: "Product updated successfully",
         product: updatedProduct,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (err) {
     return NextResponse.json(
       { success: false, message: "Failed to update product" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -33,6 +33,10 @@ export const recipeSchema = z.object({
       publicId: z.string(),
     }),
   ),
+  cookingTime: z.string(),
+  difficulty: z.string(),
+  serving: z.string(),
+  prepTime: z.string(),
   instructions: z.array(z.string().min(1)),
   tags: z.array(z.string().min(1)),
   ingredients: z.array(z.string().min(1)),
@@ -65,6 +69,10 @@ export default function CreateRecipeForm() {
       isPublished: false,
       assets: [],
       tags: [],
+      cookingTime: "",
+      difficulty: "",
+      serving: "",
+      prepTime: "",
     },
   });
 
@@ -123,6 +131,64 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
+        <div className="grid grid-cols-4">
+          <FormField
+            control={form.control}
+            name="cookingTime"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Cooking Time</FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-full"
+                    placeholder="Cooking time for the recipe..."
+                    {...field}
+                  />
+                </FormControl>{" "}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Serving</FormLabel>
+                <FormControl>
+                  <TagInput placeholder="Tags for the recipe..." {...field} />
+                </FormControl>{" "}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <TagInput placeholder="Tags for the recipe..." {...field} />
+                </FormControl>{" "}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <TagInput placeholder="Tags for the recipe..." {...field} />
+                </FormControl>{" "}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <FormField
           control={form.control}
           name="assets"

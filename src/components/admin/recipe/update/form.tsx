@@ -37,6 +37,10 @@ export const recipeSchema = z.object({
       publicId: z.string(),
     }),
   ),
+  cookingTime: z.string(),
+  difficulty: z.string(),
+  serving: z.string(),
+  prepTime: z.string(),
   tags: z.array(z.string().min(1)) ?? [],
   instructions: z.array(z.string().min(1)),
   ingredients: z.array(z.string().min(1)),
@@ -71,6 +75,10 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
       assets: recipe.assets,
       slug: recipe.slug,
       tags: recipe.tags,
+      cookingTime: recipe.cookingTime,
+      difficulty: recipe.difficulty,
+      serving: recipe.serving,
+      prepTime: recipe.prepTime,
     },
   });
 

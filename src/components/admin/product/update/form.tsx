@@ -42,6 +42,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
       healthBenefits: product.healthBenefits,
       weightUnit: product.weightUnit,
       dimension: product.dimension,
+      quantity: product.quantity,
       servingUnit: product.weightUnit,
       assets: product.assets,
       inStock: product.inStock,
@@ -151,7 +152,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
               )}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3  gap-4">
             <FormField
               name="type"
               control={form.control}
@@ -165,6 +166,20 @@ export default function UpdateProductForm({ product }: { product: Product }) {
                 </FormItem>
               )}
             />
+            <FormField
+              name="quantity"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantity</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...numberField(field)} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               name="slug"
               control={form.control}

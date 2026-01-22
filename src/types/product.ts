@@ -9,7 +9,7 @@ export interface ProductPropsBase {
   healthBenefits: string[];
   type: string;
   description?: string;
-
+  quantity: number;
   mrp: number;
   price: number;
 
