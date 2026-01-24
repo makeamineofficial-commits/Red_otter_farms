@@ -27,7 +27,10 @@ export default function Process() {
           // defaultValue="item-1"
           className=""
         >
-          <AccordionItem value="item-1" className="border-b border-b-forest">
+          <AccordionItem
+            value="item-1"
+            className="border-b border-b-forest data-[state=open]:bg-herbal p-4 px-10!"
+          >
             <AccordionTrigger className="text-[1.725rem] font-light tracking-[1.42px] w-full">
               Where does your produce come from?
             </AccordionTrigger>
@@ -38,7 +41,7 @@ export default function Process() {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="item-2" className="border-b border-b-forest">
+          <AccordionItem value="item-2" className="border-b border-b-forest data-[state=open]:bg-herbal p-4 px-10!">
             <AccordionTrigger className="text-[1.725rem] font-light tracking-[1.42px] w-full">
               From local farms to your table.
             </AccordionTrigger>
@@ -50,7 +53,7 @@ export default function Process() {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="item-3" className="border-b border-b-forest">
+          <AccordionItem value="item-3" className="border-b border-b-forest data-[state=open]:bg-herbal p-4 px-10!">
             <AccordionTrigger className="text-[1.725rem] font-light tracking-[1.42px] w-full">
               The journey of freshness.
             </AccordionTrigger>

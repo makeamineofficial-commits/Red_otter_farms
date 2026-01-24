@@ -20,7 +20,7 @@ function AccordionItem({
     <AccordionPrimitive.Item
       data-slot="accordion-item"
       className={cn(
-        "border-b  bg-transparent data-[state=open]:bg-herbal transition-all duration-200 p-4 px-10! ",
+        "border-b  bg-transparent  transition-all duration-200 ",
         className,
       )}
       {...props}
@@ -28,11 +28,16 @@ function AccordionItem({
   );
 }
 
+// 
+
 function AccordionTrigger({
   className,
   children,
+  showCross = true,
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
+  showCross?: boolean;
+}) {
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
@@ -44,7 +49,9 @@ function AccordionTrigger({
         {...props}
       >
         {children}
-        <X className="text-muted-foreground pointer-events-none size-6 shrink-0   duration-200" />
+        {showCross && (
+          <X className="text-muted-foreground pointer-events-none size-6 shrink-0   duration-200" />
+        )}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   );

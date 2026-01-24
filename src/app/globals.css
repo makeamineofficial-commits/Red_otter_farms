@@ -54,6 +54,7 @@
   --color-forest: hsla(141, 100%, 15%, 1);
   --color-herbal: hsla(100, 12%, 90%, 1);
   --color-offwhite: hsla(0, 0%, 84%, 1);
+  --color-maroon: hsla(12, 76%, 45%, 1);
 }
 
 :root {
@@ -212,7 +213,6 @@
 .w-md-editor-text-pre {
   color: var(--color-primary) !important;
 }
-
 
 @keyframes marquee {
   0% {
