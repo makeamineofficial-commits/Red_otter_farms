@@ -222,7 +222,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden md:block">
+      <aside className="hidden md:block no-scrollbar overflow-y-auto">
         <SidebarComponent />
       </aside>
 
@@ -233,7 +233,7 @@ export default function Sidebar() {
         ></div>
       )}
       <aside
-        className={`block absolute top-0 left-0 z-100 bg-white h-screen pt-5 md:hidden ${isOpen ? "max-w-60" : "max-w-0"} overflow-hidden transition-all duration-200`}
+        className={`block absolute overflow-y-auto no-scrollbar top-0 left-0 z-100 bg-white h-screen pt-5 md:hidden ${isOpen ? "max-w-60" : "max-w-0"} overflow-hidden transition-all duration-200`}
       >
         <SidebarComponent />
       </aside>
