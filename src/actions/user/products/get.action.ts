@@ -1,9 +1,7 @@
 "use server";
 import { db } from "@/lib/db";
 import { Product } from "@/types/product";
-import { AssetType } from "@/types/common";
 import { nullToUndefined } from "@/lib/utils";
-import { validateAdmin } from "@/actions/auth/admin.action";
 
 export const getProduct = async ({
   slug,
@@ -14,7 +12,6 @@ export const getProduct = async ({
   success: boolean;
   message: string;
 }> => {
-  await validateAdmin();
 
   const product = await db.product.findUnique({
     where: {
@@ -32,17 +29,7 @@ export const getProduct = async ({
           },
         },
       },
-      categories: {
-        include: {
-          category: {
-            select: {
-              name: true,
-              slug: true,
-              publicId: true,
-            },
-          },
-        },
-      },
+
       assets: {
         select: {
           url: true,
@@ -57,7 +44,7 @@ export const getProduct = async ({
   if (!product) return { success: true, message: "Product details found" };
   const data = nullToUndefined({
     ...product,
-    categories: product.categories.map((c) => c.category),
+    categories: [],
     description: product.description ?? undefined,
     recipes: product.linkedRecipes.map((ele) => ele.recipe),
     assets: product.assets.map((ele) => {
