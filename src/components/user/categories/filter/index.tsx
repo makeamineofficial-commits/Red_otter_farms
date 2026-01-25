@@ -8,31 +8,46 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Sliders, X } from "lucide-react";
-const DEFAULT_PRICE = [230];
+import { useProductListingStore } from "@/store/user/products.store";
+const DEFAULT_PRICE = [300];
 
 const categories = [
-  { label: "All Products", slug: "all" },
   { label: "Fruits", slug: "fruits" },
   { label: "Cheese", slug: "cheese" },
   { label: "Vegetables", slug: "vegetables" },
   { label: "Salads", slug: "salads" },
   { label: "Dairy Products", slug: "dairy-products" },
   { label: "Soups", slug: "soups" },
-  { label: "Flour & Grain", slug: "flour-grain" },
+  { label: "Flour & Grain", slug: "flour" },
 ];
 
 function FilterSection({ children }: { children?: ReactNode }) {
+  const { data } = useProductListingStore();
   const router = useRouter();
   const pathname = usePathname();
   const [inStock, setInStock] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [price, setPrice] = useState<number[]>(DEFAULT_PRICE);
 
+  const updateQuery = (params: Record<string, string | undefined>) => {
+    const search = new URLSearchParams(window.location.search);
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === "") {
+        search.delete(key);
+      } else {
+        search.set(key, value);
+      }
+    });
+
+    router.push(`${pathname}?${search.toString()}`);
+  };
+
   const handleCategoryClick = (slug: string) => {
     setInStock(true);
     setPrice(DEFAULT_PRICE);
     setSelectedCategories([slug]);
-    router.push(`/collections/${slug}`);
+    router.push(`/categories/${slug}`);
   };
 
   return (
@@ -47,8 +62,16 @@ function FilterSection({ children }: { children?: ReactNode }) {
       <div className="space-y-2">
         <p className="text-xs font-semibold ">By Stock</p>
         <div className="flex items-center justify-between">
-          <span className="text-sm">In Stock (28+)</span>
-          <Switch checked={inStock} onCheckedChange={setInStock} />
+          <span className="text-sm">
+            In Stock {data ? <>({data.total}+)</> : <></>}
+          </span>
+          <Switch
+            checked={inStock}
+            onCheckedChange={(checked) => {
+              setInStock(checked);
+              updateQuery({ inStock: checked ? "true" : undefined, page: "1" });
+            }}
+          />
         </div>
       </div>
 
@@ -59,6 +82,16 @@ function FilterSection({ children }: { children?: ReactNode }) {
         <p className="text-xs font-semibold ">By Category</p>
 
         <div className="space-y-2">
+          <div key={"all"} className="flex items-center gap-2 text-sm">
+            <Checkbox
+              id={"all"}
+              checked={pathname === "/categories"}
+              onCheckedChange={() => handleCategoryClick("")}
+            />
+            <label htmlFor={"all"} className="cursor-pointer leading-none">
+              All Products
+            </label>
+          </div>
           {categories.map((category) => (
             <div
               key={category.slug}
@@ -88,10 +121,15 @@ function FilterSection({ children }: { children?: ReactNode }) {
           <p className="text-xs font-medium text-muted-foreground">By Price</p>
           <Badge variant="secondary">₹{price[0]}</Badge>
         </div>
-
         <Slider
           value={price}
-          onValueChange={setPrice}
+          onValueChange={(val) => {
+            setPrice(val);
+            updateQuery({
+              maxPrice: String(val[0]),
+              page: "1",
+            });
+          }}
           max={300}
           min={30}
           step={10}
@@ -134,7 +172,7 @@ export default function Filter() {
             <X
               className="absolute top-5 right-4"
               onClick={() => setOpen((prev) => !prev)}
-             ></X>
+            ></X>
           </FilterSection>
         </div>
       </nav>

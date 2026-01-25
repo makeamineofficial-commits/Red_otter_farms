@@ -5,10 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Clock, Flame, Users, BarChart3, Heart, Share2 } from "lucide-react";
-
-export default function RecipeHero() {
+import { Recipe } from "@/types/recipe";
+import RecipeBreadcrumb from "../breadcrumb";
+import { Share } from "@/components/common/share";
+export default function RecipeHero({
+  cookingTime,
+  difficulty,
+  serving,
+  prepTime,
+  title,
+  summary,
+}: Recipe) {
   return (
-    <section className=" -mt-85 md:-mt-55 relative space-y-5">
+    <section className=" -mt-60 md:-mt-55 relative space-y-5">
       <div className="text-white z-30 ">
         <div className="max-w-4xl space-y-4">
           {/* Tags */}
@@ -28,16 +37,10 @@ export default function RecipeHero() {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl font-bold tracking-tight">
-            Mediterranean Veggie Salad Bowl
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
 
           {/* Description */}
-          <p className="max-w-2xl text-sm text-white/90">
-            A vibrant and nutritious salad featuring fresh vegetables, creamy
-            feta cheese, and a zesty lemon dressing. Packed with vitamins,
-            minerals, and antioxidants.
-          </p>
+          <p className="max-w-2xl text-sm text-white/90">{summary}</p>
         </div>
       </div>
 
@@ -46,10 +49,14 @@ export default function RecipeHero() {
         <div className="flex flex-col gap-6  md:justify-between">
           {/* Stats */}
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            <InfoItem icon={<Clock />} label="Prep Time" value="10 min" />
-            <InfoItem icon={<Flame />} label="Cook Time" value="15 min" />
-            <InfoItem icon={<Users />} label="Servings" value="4" />
-            <InfoItem icon={<BarChart3 />} label="Difficulty" value="Easy" />
+            <InfoItem icon={<Clock />} label="Prep Time" value={prepTime} />
+            <InfoItem icon={<Flame />} label="Cook Time" value={cookingTime} />
+            <InfoItem icon={<Users />} label="Servings" value={serving} />
+            <InfoItem
+              icon={<BarChart3 />}
+              label="Difficulty"
+              value={difficulty}
+            />
           </div>
 
           {/* Actions */}
@@ -58,10 +65,12 @@ export default function RecipeHero() {
               <Heart className="h-4 w-4" />
               Save Recipe
             </Button>
-            <Button variant="outline" className="gap-2">
-              <Share2 className="h-4 w-4" />
-              Share
-            </Button>
+            <Share>
+              <Button variant="outline" className="gap-2">
+                <Share2 className="h-4 w-4" />
+                Share
+              </Button>
+            </Share>
           </div>
         </div>
       </Card>

@@ -45,3 +45,11 @@ export interface Product extends ProductPropsBase {
     name: string;
   }[];
 }
+
+export enum SortBy {
+  BEST_SELLING = "best-selling",
+  PRICE_LOW = "price-low",
+  PRICE_HIGH = "price-high",
+  LATEST = "latest",
+  NONE = "all",
+}

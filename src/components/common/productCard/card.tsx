@@ -1,33 +1,97 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import { Minus, Plus } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
+import { useRouter } from "next/navigation";
+import { Product } from "@/types/product";
 
-export function ProductCard() {
+export function ProductCard({ name, price, mrp, assets, slug }: Product) {
+  const [api, setApi] = useState<any>(null);
+  const [current, setCurrent] = useState(0);
+  const { push } = useRouter();
+  useEffect(() => {
+    if (!api) return;
+
+    setCurrent(api.selectedScrollSnap());
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
+
   return (
-    <div className="rounded-2xl border p-3 space-y-3">
-      {/* Image */}
-      <div className="relative aspect-square rounded-xl bg-muted flex items-end justify-end p-2">
-        <Badge variant="secondary" className="text-xs">
-          1kg
-        </Badge>
-      </div>
+    <div
+      className="rounded-2xl border p-3 space-y-3 w-full"
+      onClick={() => push(`/products/${slug}`)}
+    >
+      {/* IMAGE CAROUSEL */}
+      <Carousel
+        setApi={setApi}
+        plugins={[
+          Autoplay({
+            delay: 5000,
+            stopOnInteraction: true,
+          }),
+        ]}
+        className="relative"
+      >
+        <CarouselContent>
+          {assets?.map((asset, index) => (
+            <CarouselItem key={index}>
+              <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+                <Image
+                  src={asset.url}
+                  alt={name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
 
-      {/* Title + Price */}
+        {/* DOTS */}
+        <div
+          className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          {assets?.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => api?.scrollTo(index)}
+              className={`h-2 w-2 rounded-full transition-all ${
+                current === index ? "bg-white scale-110" : "bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+      </Carousel>
+
+      {/* TITLE + PRICE */}
       <div className="space-y-1">
-        <p className="text-sm font-medium">Amla</p>
+        <p className="text-sm font-medium line-clamp-1">{name}</p>
         <p className="text-sm font-semibold">
-          ₹29.00{" "}
-          <span className="text-xs text-muted-foreground line-through">
-            ₹39.00
-          </span>
+          ₹{price}
+          {mrp && (
+            <span className="text-xs text-muted-foreground line-through ml-1">
+              ₹{mrp}
+            </span>
+          )}
         </p>
       </div>
 
-      {/* Tags */}
+      {/* TAGS */}
       <div className="flex gap-2 flex-wrap">
-        <Badge variant="outline" className="text-xs">
-          Original
-        </Badge>
         <Badge variant="outline" className="text-xs">
           Fresh
         </Badge>
@@ -36,7 +100,7 @@ export function ProductCard() {
         </Badge>
       </div>
 
-      {/* Quantity + Add to Cart */}
+      {/* QUANTITY + CART */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center border rounded-lg">
           <Button size="icon" variant="ghost">

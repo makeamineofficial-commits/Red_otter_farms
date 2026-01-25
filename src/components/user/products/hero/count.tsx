@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 export default function Count() {
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   return (
     <div className="gap-2.5 flex items-center">
       <div className="h-10  w-10 rounded-full border-2 flex items-center justify-center border-muted-foreground">

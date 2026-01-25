@@ -29,7 +29,7 @@ export function Header() {
           <Button
             key={cat.slug}
             variant={isActive ? "default" : "outline"}
-            onClick={() => router.push(`/recipes/${cat.slug}`)}
+            onClick={() => router.push(`/recipes/${cat.slug ? cat.slug : ""}`)}
             className={cn(
               "rounded-full px-5 transition-all duration-300 ease-out",
               "hover:-translate-y-0.5 active:scale-95",

@@ -1,5 +1,6 @@
-import React from "react";
 import { redirect } from "next/navigation";
+import React from "react";
+
 export default function page() {
-  redirect("/collections/all");
+  redirect("/admin/dashboard/category");
 }

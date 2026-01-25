@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
-export default function NutritionFacts() {
+import { Recipe } from "@/types/recipe";
+export default function NutritionFacts({ nutritionalInfo }: Recipe) {
   return (
     <div className="space-y-6  bg-white p-6 rounded-2xl shadow-lg">
       <div className="space-y-2">
@@ -7,17 +8,11 @@ export default function NutritionFacts() {
         <p className="text-xs text-muted-foreground">Per Serving</p>
       </div>
       <div className="space-y-2 text-sm">
-        {[
-          ["Calories", "280 kcal"],
-          ["Protein", "7 g"],
-          ["Carbs", "18 g"],
-          ["Fat", "21 g"],
-          ["Fiber", "5 g"],
-        ].map(([label, value]) => (
+        {Object.entries(nutritionalInfo).map(([label, value]) => (
           <>
             <div key={label} className="flex justify-between">
-              <span className="text-muted-foreground">{label}</span>
-              <span className="font-medium">{value}</span>
+              <span className="text-muted-foreground capitalize">{label}</span>
+              <span className="font-medium">{nutritionalInfo[label]}</span>
             </div>
             <Separator></Separator>
           </>
