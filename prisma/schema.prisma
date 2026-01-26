@@ -152,6 +152,7 @@ enum CartStatus{
 
 model Cart{
   id String @id @default(uuid())
+  sessionId String @unique @default(dbgenerated("concat('session_', gen_random_uuid())"))
   publicId String @unique @default(dbgenerated("concat('cart_', gen_random_uuid())"))
   userIdentifier  String?
   status CartStatus @default(ACTIVE)
@@ -285,4 +286,15 @@ model RecipeAsset{
   position     Int @default(0)
   isPrimary    Boolean @default(false)
   type AssetType @default(IMAGE)
+}
+
+
+model UserOTP{
+  id String @id @default(uuid())
+
+  phone String @unique 
+  otp String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

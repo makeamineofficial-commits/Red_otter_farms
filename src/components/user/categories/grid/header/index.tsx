@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { useProductListingStore } from "@/store/user/products.store";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-
+import Search from "./search";
 export function GridHeader() {
   const { data, isLoading, isFetching } = useProductListingStore();
   const { slug } = useParams();
@@ -33,24 +33,31 @@ export function GridHeader() {
           {slug ? slug.toString().replaceAll("-", " ") : "All Products"}
         </h1>
 
-        <div className="flex gap-2 items-center sm:w-fit w-full">
-          <h4 className="text-muted-foreground text-sm text-nowrap">
-            Sort By:
-          </h4>
+        <div className="flex gap-2 items-cener ">
+          <Search></Search>
+          <div className="flex gap-2 items-center sm:w-fit w-full">
+            <h4 className="text-muted-foreground text-sm text-nowrap">
+              Sort By:
+            </h4>
 
-          <Select value={currentSort} onValueChange={handleSortChange} disabled>
-            <SelectTrigger className="sm:w-44 w-full">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
+            <Select
+              value={currentSort}
+              onValueChange={handleSortChange}
+              disabled
+            >
+              <SelectTrigger className="sm:w-44 w-full">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
 
-            <SelectContent>
-              <SelectItem value="all">Select</SelectItem>
-              {/* <SelectItem value="best-selling">Best Selling</SelectItem> */}
-              <SelectItem value="price-low">Price: Low to High</SelectItem>
-              <SelectItem value="price-high">Price: High to Low</SelectItem>
-              <SelectItem value="latest">Latest</SelectItem>
-            </SelectContent>
-          </Select>
+              <SelectContent>
+                <SelectItem value="all">Select</SelectItem>
+                {/* <SelectItem value="best-selling">Best Selling</SelectItem> */}
+                <SelectItem value="price-low">Price: Low to High</SelectItem>
+                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                <SelectItem value="latest">Latest</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
     );
@@ -65,23 +72,27 @@ export function GridHeader() {
           ({data.total} Products)
         </span>
       </h1>
+      <div className="flex gap-2 items-cener ">
+        <Search></Search>
+        <div className="flex gap-2 items-center sm:w-fit w-full">
+          <h4 className="text-muted-foreground text-sm text-nowrap">
+            Sort By:
+          </h4>
 
-      <div className="flex gap-2 items-center sm:w-fit w-full">
-        <h4 className="text-muted-foreground text-sm text-nowrap">Sort By:</h4>
+          <Select value={currentSort} onValueChange={handleSortChange}>
+            <SelectTrigger className="sm:w-44 w-full">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
 
-        <Select value={currentSort} onValueChange={handleSortChange}>
-          <SelectTrigger className="sm:w-44 w-full">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-
-          <SelectContent>
-            <SelectItem value="all">Select</SelectItem>
-            {/* <SelectItem value="best-selling">Best Selling</SelectItem> */}
-            <SelectItem value="price-low">Price: Low to High</SelectItem>
-            <SelectItem value="price-high">Price: High to Low</SelectItem>
-            <SelectItem value="latest">Latest</SelectItem>
-          </SelectContent>
-        </Select>
+            <SelectContent>
+              <SelectItem value="all">Select</SelectItem>
+              {/* <SelectItem value="best-selling">Best Selling</SelectItem> */}
+              <SelectItem value="price-low">Price: Low to High</SelectItem>
+              <SelectItem value="price-high">Price: High to Low</SelectItem>
+              <SelectItem value="latest">Latest</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );

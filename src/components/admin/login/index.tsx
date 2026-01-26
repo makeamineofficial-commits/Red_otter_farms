@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { loginAdminUser } from "@/actions/admin/auth/login.action";
+import { loginAdminUser } from "@/actions/auth/admin.action";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

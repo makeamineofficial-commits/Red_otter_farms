@@ -16,7 +16,7 @@ export default function page() {
           Your farming journey at a glance
         </p>
       </div>
-      <Progress></Progress>
+      {/* <Progress></Progress> */}
 
       <div className="flex gap-4 md:flex-row flex-col">
         <Balance></Balance>

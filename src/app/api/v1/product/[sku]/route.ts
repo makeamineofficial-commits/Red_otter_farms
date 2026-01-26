@@ -1,11 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { Prisma } from "../../../../../../generated/prisma/client";
+
+const API_SECRET = process.env.API_SECRET;
+
 export async function PATCH(
   req: NextRequest,
   context: { params: Promise<{ sku: string }> },
 ) {
+  const headers = req.headers;
+  const api_secret = headers.get("API_SECRET");
+
+  if (!api_secret)
+    return NextResponse.json(
+      {
+        message: "API_SECRET missing in headers",
+      },
+      { status: 401 },
+    );
+
+  if (api_secret !== API_SECRET) {
+    return NextResponse.json(
+      {
+        message: "Unauthorized! API_SECRET didn't matched",
+      },
+      { status: 401 },
+    );
+  }
+
   const { price, inStock, quantity } = await req.json();
+
   const { sku } = await context.params;
 
   try {
@@ -26,7 +50,7 @@ export async function PATCH(
     const updatedProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
         const updatedProduct = await tx.product.update({
-          data: { inStock, price, quantity },
+          data: { inStock, price: price * 100, quantity },
           where: { id: check.id },
         });
         return updatedProduct;

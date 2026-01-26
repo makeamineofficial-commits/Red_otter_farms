@@ -36,9 +36,17 @@ export const updateProduct = async (product: UpdateProductProps) => {
       };
     const updatedProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const { sku, publicId, assets, categories: col, ...rest } = product;
+        const {
+          sku,
+          publicId,
+          price,
+          mrp,
+          assets,
+          categories: col,
+          ...rest
+        } = product;
         const updatedProduct = await tx.product.update({
-          data: { ...rest },
+          data: { price: price * 100, mrp: mrp * 100, ...rest },
           where: { id: check.id },
         });
 

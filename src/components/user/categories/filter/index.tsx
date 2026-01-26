@@ -7,8 +7,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Sliders, X } from "lucide-react";
+import { Sliders } from "lucide-react";
 import { useProductListingStore } from "@/store/user/products.store";
+import { useDebouncedCallback } from "use-debounce";
+
 const DEFAULT_PRICE = [300];
 
 const categories = [
@@ -25,6 +27,7 @@ function FilterSection({ children }: { children?: ReactNode }) {
   const { data } = useProductListingStore();
   const router = useRouter();
   const pathname = usePathname();
+
   const [inStock, setInStock] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [price, setPrice] = useState<number[]>(DEFAULT_PRICE);
@@ -33,7 +36,7 @@ function FilterSection({ children }: { children?: ReactNode }) {
     const search = new URLSearchParams(window.location.search);
 
     Object.entries(params).forEach(([key, value]) => {
-      if (value === undefined || value === "") {
+      if (!value) {
         search.delete(key);
       } else {
         search.set(key, value);
@@ -43,6 +46,24 @@ function FilterSection({ children }: { children?: ReactNode }) {
     router.push(`${pathname}?${search.toString()}`);
   };
 
+  /* ---------------- DEBOUNCED HANDLERS ---------------- */
+
+  const debouncedPriceUpdate = useDebouncedCallback((val: number[]) => {
+    updateQuery({
+      maxPrice: String(val[0]),
+      page: "1",
+    });
+  }, 400);
+
+  const debouncedStockUpdate = useDebouncedCallback((checked: boolean) => {
+    updateQuery({
+      inStock: checked ? "true" : undefined,
+      page: "1",
+    });
+  }, 300);
+
+  /* ---------------------------------------------------- */
+
   const handleCategoryClick = (slug: string) => {
     setInStock(true);
     setPrice(DEFAULT_PRICE);
@@ -51,25 +72,27 @@ function FilterSection({ children }: { children?: ReactNode }) {
   };
 
   return (
-    <div className="w-72  p-4 space-y-6 relative">
+    <div className="w-72 p-4 space-y-6 relative">
       {children}
+
+      {/* HEADER */}
       <div className="flex items-center gap-2">
         <Sliders className="rotate-90" />
         <h2 className="text-lg font-semibold">Filters</h2>
       </div>
 
-      {/* Stock */}
+      {/* STOCK */}
       <div className="space-y-2">
-        <p className="text-xs font-semibold ">By Stock</p>
+        <p className="text-xs font-semibold">By Stock</p>
         <div className="flex items-center justify-between">
           <span className="text-sm">
-            In Stock {data ? <>({data.total}+)</> : <></>}
+            In Stock {data ? <>({data.total}+)</> : null}
           </span>
           <Switch
             checked={inStock}
             onCheckedChange={(checked) => {
               setInStock(checked);
-              updateQuery({ inStock: checked ? "true" : undefined, page: "1" });
+              debouncedStockUpdate(checked);
             }}
           />
         </div>
@@ -77,21 +100,22 @@ function FilterSection({ children }: { children?: ReactNode }) {
 
       <Separator />
 
-      {/* Category */}
+      {/* CATEGORY */}
       <div className="space-y-3">
-        <p className="text-xs font-semibold ">By Category</p>
+        <p className="text-xs font-semibold">By Category</p>
 
         <div className="space-y-2">
-          <div key={"all"} className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm">
             <Checkbox
-              id={"all"}
+              id="all"
               checked={pathname === "/categories"}
               onCheckedChange={() => handleCategoryClick("")}
             />
-            <label htmlFor={"all"} className="cursor-pointer leading-none">
+            <label htmlFor="all" className="cursor-pointer">
               All Products
             </label>
           </div>
+
           {categories.map((category) => (
             <div
               key={category.slug}
@@ -102,10 +126,7 @@ function FilterSection({ children }: { children?: ReactNode }) {
                 checked={pathname.includes(category.slug)}
                 onCheckedChange={() => handleCategoryClick(category.slug)}
               />
-              <label
-                htmlFor={category.slug}
-                className="cursor-pointer leading-none"
-              >
+              <label htmlFor={category.slug} className="cursor-pointer">
                 {category.label}
               </label>
             </div>
@@ -115,20 +136,18 @@ function FilterSection({ children }: { children?: ReactNode }) {
 
       <Separator />
 
-      {/* Price */}
+      {/* PRICE */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <p className="text-xs font-medium text-muted-foreground">By Price</p>
           <Badge variant="secondary">₹{price[0]}</Badge>
         </div>
+
         <Slider
           value={price}
           onValueChange={(val) => {
             setPrice(val);
-            updateQuery({
-              maxPrice: String(val[0]),
-              page: "1",
-            });
+            debouncedPriceUpdate(val);
           }}
           max={300}
           min={30}
@@ -144,38 +163,4 @@ function FilterSection({ children }: { children?: ReactNode }) {
   );
 }
 
-export default function Filter() {
-  const [open, setOpen] = useState(false);
-  return (
-    <aside>
-      <nav className="hidden lg:block border rounded-2xl">
-        <FilterSection />
-      </nav>
-
-      <div className=" items-center gap-2  flex lg:hidden">
-        <Sliders
-          className="rotate-90"
-          size={20}
-          onClick={() => setOpen((prev) => !prev)}
-        />
-      </div>
-
-      <div
-        onClick={() => setOpen(false)}
-        className={`bg-black/30 fixed top-0 left-0 h-screen z-90 w-screen ${open ? "block lg:hidden" : "hidden"}`}
-      ></div>
-      <nav
-        className={`fixed top-0 left-0  bg-white shadow-xl h-screen block lg:hidden z-100 overflow-hidden transition-all duration-200 ${open ? "max-w-96" : "max-w-0"} `}
-      >
-        <div className="p-4">
-          <FilterSection>
-            <X
-              className="absolute top-5 right-4"
-              onClick={() => setOpen((prev) => !prev)}
-            ></X>
-          </FilterSection>
-        </div>
-      </nav>
-    </aside>
-  );
-}
+export default FilterSection;

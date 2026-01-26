@@ -4,8 +4,11 @@ import { cookies } from "next/headers";
 import { generateJWT } from "@/utils/jwt.util";
 import { redirect } from "next/navigation";
 import { validateToken } from "@/utils/jwt.util";
+import { db } from "@/lib/db";
+import { sendOTP, verifyOTP } from "@/utils/otp.util";
+import { success } from "zod";
 
-export const validateUser = async () => {
+const validateUser = async () => {
   const cookieStore = await cookies();
 
   const accessToken = cookieStore.get("access-token")?.value;
@@ -15,7 +18,7 @@ export const validateUser = async () => {
   const refreshPayload = await validateToken(refreshToken);
 
   if (!accessPayload && !refreshPayload) {
-    redirect("/");
+    redirect("/?action=SESSION_EXPIRED");
   }
 
   if (!accessPayload && refreshPayload) {
@@ -34,12 +37,11 @@ export const validateUser = async () => {
   }
 
   return {
-    id: accessPayload!.id,
-    email: accessPayload!.email,
+    phone: refreshPayload!.phone,
   };
 };
 
-export const isValidateUser = async () => {
+const isValidateUser = async () => {
   const cookieStore = await cookies();
 
   const accessToken = cookieStore.get("access-token")?.value;
@@ -51,28 +53,64 @@ export const isValidateUser = async () => {
   if (!accessPayload && !refreshPayload) {
     return false;
   }
+  // even with expired access token they are considered logged in
+  return true;
+};
 
-  if (!accessPayload && refreshPayload) {
-    const newAccessToken = await generateJWT({
-      id: refreshPayload.id,
-      email: refreshPayload.email,
-    });
+async function logout() {
+  const cookieStore = await cookies();
+  cookieStore.delete("access-token");
+  cookieStore.delete("refresh-token");
+  redirect("/");
+}
 
-    cookieStore.set("access-token", newAccessToken, {
+const loginUser = async (data: { phone: string; type?: string }) => {
+  try {
+    await sendOTP(data);
+    return {
+      success: true,
+      message: "OTP sent to your phone successfully",
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      success: false,
+      message: "Failed to send OTP to your phone",
+    };
+  }
+};
+
+const verifyUser = async ({ otp }: { otp: string }) => {
+  try {
+    const phone = await verifyOTP(otp);
+    const accessToken = await generateJWT({ phone });
+    const refreshToken = await generateJWT({ phone }, "30d");
+    const cookieStore = await cookies();
+    cookieStore.set("access-token", accessToken, {
       httpOnly: true,
       secure: true,
       sameSite: true,
       maxAge: 60 * 15,
       path: "/",
     });
+    cookieStore.set("refresh-token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: true,
+      maxAge: 60 * 60 * 24 * 30,
+      path: "/",
+    });
+    return {
+      success: true,
+      message: "Your phone no has been verified",
+    };
+  } catch (err: any) {
+    console.log(err);
+    return {
+      success: false,
+      message: err.message,
+    };
   }
-
-  return true;
 };
 
-export async function logout() {
-  const cookieStore = await cookies();
-  cookieStore.delete("access-token");
-  cookieStore.delete("refresh-token");
-  redirect("/");
-}
+export { logout, isValidateUser, validateUser, loginUser, verifyUser };

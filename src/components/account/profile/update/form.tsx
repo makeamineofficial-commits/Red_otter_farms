@@ -20,6 +20,8 @@ import {
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAccountStore } from "@/store/user/account.store";
+import { useEffect } from "react";
 
 const indianMobileRegex = /^[6-9]\d{9}$/;
 
@@ -47,18 +49,26 @@ export const profileSchema = z.object({
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileForm() {
+  const { data, isFetching, isLoading } = useAccountStore();
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      firstName: data?.first_name,
+      lastName: data?.last_name,
       email: "",
-      phone: "",
+      phone: data?.phone,
       age: undefined,
       familySize: undefined,
       familyMemberType: undefined,
     },
   });
+
+  useEffect(() => {
+    if (!data) return;
+    form.setValue("firstName", data.first_name);
+    form.setValue("lastName", data.last_name);
+    form.setValue("phone", data.phone);
+  }, [data]);
 
   const onSubmit = (values: ProfileFormValues) => {
     console.log("PROFILE SUBMIT", values);
@@ -78,7 +88,11 @@ export default function ProfileForm() {
             <FormItem>
               <FormLabel>First Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter first name" {...field} />
+                <Input
+                  disabled={isLoading || isFetching}
+                  placeholder="Enter first name"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -93,7 +107,11 @@ export default function ProfileForm() {
             <FormItem>
               <FormLabel>Last Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter last name" {...field} />
+                <Input
+                  disabled={isLoading || isFetching}
+                  placeholder="Enter last name"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -108,7 +126,11 @@ export default function ProfileForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter email" {...field} />
+                <Input
+                  disabled={isLoading || isFetching}
+                  placeholder="Enter email"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -123,7 +145,12 @@ export default function ProfileForm() {
             <FormItem>
               <FormLabel>Phone (optional)</FormLabel>
               <FormControl>
-                <Input placeholder="10-digit mobile number" {...field} />
+                <Input
+                  readOnly
+                  disabled
+                  placeholder="10-digit mobile number"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -139,6 +166,7 @@ export default function ProfileForm() {
               <FormLabel>Age</FormLabel>
               <FormControl>
                 <Input
+                  disabled={isLoading || isFetching}
                   type="number"
                   placeholder="Enter age"
                   value={field.value ?? ""}
@@ -163,7 +191,10 @@ export default function ProfileForm() {
               <FormLabel>Family Size</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="w-150">
+                  <SelectTrigger
+                    disabled={isLoading || isFetching}
+                    className="w-150"
+                  >
                     <SelectValue placeholder="Select family size" />
                   </SelectTrigger>
                 </FormControl>
@@ -188,7 +219,10 @@ export default function ProfileForm() {
               <FormLabel>Family Type</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="w-150">
+                  <SelectTrigger
+                    disabled={isLoading || isFetching}
+                    className="w-150"
+                  >
                     <SelectValue placeholder="Select family type" />
                   </SelectTrigger>
                 </FormControl>

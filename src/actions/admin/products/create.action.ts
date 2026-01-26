@@ -23,8 +23,10 @@ export const createProduct = async (product: ProductProps) => {
       };
     const newProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const { assets, categories: col, ...rest } = product;
-        const newProduct = await tx.product.create({ data: { slug, ...rest } });
+        const { assets, categories: col, price, mrp, ...rest } = product;
+        const newProduct = await tx.product.create({
+          data: { slug, price: price * 100, mrp: mrp * 100, ...rest },
+        });
         const categorys = await tx.category.findMany({
           where: {
             publicId: {
