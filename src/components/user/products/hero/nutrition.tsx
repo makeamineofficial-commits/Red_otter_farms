@@ -7,7 +7,7 @@ export default function Nutrition({ nutritionalInfo }: Product) {
       {Object.entries(nutritionalInfo).map(([key]) => (
         <Badge
           variant={"outline"}
-          className="text-[1.125rem] rounded-md! border-black/50!"
+          className="text-[1rem] rounded-full! px-3.5! border-black/50!"
         >
           <span className="text-muted-foreground capitalize">{key}</span>{" "}
           <span className="font-medium">{nutritionalInfo[key]}</span>

@@ -10,7 +10,7 @@ export default function Ingredients({ ingredients }: Recipe) {
       <ul className="space-y-2 text-sm">
         {ingredients.map((item) => (
           <li key={item} className="flex items-start gap-2">
-            <CheckCircle2 className="size-4 text-emerald-500 mt-0.5" />
+            <CheckCircle2 className="size-4 text-forest mt-0.5" />
             <span>{item}</span>
           </li>
         ))}

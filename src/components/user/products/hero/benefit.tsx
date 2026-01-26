@@ -8,7 +8,7 @@ export default function Benefit({ healthBenefits }: Product) {
       {healthBenefits.map((ele) => (
         <Badge
           variant={"outline"}
-          className="text-[0.75rem] bg-muted px-3! border-black/50!"
+          className="text-[1rem] capitalize px-3! bg-white text-forest border-forest"
         >
           <Leaf></Leaf>
           {ele}

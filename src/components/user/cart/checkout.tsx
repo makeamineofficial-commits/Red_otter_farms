@@ -17,8 +17,9 @@ export default function Checkout() {
   return (
     <div className="bg-white w-full p-4 border-t">
       <Button
-        className="w-full py-4 h-auto! text-base"
+        className="w-full py-4 h-auto! text-base text-forest bg-white border-forest hover:bg-forest hover:text-white"
         size="lg"
+        variant={"outline"}
         disabled={isDisabled}
       >
         {`Checkout ₹${formatPrice(total)}`}

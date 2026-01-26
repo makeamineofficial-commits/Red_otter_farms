@@ -17,23 +17,28 @@ export default function Hero() {
 
   const { type, displayName, description, price, mrp } = data;
   return (
-    <article className="w-full xl:min-w-150 space-y-2">
-      <h2 className="uppercase font-semibold text-[0.875rem] tracking-[0.6px]">
+    <article className="w-full xl:min-w-150 space-y-5">
+      <h2 className="uppercase font-semibold text-forest text-[0.875rem] tracking-[0.6px]">
         {type}
       </h2>
 
       <Nutrition {...data}></Nutrition>
 
-      <h1 className="text-[2.375rem] leading-[120%]">
-        <span>{displayName}</span>
-      </h1>
-      <p className="text-[1.125rem] font-light">{description}</p>
+      <div className="space-y-1.5">
+        <h1 className="text-[2.375rem] leading-[120%] font-semibold">
+          <span>{displayName}</span>
+        </h1>
+        <p className="text-[1.125rem] font-light">{description}</p>
+      </div>
 
-      <div className="mt-13">
-        <div className="flex items-center gap-4.5">
+      <Benefit {...data}></Benefit>
+      <div className="mt-9">
+        <div className="flex items-end gap-2  ">
           {price != mrp ? (
             <>
-              <p className="text-[1.875rem] font-bold">₹{formatPrice(price)}</p>
+              <p className="text-[1.875rem] text-forest leading-none font-bold align-bottom">
+                ₹{formatPrice(price)}
+              </p>
               <p className="text-muted-foreground line-through">
                 ₹{formatPrice(mrp)}
               </p>
@@ -46,24 +51,22 @@ export default function Hero() {
         </div>
       </div>
 
-      <Benefit {...data}></Benefit>
-
       <div className="flex items-center justify-center gap-4 flex-col w-full mt-4">
         <Count {...data} />
 
         <Button
           variant={"outline"}
-          className="w-full h-14!  border-black border-2 font-bold"
+          className="w-full h-14!   border-forest text-forest hover:bg-white border-2 font-bold"
           size="lg"
         >
           Subscribe (₹21.5)
         </Button>
         <div className="bg-muted flex items-center gap-3.25 w-full p-3 rounded-md">
           <div className="bg-muted-foreground/10 flex items-center rounded-full justify-center p-2">
-            <Star className="fill-black"></Star>
+            <Star className="fill-forest"></Star>
           </div>
 
-          <div className="text-[0.75rem]">
+          <div className="text-[0.75rem] text-forest">
             <h2 className="font-bold">Loyalty Reward</h2>
             <p>Earn 50 pts with this purchase</p>
           </div>
@@ -71,16 +74,17 @@ export default function Hero() {
 
         {data.recipes.length > 0 ? (
           <>
-            <div className="border-2 rounded-md border-black p-3 w-full">
+            <div className="border-2 rounded-md border-forest p-3 w-full">
               <h2 className="flex items-center gap-2 font-bold">
-                <ChefHat></ChefHat>
-                <span>Recipe Ideas</span>
+                <ChefHat className="fill-forest"></ChefHat>
+                <span className="text-forest">Recipe Ideas</span>
               </h2>
 
               <ul className="list-disc pl-5 mt-4 text-[0.875rem] font-light tracking-[0%] flex flex-col gap-2">
                 {data.recipes.map((ele) => (
                   <Link
                     href={`/recipes/all/${ele.slug}`}
+                    target="_blank"
                     className="hover:underline"
                   >
                     <li>{ele.title}</li>

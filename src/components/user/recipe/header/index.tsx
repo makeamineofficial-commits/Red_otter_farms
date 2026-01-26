@@ -34,7 +34,7 @@ export function Header() {
               "rounded-full px-5 transition-all duration-300 ease-out",
               "hover:-translate-y-0.5 active:scale-95",
               isActive
-                ? "bg-green-600 text-white shadow-md shadow-green-100 hover:bg-green-700"
+                ? "bg-forest text-white shadow-md shadow-green-100 hover:bg-forest"
                 : "hover:bg-muted",
             )}
           >

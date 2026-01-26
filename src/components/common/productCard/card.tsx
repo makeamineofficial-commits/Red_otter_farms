@@ -20,13 +20,13 @@ export function ProductCard(product: Product) {
   const [current, setCurrent] = useState(0);
   useEffect(() => {
     if (!api) return;
-    
+
     setCurrent(api.selectedScrollSnap());
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
-  
+
   const { name, price, mrp, assets, slug } = product;
   const { update, cart } = useCart();
   const [count, setCount] = useState(1);
@@ -134,7 +134,7 @@ export function ProductCard(product: Product) {
         <div className="flex gap-2 items-center">
           <Button
             size="sm"
-            className="rounded-lg"
+            className="rounded-lg bg-maroon! hover:bg-maroon/90"
             onClick={() => {
               update({ product, quantity: count });
             }}
@@ -143,7 +143,7 @@ export function ProductCard(product: Product) {
           </Button>
           <Link href={`/products/${slug}`} target="_blank">
             <Button variant={"outline"}>
-              <ExternalLink></ExternalLink>
+              <ExternalLink className="text-maroon"></ExternalLink>
             </Button>
           </Link>
         </div>

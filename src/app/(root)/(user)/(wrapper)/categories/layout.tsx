@@ -7,7 +7,7 @@ export default function layout({ children }: { children: ReactNode }) {
   return (
     <>
       <ProductListingStore>
-        <main className="pt-45 px-4 md:px-12 lg:px-18 pb-5">
+        <main className=" px-4 md:px-12 lg:px-18 pb-5">
           <Banner></Banner>
 
           <article className="flex my-5 gap-2 lg:gap-10 lg:flex-row flex-col lg:items-start items-end">

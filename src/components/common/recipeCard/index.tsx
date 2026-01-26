@@ -13,6 +13,7 @@ import { Clock, Users } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Recipe } from "@/types/recipe";
 import Autoplay from "embla-carousel-autoplay";
+import Link from "next/link";
 
 export function RecipeCard({
   title,
@@ -102,22 +103,20 @@ export function RecipeCard({
 
           <div className="flex gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4 text-green-500" />
+              <Clock className="h-4 w-4 text-forest" />
               {cookingTime}
             </span>
             <span className="flex items-center gap-1">
-              <Users className="h-4 w-4 text-green-500" />
+              <Users className="h-4 w-4 text-forest" />
               {serving}
             </span>
           </div>
         </div>
-
-        <Button
-          onClick={() => router.push(href)}
-          className="w-full rounded-xl bg-green-600 hover:bg-green-700"
-        >
-          View Recipe
-        </Button>
+        <Link href={href} target="_blank">
+          <Button className="w-full rounded-xl bg-forest hover:bg-forest">
+            View Recipe
+          </Button>
+        </Link>
       </div>
     </div>
   );

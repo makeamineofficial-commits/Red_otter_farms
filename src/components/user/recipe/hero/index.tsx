@@ -22,16 +22,16 @@ export default function RecipeHero({
         <div className="max-w-4xl space-y-4">
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            <Badge className="bg-green-500/90 py-1.5! px-3! hover:bg-green-500">
+            <Badge className="bg-forest/90 py-1.5! px-3! hover:bg-forest">
               Vegetarian
             </Badge>
-            <Badge className="bg-green-500/90 py-1.5! px-3! hover:bg-green-500">
+            <Badge className="bg-forest/90 py-1.5! px-3! hover:bg-forest">
               Gluten-Free
             </Badge>
-            <Badge className="bg-green-500/90 py-1.5! px-3! hover:bg-green-500">
+            <Badge className="bg-forest/90 py-1.5! px-3! hover:bg-forest">
               Quick & Easy
             </Badge>
-            <Badge className="bg-green-500/90 py-1.5! px-3! hover:bg-green-500">
+            <Badge className="bg-forest/90 py-1.5! px-3! hover:bg-forest">
               Healthy
             </Badge>
           </div>
@@ -89,7 +89,7 @@ function InfoItem({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="rounded-full bg-green-100 p-2 text-green-600">{icon}</div>
+      <div className="rounded-full bg-forest/10 p-2 text-forest/60">{icon}</div>
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-semibold">{value}</p>

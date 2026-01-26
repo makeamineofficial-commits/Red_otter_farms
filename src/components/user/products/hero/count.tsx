@@ -23,18 +23,18 @@ export default function Count(product: Product) {
   }, [cart]);
   return (
     <div className="flex w-full flex-col justify-between sm:flex-row gap-3">
-      <div className="gap-2.5 flex items-center">
-        <div className="h-10  w-10 rounded-full border-2 flex items-center justify-center border-muted-foreground">
+      <div className=" flex items-center bg-[#E5E5E5] h-fit w-fit rounded-2xl">
+        <div className="h-12   bg-white w-12 rounded-l-2xl  border-2 flex items-center justify-center">
           <Minus
             className="size-5 cursor-pointer"
             onClick={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}
           />{" "}
         </div>
 
-        <span className=" bg-[#E5E5E5]  rounded-md h-10 w-12 items-center justify-center flex leading-0 text-[1rem] sm:text-[1.125rem] font-semibold flex-1 text-center">
+        <span className="   rounded-md h-10 w-12 items-center justify-center flex leading-0 text-[1rem] sm:text-[1.125rem] font-semibold flex-1 text-center">
           {quantity}
         </span>
-        <div className="h-10 w-10 rounded-full border-2  flex items-center justify-center border-muted-foreground">
+        <div className="h-12 w-12 bg-white  rounded-r-2xl  border-2  flex items-center justify-center ">
           <Plus
             className="size-5 cursor-pointer"
             onClick={() => setQuantity((quantity) => quantity + 1)}
@@ -51,6 +51,7 @@ export default function Count(product: Product) {
         h-14 font-bold
         w-full 
         sm:flex-1 sm:max-w-56
+        bg-forest text-white hover:bg-forest/90 hover:text-white
         "
       >
         Add to Cart
