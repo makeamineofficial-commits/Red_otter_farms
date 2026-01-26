@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import Login from "../login";
+import Cart from "../cart";
 import { Handbag, Heart, Search } from "lucide-react";
 const collections = [
   { slug: "salads", label: "The Salads World" },
@@ -45,7 +46,7 @@ export default function Header() {
             <Heart className="stroke-1 stroke-red-500 size-9 " stroke="0.01" />
           </Link>
           <Login></Login>
-          <Handbag className="stroke-1 stroke-red-500  size-9" stroke="1" />
+          <Cart></Cart>
         </nav>
       </div>
     </header>

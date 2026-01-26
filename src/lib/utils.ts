@@ -23,7 +23,7 @@ export const nullToUndefined = <T extends Record<string, any>>(obj: T) => {
     Object.entries(obj).map(([key, value]) => [
       key,
       value === null ? undefined : value,
-    ])
+    ]),
   ) as {
     [K in keyof T]: T[K] extends null ? undefined : T[K];
   };
@@ -31,14 +31,16 @@ export const nullToUndefined = <T extends Record<string, any>>(obj: T) => {
 
 export const numberField = (field: any) => {
   const [inputValue, setInputValue] = React.useState<string>(
-    field.value !== undefined && field.value !== null ? String(field.value) : ""
+    field.value !== undefined && field.value !== null
+      ? String(field.value)
+      : "",
   );
 
   React.useEffect(() => {
     setInputValue(
       field.value !== undefined && field.value !== null
         ? String(field.value)
-        : ""
+        : "",
     );
   }, [field.value]);
 
@@ -56,4 +58,8 @@ export const numberField = (field: any) => {
       }
     },
   };
+};
+
+export const formatPrice = (val: number) => {
+  return (val / 100).toFixed(2);
 };

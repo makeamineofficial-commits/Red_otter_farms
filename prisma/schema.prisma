@@ -66,6 +66,7 @@ model Product {
   orderedIn  OrderProduct[]
   addedToCart CartProduct[]
   linkedRecipes RecipeProduct[] 
+  wishList   UserWishlist[]
 
 
 
@@ -161,6 +162,7 @@ model Cart{
   updatedAt DateTime @updatedAt
 
   @@index([publicId])
+  @@index([sessionId])
   @@index([status])
 }
 
@@ -240,7 +242,7 @@ model Recipe{
   chefTips    String[]
   ingredients String[]
   nutritionalInfo Json?
-
+  recipeSaves RecipeSaves[]
 
   cookingTime String @default("")
   difficulty String @default("")
@@ -297,4 +299,25 @@ model UserOTP{
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+
+
+
+model RecipeSaves{
+  phone String
+  recipeId String 
+
+  recipe Recipe @relation(references:[id],fields:[recipeId])
+
+  @@id([phone,recipeId])
+}
+
+model UserWishlist{
+  phone String
+  productId String 
+
+  product Product @relation(references:[id],fields:[productId])
+
+  @@id([phone,productId])
 }

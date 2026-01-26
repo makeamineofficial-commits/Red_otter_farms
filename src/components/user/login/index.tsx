@@ -1,13 +1,20 @@
 "use client";
 
 import { CircleUserRound, X } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { isValidateUser } from "@/actions/auth/user.action";
 import { useRouter } from "next/navigation";
 import LoginForm from "./form";
-export default function Login() {
+import { useSearchParams } from "next/navigation";
+function _Login() {
   const [open, setOpen] = useState(false);
   const { push } = useRouter();
+  // const searchParams = useSearchParams();
+  // const action = searchParams.get("action");
+
+  // useEffect(() => {
+  //   if (action) setOpen(true);
+  // }, [action]);
   return (
     <>
       <CircleUserRound
@@ -40,8 +47,16 @@ export default function Login() {
         </div>
 
         {/* content */}
-        <LoginForm></LoginForm>
+        <LoginForm close={() => setOpen(false)}></LoginForm>
       </div>
     </>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<></>}>
+      <_Login />
+    </Suspense>
   );
 }

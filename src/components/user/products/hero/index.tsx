@@ -9,6 +9,7 @@ import Benefit from "./benefit";
 import HeroSkeleton from "./loader";
 import { useProductStore } from "@/store/user/product.store";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
 export default function Hero() {
   const { data, isLoading, isFetching } = useProductStore();
 
@@ -32,12 +33,14 @@ export default function Hero() {
         <div className="flex items-center gap-4.5">
           {price != mrp ? (
             <>
-              <p className="text-[1.875rem] font-bold">₹{price}</p>
-              <p className="text-muted-foreground line-through">₹{mrp}</p>
+              <p className="text-[1.875rem] font-bold">₹{formatPrice(price)}</p>
+              <p className="text-muted-foreground line-through">
+                ₹{formatPrice(mrp)}
+              </p>
             </>
           ) : (
             <>
-              <p className="text-[1.875rem] font-bold">₹{price}</p>
+              <p className="text-[1.875rem] font-bold">₹{formatPrice(price)}</p>
             </>
           )}
         </div>
@@ -46,20 +49,7 @@ export default function Hero() {
       <Benefit {...data}></Benefit>
 
       <div className="flex items-center justify-center gap-4 flex-col w-full mt-4">
-        <div className="flex w-full flex-col justify-between sm:flex-row gap-3">
-          <Count />
-
-          <Button
-            size="lg"
-            className="
-      h-14 font-bold
-      w-full 
-      sm:flex-1 sm:max-w-56
-    "
-          >
-            Add to Cart
-          </Button>
-        </div>
+        <Count {...data} />
 
         <Button
           variant={"outline"}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,11 +36,12 @@ const otpSchema = z.object({
   otp: z.string().min(6, "Enter valid OTP"),
 });
 
-export default function LoginForm() {
+export default function LoginForm({ close }: { close: () => void }) {
   const router = useRouter();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [isPending, startTransition] = useTransition();
-
+  const searchParams = useSearchParams();
+  const action = searchParams.get("action");
   const phoneForm = useForm<z.infer<typeof phoneSchema>>({
     resolver: zodResolver(phoneSchema),
     defaultValues: { phone: "", type: "mobile" },
@@ -75,7 +76,8 @@ export default function LoginForm() {
       }
 
       toast.success("Login successful");
-      router.push("/account/profile");
+      if (action === "close") close();
+      else router.push("/account/profile");
     });
   };
 

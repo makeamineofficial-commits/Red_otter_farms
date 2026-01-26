@@ -1,15 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Minus, Plus } from "lucide-react";
+import { ExternalLink, Minus, Plus } from "lucide-react";
 import { Product } from "@/types/product";
 
 export function ProductCardLoader() {
   return (
     <div className="rounded-2xl w-full border p-3 space-y-3 animate-pulse duration-300 transition-all">
-      {/* Image */}
       <div className="relative aspect-square rounded-xl bg-muted flex items-end justify-end p-2"></div>
 
-      {/* Title + Price */}
       <div className="space-y-1">
         <p className="text-sm font-medium">Product Name</p>
         <p className="text-sm font-semibold">
@@ -44,10 +42,15 @@ export function ProductCardLoader() {
             <Plus className="size-4" />
           </Button>
         </div>
+        <div className="flex gap-2 items-center">
+          <Button size="sm" className="rounded-lg">
+            Add to Cart
+          </Button>
 
-        <Button size="sm" className="rounded-lg" disabled>
-          Add to Cart
-        </Button>
+          <Button variant={"outline"}>
+            <ExternalLink></ExternalLink>
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ export async function getAccount(): Promise<{
   message: string;
   account?: Account;
 }> {
-  const { phone } = await validateUser();
+  await validateUser();
   return new Promise((res, rej) => {
     res({
       success: true,

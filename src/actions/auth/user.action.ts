@@ -18,7 +18,7 @@ const validateUser = async () => {
   const refreshPayload = await validateToken(refreshToken);
 
   if (!accessPayload && !refreshPayload) {
-    redirect("/?action=SESSION_EXPIRED");
+    return null;
   }
 
   if (!accessPayload && refreshPayload) {
