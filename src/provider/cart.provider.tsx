@@ -24,7 +24,7 @@ type ContextType = {
 const Context = createContext<ContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [cart, setCart] = useState<Cart | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [isUpdating, setUpdating] = useState(false);
@@ -41,6 +41,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
     fetchCart();
   }, []);
+
+  useEffect(() => {
+    const body = window.document.body;
+    if (isOpen) {
+      if (body) body.style.overflow = "hidden";
+    } else {
+      if (body) body.style.overflow = "auto";
+    }
+  }, [isOpen]);
 
   const toggle = () => setIsOpen((prev) => !prev);
 

@@ -15,7 +15,7 @@ export default function Checkout() {
     isLoading || isUpdating || !cart || cart.products.length === 0;
 
   return (
-    <div className="bg-white shadow-sm w-full p-4 border-t">
+    <div className="bg-white w-full p-4 border-t">
       <Button
         className="w-full py-4 h-auto! text-base"
         size="lg"

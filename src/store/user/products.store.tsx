@@ -39,10 +39,9 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
     PaginatedResponse<Product> | undefined
   >({
-    queryKey: ["products", filter],
+    queryKey: ["products", JSON.stringify(filter)],
     queryFn: async () => {
       const res = await listProducts(filter);
-      console.log(res.data);
       return res;
     },
     staleTime: 1000 * 60 * 5,

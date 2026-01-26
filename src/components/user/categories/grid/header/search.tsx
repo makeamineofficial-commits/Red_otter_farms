@@ -1,11 +1,11 @@
 "use client";
 
 import { SearchIcon } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useDebounce } from "use-debounce";
 
-export default function Search() {
+function _Search() {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -61,5 +61,13 @@ export default function Search() {
         "
       />
     </div>
+  );
+}
+
+export default function Search() {
+  return (
+    <Suspense fallback={<></>}>
+      <_Search />
+    </Suspense>
   );
 }

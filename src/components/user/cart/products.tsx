@@ -93,7 +93,7 @@ function CartProductSkeleton() {
 export default function Products() {
   const { cart, isLoading, isUpdating } = useCart();
   return (
-    <div className="p-4 flex flex-col gap-2">
+    <div className="p-4 flex flex-col pb-10 gap-2 flex-1  no-scrollbar overflow-y-auto ">
       {isLoading || !cart ? (
         <>
           {[1, 2, 3, 4].map((ele) => (

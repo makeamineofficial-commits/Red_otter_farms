@@ -113,7 +113,7 @@ export default function NutritionMeter() {
       <Accordion type="single" defaultValue="nutrition" collapsible>
         <AccordionItem
           value="nutrition"
-          className="border-t bg-background rounded-t-2xl shadow-xl"
+          className="border-t bg-background rounded-t-2xl "
         >
           {/* Trigger */}
           <AccordionTrigger2

@@ -28,7 +28,7 @@ export const listProducts = async (
     limit = 10,
     page = 1,
   } = filters;
-
+  console.log("[LIST CATEGORIES CALLED]", filters);
   const safeLimit = Math.max(1, Math.min(limit, 100));
   const safePage = Math.max(1, page);
   const skip = (safePage - 1) * safeLimit;
@@ -36,7 +36,9 @@ export const listProducts = async (
   const where: Prisma.ProductWhereInput = {
     isPublished: true,
     ...(inStock && { inStock: true }),
-    ...(typeof maxPrice === "number" && { price: { lte: maxPrice } }),
+    ...(typeof maxPrice === "number" && {
+      price: { lte: Number(maxPrice) * 100 },
+    }),
     ...(q && {
       OR: [
         { name: { contains: q, mode: "insensitive" } },

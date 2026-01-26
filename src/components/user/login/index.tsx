@@ -15,6 +15,15 @@ function _Login() {
   // useEffect(() => {
   //   if (action) setOpen(true);
   // }, [action]);
+
+  useEffect(() => {
+    const body = window.document.body;
+    if (open) {
+      if (body) body.style.overflow = "hidden";
+    } else {
+      if (body) body.style.overflow = "auto";
+    }
+  }, [open]);
   return (
     <>
       <CircleUserRound
