@@ -3,8 +3,13 @@
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
+import { Product } from "@/types/product";
 
-const _getProduct = async (slug: string) => {
+const _getProduct = async (
+  slug: string,
+): Promise<
+  (Product & { recipes: { title: string; slug: string }[] }) | null
+> => {
   const product = await db.product.findUnique({
     where: { slug },
     include: {
@@ -31,6 +36,8 @@ const _getProduct = async (slug: string) => {
 
   return nullToUndefined({
     ...product,
+    description: product.description!,
+    nutritionalInfo: product.nutritionalInfo as any,
     recipes: product.linkedRecipes.map((r) => r.recipe),
     categories: [],
   });
