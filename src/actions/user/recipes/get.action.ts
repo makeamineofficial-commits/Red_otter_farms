@@ -1,20 +1,12 @@
 "use server";
+
 import { db } from "@/lib/db";
-import { Recipe } from "@/types/recipe";
 import { nullToUndefined } from "@/lib/utils";
-import { validateAdmin } from "@/actions/auth/admin.action";
+import { unstable_cache } from "next/cache";
 
-export const getRecipe = async ({
-  slug,
-}: {
-  slug: string;
-}): Promise<{ recipe?: Recipe; success: boolean; message: string }> => {
-  await validateAdmin();
-
-  const product = await db.recipe.findUnique({
-    where: {
-      slug,
-    },
+const _getRecipe = async (slug: string) => {
+  const recipe = await db.recipe.findUnique({
+    where: { slug },
     include: {
       linkedProducts: {
         select: {
@@ -26,6 +18,7 @@ export const getRecipe = async ({
           },
         },
       },
+
       assets: {
         select: {
           url: true,
@@ -37,22 +30,33 @@ export const getRecipe = async ({
       },
     },
   });
-  if (!product) return { success: false, message: "Recipe details not found" };
 
-  const data = nullToUndefined({
-    ...product,
-    linkedProducts: product.linkedProducts.map((ele) => {
-      return { ...ele.product };
-    }),
-    assets: product.assets.map((ele) => {
-      return { ...ele };
-    }),
+  if (!recipe) return null;
+
+  return nullToUndefined({
+    ...recipe,
+    linkedProducts: recipe.linkedProducts.map((p) => p.product),
   });
-
-  return {
-    // @ts-ignore
-    recipe: data,
-    success: true,
-    message: "Recipe details found",
-  };
 };
+
+export const getRecipe = unstable_cache(
+  async ({ slug }: { slug: string }) => {
+    const data = await _getRecipe(slug);
+
+    if (!data) {
+      return { success: false, message: "Recipe details not found" };
+    }
+
+    return {
+      success: true,
+      message: "Recipe details found",
+      recipe: data,
+    };
+  },
+  // @ts-ignore
+  (args) => [`recipe:${args.slug}`],
+  {
+    revalidate: 60,
+    tags: ["recipe"],
+  },
+);
