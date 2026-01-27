@@ -13,7 +13,8 @@ export interface CartProduct {
   displayName: string;
   description?: string | null;
   nutritionalInfo: any;
-
+  weight: number;
+  weightUnit: string;
   assets: {
     url: string;
     type: any;

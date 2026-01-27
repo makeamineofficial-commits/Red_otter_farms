@@ -21,6 +21,8 @@ export const getCart = async (): Promise<Cart | null> => {
               displayName: true,
               description: true,
               nutritionalInfo: true,
+              weight: true,
+              weightUnit: true,
               assets: {
                 select: {
                   url: true,

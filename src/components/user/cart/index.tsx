@@ -2,7 +2,7 @@
 
 import { Handbag, X } from "lucide-react";
 import { Suspense, useEffect } from "react";
-import Products from "./products";
+import Products from "@/components/common/cartProduct";
 import { useCart } from "@/provider/cart.provider";
 import NutritionMeter from "./nutritionMeter";
 import Checkout from "./checkout";
@@ -37,7 +37,9 @@ function _Cart() {
           </button>
         </div>
 
-        <Products></Products>
+        <div className="p-4">
+          <Products></Products>
+        </div>
         <div className="fixed bottom-0 left-0 right-0 z-50 shadow-xl">
           <NutritionMeter></NutritionMeter>
           <Checkout></Checkout>

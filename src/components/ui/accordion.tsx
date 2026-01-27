@@ -70,7 +70,7 @@ function AccordionTrigger2({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none ",
+          "group flex flex-1 items-center gap-3 rounded-md py-4 text-left text-sm font-medium transition-all outline-none",
           className,
         )}
         {...props}
@@ -80,6 +80,7 @@ function AccordionTrigger2({
     </AccordionPrimitive.Header>
   );
 }
+
 
 function AccordionContent({
   className,

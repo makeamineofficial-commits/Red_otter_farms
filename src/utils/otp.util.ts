@@ -55,13 +55,12 @@ export async function sendOTP({
     return otp;
   });
 
-  // ---- NETWORK PART (OUTSIDE TX) ----
   try {
     const url = `https://automation.redotterfarms.com/webhook/74bbc36f-88f5-4315-9530-986b3fe60a71?type=${type}`;
 
     console.log("[OTP] Sending OTP webhook", {
       url,
-      phone,
+      phone: "+91" + phone,
     });
 
     const res = await fetch(url, {

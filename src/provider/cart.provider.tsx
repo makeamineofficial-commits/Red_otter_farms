@@ -14,7 +14,11 @@ import { Cart, CartProduct } from "@/types/cart";
 type ContextType = {
   isOpen: boolean;
   toggle: () => void;
-  update: (args: { product: CartProduct; quantity: number }) => Promise<void>;
+  update: (args: {
+    product: CartProduct;
+    quantity: number;
+    toggle?: boolean;
+  }) => Promise<void>;
   remove: (args: { productPublicId: string }) => Promise<void>;
   cart: Cart | null;
   isUpdating: boolean;
@@ -78,9 +82,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const update = async ({
     product,
     quantity,
+    toggle = true,
   }: {
     product: CartProduct;
     quantity: number;
+    toggle?: boolean;
   }) => {
     if (!cart) return;
 
@@ -106,7 +112,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
 
     setCart(updatedCart);
-    setIsOpen(true);
+
+    if (toggle) setIsOpen(true);
+
     try {
       setUpdating(true);
       await updateCart({

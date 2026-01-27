@@ -3,12 +3,15 @@
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Menu } from "lucide-react";
 import { useMenu } from "@/provider/menu.provider";
+import Link from "next/link";
 export default function Header() {
   const { toggle } = useMenu();
   return (
     <header className="flex items-center justify-between px-2 py-4 md:p-4 border-b">
       <div className="flex justify-center items-center gap-2 md:gap-6">
-        <ChevronLeft></ChevronLeft>
+        <Link href="/">
+          <ChevronLeft></ChevronLeft>
+        </Link>
         <div>
           <h2 className="font-bold text-[1.125rem] leading-none">
             Customer Hub
