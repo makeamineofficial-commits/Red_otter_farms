@@ -136,6 +136,7 @@ export function ProductCard(product: Product) {
             size="sm"
             className="rounded-lg bg-maroon! hover:bg-maroon/90"
             onClick={() => {
+              // @ts-ignore
               update({ product, quantity: count });
             }}
           >

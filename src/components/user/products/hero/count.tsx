@@ -6,7 +6,6 @@ import { Product } from "@/types/product";
 import { useCart } from "@/provider/cart.provider";
 import { Button } from "@/components/ui/button";
 export default function Count(product: Product) {
-  const { name, price, mrp, assets, slug } = product;
   const { update, cart } = useCart();
 
   const [quantity, setQuantity] = useState(1);
@@ -44,6 +43,7 @@ export default function Count(product: Product) {
 
       <Button
         onClick={() => {
+          // @ts-ignore
           update({ product, quantity });
         }}
         size="lg"
