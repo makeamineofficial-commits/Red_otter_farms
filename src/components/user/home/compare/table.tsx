@@ -64,7 +64,7 @@ export default function ComparisonTable() {
               grid
               grid-cols-[minmax(240px,1fr)_minmax(240px,1fr)]
               min-w-max
-              lg:min-w-lg
+              lg:min-w-2xl
               lg:grid-cols-2 
             "
           >
