@@ -39,14 +39,18 @@ export function Share({ children }: { children: ReactNode }) {
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className="sm:max-w-md rounded-xl bg-white">
+      <DialogContent className="sm:min-w-md rounded-xl bg-white">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">Share</DialogTitle>
+          <DialogTitle className="text-lg font-semibold text-left!">
+            Share
+          </DialogTitle>
         </DialogHeader>
 
         {/* URL + Copy (YouTube style) */}
-        <div className="flex items-center gap-2 border rounded-lg px-3 py-2">
-          <p className="text-sm truncate flex-1 text-muted-foreground">{url}</p>
+        <div className="flex items-center gap-2 border rounded-lg px-3 py-2 overflow-hidden">
+          <p className="text-sm text-muted-foreground truncate min-w-0 flex-1">
+            {url}
+          </p>
 
           <Button
             size="sm"

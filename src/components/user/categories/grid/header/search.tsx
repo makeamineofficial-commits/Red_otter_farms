@@ -43,7 +43,7 @@ function _Search() {
   }, [debouncedValue]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 w-full">
       <SearchIcon className="text-muted-foreground" />
       <input
         ref={inputRef}
@@ -57,6 +57,7 @@ function _Search() {
           focus:ring-0
           focus:border-muted-foreground
           bg-transparent
+          w-full
           text-sm pb-1 pl-2
         "
       />

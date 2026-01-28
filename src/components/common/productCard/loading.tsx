@@ -7,7 +7,9 @@ export function ProductCardLoader() {
   return (
     <div className="rounded-2xl w-full border p-3 space-y-3 animate-pulse duration-300 transition-all">
       <div className="relative aspect-square rounded-xl bg-muted flex items-end justify-end p-2"></div>
-
+      {/* <Button variant={"outline"}>
+        <ExternalLink></ExternalLink>
+      </Button> */}
       <div className="space-y-1">
         <p className="text-sm font-medium">Product Name</p>
         <p className="text-sm font-semibold">
@@ -43,12 +45,15 @@ export function ProductCardLoader() {
           </Button>
         </div>
         <div className="flex gap-2 items-center">
-          <Button size="sm" className="rounded-lg">
+          <Button
+            size="sm"
+            className="rounded-lg bg-maroon! hover:bg-maroon/90"
+          >
             Add to Cart
           </Button>
 
           <Button variant={"outline"}>
-            <ExternalLink></ExternalLink>
+            <ExternalLink className="text-maroon"></ExternalLink>
           </Button>
         </div>
       </div>

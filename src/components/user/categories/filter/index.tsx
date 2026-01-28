@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Sliders } from "lucide-react";
+import { Sliders, X } from "lucide-react";
 import { useProductListingStore } from "@/store/user/products.store";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -46,8 +46,6 @@ function FilterSection({ children }: { children?: ReactNode }) {
     router.push(`${pathname}?${search.toString()}`);
   };
 
-  /* ---------------- DEBOUNCED HANDLERS ---------------- */
-
   const debouncedPriceUpdate = useDebouncedCallback((val: number[]) => {
     updateQuery({
       maxPrice: String(val[0]),
@@ -61,8 +59,6 @@ function FilterSection({ children }: { children?: ReactNode }) {
       page: "1",
     });
   }, 300);
-
-  /* ---------------------------------------------------- */
 
   const handleCategoryClick = (slug: string) => {
     setInStock(true);
@@ -163,4 +159,38 @@ function FilterSection({ children }: { children?: ReactNode }) {
   );
 }
 
-export default FilterSection;
+export default function Filter() {
+  const [open, setOpen] = useState(false);
+  return (
+    <aside>
+      <nav className="hidden lg:block border rounded-2xl">
+        <FilterSection />
+      </nav>
+
+      <div className=" items-center gap-2  flex lg:hidden">
+        <Sliders
+          className="rotate-90"
+          size={20}
+          onClick={() => setOpen((prev) => !prev)}
+        />
+      </div>
+
+      <div
+        onClick={() => setOpen(false)}
+        className={`bg-black/30 fixed top-0 left-0 h-screen z-90 w-screen ${open ? "block lg:hidden" : "hidden"}`}
+      ></div>
+      <nav
+        className={`fixed top-0 left-0  bg-white shadow-xl h-screen block lg:hidden z-100 overflow-hidden transition-all duration-200 ${open ? "max-w-96" : "max-w-0"} `}
+      >
+        <div className="p-4">
+          <FilterSection>
+            <X
+              className="absolute top-5 right-4"
+              onClick={() => setOpen((prev) => !prev)}
+            ></X>
+          </FilterSection>
+        </div>
+      </nav>
+    </aside>
+  );
+}

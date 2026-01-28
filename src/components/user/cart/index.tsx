@@ -11,7 +11,7 @@ function _Cart() {
   return (
     <>
       <Handbag
-        className="stroke-1 stroke-red-500 size-9 cursor-pointer"
+        className="stroke-1 stroke-red-500 size-8 lg:size-9 cursor-pointer"
         onClick={() => {
           toggle();
         }}

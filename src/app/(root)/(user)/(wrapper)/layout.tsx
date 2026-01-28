@@ -7,7 +7,7 @@ import { CartProvider } from "@/provider/cart.provider";
 export default function layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <div className="pt-45" />
+      <div className="pt-35 lg:pt-45" />
       {children}
     </>
   );

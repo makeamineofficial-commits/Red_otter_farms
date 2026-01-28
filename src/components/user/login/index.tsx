@@ -27,7 +27,7 @@ function _Login() {
   return (
     <>
       <CircleUserRound
-        className="stroke-1 stroke-red-500 size-9 cursor-pointer"
+        className="stroke-1 stroke-red-500 size-8 lg:size-9 cursor-pointer "
         onClick={async () => {
           const user = await isValidateUser();
           if (user) push("/account");

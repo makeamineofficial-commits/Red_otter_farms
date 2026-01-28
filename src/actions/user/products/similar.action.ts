@@ -23,7 +23,7 @@ export async function getSimilarProducts(slug: string) {
         hasSome: product.healthBenefits,
       },
     },
-    take: 5,
+    take: 4,
     orderBy: {
       createdAt: "desc",
     },

@@ -48,7 +48,7 @@ const PaginationComponent = ({
   };
 
   return (
-    <div className="my-4 flex items-center justify-between">
+    <div className="my-4 flex flex-col gap-4 sm:gap-0 sm:flex-row items-center justify-between">
       <div className="text-xs text-muted-foreground">
         <span className="text-nowrap">
           Showing {start}-{end} out of {total}

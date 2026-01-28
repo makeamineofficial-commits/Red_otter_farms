@@ -10,6 +10,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
       <body className="relative max-w-500 mx-auto">
         <Header></Header>
         {children}
+        {/* <div className="pt-40"></div> */}
         <Newsletter></Newsletter>
         <Footer></Footer>
 

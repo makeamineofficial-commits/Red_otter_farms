@@ -55,6 +55,8 @@
   --color-herbal: hsla(100, 12%, 90%, 1);
   --color-offwhite: hsla(0, 0%, 84%, 1);
   --color-maroon: hsla(12, 76%, 45%, 1);
+  --breakpoint-3xl: 1800px;
+  --breakpoint-xs: 400px;
 }
 
 :root {

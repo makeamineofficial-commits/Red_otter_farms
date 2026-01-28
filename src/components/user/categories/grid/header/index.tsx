@@ -33,7 +33,7 @@ export function GridHeader() {
           {slug ? slug.toString().replaceAll("-", " ") : "All Products"}
         </h1>
 
-        <div className="flex gap-2 items-cener ">
+        <div className="flex w-full sm:w-fit gap-5 sm:gap-2 items-cener sm:flex-row flex-col">
           <Search></Search>
           <div className="flex gap-2 items-center sm:w-fit w-full">
             <h4 className="text-muted-foreground text-sm text-nowrap">
@@ -72,7 +72,7 @@ export function GridHeader() {
           ({data.total} Products)
         </span>
       </h1>
-      <div className="flex gap-2 items-cener ">
+      <div className="flex w-full sm:w-fit gap-5 sm:gap-2 items-cener sm:flex-row flex-col">
         <Search></Search>
         <div className="flex gap-2 items-center sm:w-fit w-full">
           <h4 className="text-muted-foreground text-sm text-nowrap">
