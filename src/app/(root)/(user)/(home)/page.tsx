@@ -15,9 +15,9 @@ export default function page() {
   return (
     <>
       <Hero></Hero>
-      <Trending></Trending>
-      <Process></Process>
       <Explore></Explore>
+      <Process></Process>
+      <Trending></Trending>
       <Working></Working>
       <Compare></Compare>
       <Social></Social>

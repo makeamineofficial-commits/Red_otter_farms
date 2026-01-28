@@ -1,5 +1,10 @@
-import React from "react";
-
+import ProductCarousel from "./carousel";
+import Hero from "./hero";
 export default function Explore() {
-  return <div>explore</div>;
+  return (
+    <section>
+      <Hero />
+      <ProductCarousel></ProductCarousel>
+    </section>
+  );
 }

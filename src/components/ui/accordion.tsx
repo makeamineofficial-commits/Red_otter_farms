@@ -50,7 +50,7 @@ function AccordionTrigger({
       >
         {children}
         {showCross && (
-          <X className="text-muted-foreground pointer-events-none size-6 shrink-0   duration-200" />
+          <X className="text-muted-foreground pointer-events-none size-4 xl:size-6 shrink-0   duration-200" />
         )}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
@@ -80,7 +80,6 @@ function AccordionTrigger2({
     </AccordionPrimitive.Header>
   );
 }
-
 
 function AccordionContent({
   className,

@@ -25,7 +25,7 @@ function _Cart() {
       )}
 
       <div
-        className={`fixed flex flex-col  top-0 right-0 h-screen w-72 md:w-96 overflow-y-auto no-scrollbar bg-white shadow-2xl z-50
+        className={`fixed flex flex-col  top-0 right-0 h-screen w-80 md:w-96 overflow-y-auto no-scrollbar bg-white shadow-2xl z-50
           transform transition-transform duration-300
           ${isOpen ? "translate-x-0" : "translate-x-full"}
         `}
