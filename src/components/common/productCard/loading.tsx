@@ -11,7 +11,7 @@ export function ProductCardLoader() {
         <ExternalLink></ExternalLink>
       </Button> */}
       <div className="space-y-1">
-        <p className="text-sm font-medium">Product Name</p>
+        <p className="font-medium">Product Name</p>
         <p className="text-sm font-semibold">
           ₹29.00{" "}
           <span className="text-xs text-muted-foreground line-through">
@@ -50,10 +50,6 @@ export function ProductCardLoader() {
             className="rounded-lg bg-maroon! hover:bg-maroon/90"
           >
             Add to Cart
-          </Button>
-
-          <Button variant={"outline"}>
-            <ExternalLink className="text-maroon"></ExternalLink>
           </Button>
         </div>
       </div>

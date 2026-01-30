@@ -27,7 +27,8 @@ export function ProductCard(product: Product) {
     });
   }, [api]);
 
-  const { name, price, mrp, assets, slug } = product;
+  const { name, price, mrp, assets, weight, weightUnit, slug, healthBenefits } =
+    product;
   const { update, cart } = useCart();
   const [count, setCount] = useState(1);
   useEffect(() => {
@@ -43,8 +44,12 @@ export function ProductCard(product: Product) {
   }, [cart]);
 
   return (
-    <div className="rounded-2xl border p-3 space-y-3 w-full">
-      {/* IMAGE CAROUSEL */}
+    <div className="rounded-2xl border p-3 space-y-3 w-full relative flex flex-col">
+      <Link
+        href={`/products/${slug}`}
+        target="_blank"
+        className="absolute top-0 left-0  h-full w-full"
+      ></Link>
       <Carousel
         setApi={setApi}
         plugins={[
@@ -55,6 +60,10 @@ export function ProductCard(product: Product) {
         ]}
         className="relative"
       >
+        <Badge className="absolute bottom-2 right-2 z-10 bg-muted! text-muted-foreground!">
+          {weight}
+          {weightUnit}
+        </Badge>
         <CarouselContent>
           {assets?.map((asset, index) => (
             <CarouselItem key={index}>
@@ -72,7 +81,7 @@ export function ProductCard(product: Product) {
 
         {/* DOTS */}
         <div
-          className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1"
+          className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10 "
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -90,8 +99,8 @@ export function ProductCard(product: Product) {
       </Carousel>
 
       {/* TITLE + PRICE */}
-      <div className="space-y-1">
-        <p className="text-sm font-medium line-clamp-1">{name}</p>
+      <div className="space-y-1 relative z-10  w-fit">
+        <p className=" font-medium line-clamp-1">{name}</p>
         <p className="text-sm font-semibold">
           ₹{formatPrice(price)}
           {mrp && (
@@ -103,17 +112,16 @@ export function ProductCard(product: Product) {
       </div>
 
       {/* TAGS */}
-      <div className="flex gap-2 flex-wrap">
-        <Badge variant="outline" className="text-xs">
-          Fresh
-        </Badge>
-        <Badge variant="outline" className="text-xs">
-          Quality Check
-        </Badge>
+      <div className="flex gap-2 flex-wrap relative z-10  w-fit">
+        {healthBenefits.map((ele) => (
+          <Badge variant="outline" className="text-xs capitalize">
+            {ele}
+          </Badge>
+        ))}
       </div>
 
       {/* QUANTITY + CART */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 relative z-10 mt-auto">
         <div className="flex items-center border rounded-lg">
           <Button
             size="icon"
@@ -142,11 +150,6 @@ export function ProductCard(product: Product) {
           >
             Add to Cart
           </Button>
-          <Link href={`/products/${slug}`} target="_blank">
-            <Button variant={"outline"}>
-              <ExternalLink className="text-maroon"></ExternalLink>
-            </Button>
-          </Link>
         </div>
       </div>
     </div>

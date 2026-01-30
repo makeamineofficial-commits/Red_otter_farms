@@ -10,6 +10,7 @@ import {
 import { useProductListingStore } from "@/store/user/products.store";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Search from "./search";
+import { SortSelect } from "./sortSelect";
 export function GridHeader() {
   const { data, isLoading, isFetching } = useProductListingStore();
   const { slug } = useParams();
@@ -40,23 +41,11 @@ export function GridHeader() {
               Sort By:
             </h4>
 
-            <Select
+            <SortSelect
               value={currentSort}
-              onValueChange={handleSortChange}
-              disabled
-            >
-              <SelectTrigger className="sm:w-44 w-full">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectItem value="all">Select</SelectItem>
-                {/* <SelectItem value="best-selling">Best Selling</SelectItem> */}
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="latest">Latest</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={handleSortChange}
+              disabled={true}
+            />
           </div>
         </div>
       </div>
@@ -79,19 +68,11 @@ export function GridHeader() {
             Sort By:
           </h4>
 
-          <Select value={currentSort} onValueChange={handleSortChange}>
-            <SelectTrigger className="sm:w-44 w-full">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="all">Select</SelectItem>
-              {/* <SelectItem value="best-selling">Best Selling</SelectItem> */}
-              <SelectItem value="price-low">Price: Low to High</SelectItem>
-              <SelectItem value="price-high">Price: High to Low</SelectItem>
-              <SelectItem value="latest">Latest</SelectItem>
-            </SelectContent>
-          </Select>
+          <SortSelect
+            value={currentSort}
+            onChange={handleSortChange}
+            disabled={false}
+          />
         </div>
       </div>
     </div>
