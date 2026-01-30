@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/input-otp";
 
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 
 const phoneSchema = z.object({
   phone: z.string().min(10, "Please enter a valid mobile number"),
@@ -121,8 +122,16 @@ export default function LoginForm({ close }: { close: () => void }) {
                 type="submit"
                 className="w-full bg-maroon rounded-full py-6 text-sm font-semibold hover:bg-maroon/90"
                 disabled={isPending}
+                onClick={() => {
+                  phoneForm.setValue("type", "mobile");
+                  phoneForm.handleSubmit(onSendOTP)();
+                }}
               >
-                {isPending ? "Sending OTP..." : "LOGIN WITH OTP"}
+                {isPending ? (
+                  <Loader2 className="animate-spin duration-300" />
+                ) : (
+                  "LOGIN WITH OTP"
+                )}
               </Button>
 
               <Button
@@ -134,7 +143,11 @@ export default function LoginForm({ close }: { close: () => void }) {
                   phoneForm.handleSubmit(onSendOTP)();
                 }}
               >
-                LOGIN WITH WHATSAPP
+                {isPending ? (
+                  <Loader2 className="animate-spin duration-300" />
+                ) : (
+                  "LOGIN WITH WHATSAPP"
+                )}
               </Button>
             </div>
           </form>

@@ -1,60 +1,23 @@
-import crypto from "crypto";
 import { db } from "@/lib/db";
 
-const SECRET = process.env.OTP_SECRET as string;
-const OTP_TTL_MS = 5 * 60 * 1000;
-
-function generateOTP(phone: string): string {
-  const timestamp = Math.floor(Date.now() / OTP_TTL_MS);
-  const hmac = crypto
-    .createHmac("sha256", SECRET)
-    .update(`${phone}:${timestamp}`)
-    .digest("hex");
-
-  return (parseInt(hmac.slice(-6), 16) % 1_000_000).toString().padStart(6, "0");
-}
 export async function sendOTP({
   phone,
   type = "mobile",
 }: {
   phone: string;
   type?: string;
-}): Promise<string> {
+}): Promise<string | null> {
   console.log("[OTP] sendOTP called", { phone, type });
 
-  if (!process.env.OTP_SECRET) {
-    console.error("[OTP] OTP_SECRET missing");
-    throw new Error("Server misconfiguration");
-  }
-
-  if (!process.env.BACKEND_API_KEY) {
-    console.error("[OTP] BACKEND_API_KEY missing");
-    throw new Error("Server misconfiguration");
-  }
-
-  // ---- DB PART (ONLY DB) ----
   const otp = await db.$transaction(async (tx) => {
-    const existing = await tx.userOTP.findUnique({ where: { phone } });
-
-    if (existing) {
-      const age = Date.now() - existing.createdAt.getTime();
-      if (age < OTP_TTL_MS) {
-        const retryAfter = Math.ceil((OTP_TTL_MS - age) / 1000);
-        console.warn("[OTP] Retry too soon", { phone, retryAfter });
-        throw new Error(`Please try again after ${retryAfter} seconds`);
-      }
-      await tx.userOTP.delete({ where: { id: existing.id } });
-    }
-
-    const otp = generateOTP(phone);
-
+    await tx.userOTP.deleteMany({ where: { phone } });
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     await tx.userOTP.create({
       data: { phone, otp },
     });
-
     return otp;
   });
-
+  console.log("[OTP] OTP added", { otp });
   try {
     const url = `https://automation.redotterfarms.com/webhook/74bbc36f-88f5-4315-9530-986b3fe60a71?type=${type}`;
 
@@ -84,8 +47,7 @@ export async function sendOTP({
       });
       throw new Error("Failed to send OTP");
     }
-
-    console.log("[OTP] OTP sent successfully", responseText);
+    if (process.env.NODE_ENV === "development") console.log("[OTP]", otp);
     return otp;
   } catch (err) {
     console.error("[OTP] Fetch exception", err);
@@ -93,24 +55,24 @@ export async function sendOTP({
   }
 }
 
-export async function verifyOTP(submittedOTP: string): Promise<string> {
+export async function verifyOTP(submittedOTP: string) {
   return await db.$transaction(async (tx) => {
     const record = await tx.userOTP.findUnique({
       where: { otp: submittedOTP },
     });
 
-    if (!record) throw new Error("OTP didn't matched! Please try again");
+    if (!record)
+      return {
+        message: "OTP didn't matched! Please try again",
+        success: false,
+      };
 
-    const now = new Date();
-    const age = now.getTime() - record.createdAt.getTime();
-    if (age > OTP_TTL_MS) {
-      await tx.userOTP.delete({ where: { id: record.id } });
-      throw new Error("OTP has expired! Please re-login to continue");
-    }
     await tx.userOTP.delete({ where: { id: record.id } });
-    const expectedOTP = generateOTP(record.phone);
-    if (expectedOTP !== submittedOTP) throw new Error("OTP didn't matched");
 
-    return record.phone;
+    return {
+      message: "OTP verified",
+      success: true,
+      phone: record.phone,
+    };
   });
 }

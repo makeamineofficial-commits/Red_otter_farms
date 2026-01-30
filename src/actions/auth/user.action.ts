@@ -82,7 +82,12 @@ const loginUser = async (data: { phone: string; type?: string }) => {
 
 const verifyUser = async ({ otp }: { otp: string }) => {
   try {
-    const phone = await verifyOTP(otp);
+    const res = await verifyOTP(otp);
+
+    if (!res.success || !res.phone) {
+      return { success: false, message: res.message };
+    }
+    const { phone } = res;
     const accessToken = await generateJWT({ phone });
     const refreshToken = await generateJWT({ phone }, "30d");
     const cookieStore = await cookies();
