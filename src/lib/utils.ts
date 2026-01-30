@@ -63,3 +63,13 @@ export const numberField = (field: any) => {
 export const formatPrice = (val: number) => {
   return (val / 100).toFixed(2);
 };
+export function isNCRPincode(pincode: string): boolean {
+  const prefix = pincode.slice(0, 3);
+
+  return (
+    prefix.startsWith("11") ||
+    prefix.startsWith("122") ||
+    prefix.startsWith("201") ||
+    prefix.startsWith("121")
+  );
+}

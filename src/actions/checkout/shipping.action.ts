@@ -6,19 +6,7 @@ const SHIPROCKET_PASSWORD = process.env.SHIPROCKET_PASSWORD as string;
 
 import { getCart } from "../user/cart/get.action";
 
-function isNCRPincode(pincode: string): boolean {
-  if (!/^\d{6}$/.test(pincode)) return false;
-
-  const prefix = pincode.slice(0, 3);
-
-  return (
-    prefix.startsWith("11") ||
-    prefix.startsWith("122") ||
-    prefix.startsWith("201") ||
-    prefix.startsWith("121")
-  );
-}
-
+import { isNCRPincode } from "@/lib/utils";
 export async function getShippingRate({
   deliveryPincode,
 }: {
@@ -42,8 +30,8 @@ export async function getShippingRate({
 
     const weight = cart.products
       .map((ele) => {
-        if (ele.weightUnit === "kg") return ele.weight;
-        return ele.weight / 1000; // convert grams to kg
+        if (ele.weightUnit === "kg") return ele.weight * ele.quantity;
+        return (ele.weight / 1000) * ele.quantity;
       })
       .reduce((a, b) => a + b, 0);
 
@@ -83,49 +71,41 @@ export const getShiprocketRate = async ({
   weight?: number;
 }) => {
   try {
-    console.log("Logging into Shiprocket API...");
+    if (weight === 0) return { success: false, rate: 9900, courier: "" };
+
     const { data: authData } = await axios.post(
       "https://apiv2.shiprocket.in/v1/external/auth/login",
       {
-        email: SHIPROCKET_EMAIL,
-        password: SHIPROCKET_PASSWORD,
+        email: SHIPROCKET_EMAIL.trim(),
+        password: SHIPROCKET_PASSWORD.trim(),
       },
     );
 
     const token = authData.token;
-    console.log("Received Shiprocket token:", token?.substring(0, 10) + "...");
 
-    console.log(
-      `Fetching shipping rate: pickup=${pickupPincode}, delivery=${deliveryPincode}, weight=${weight}kg`,
-    );
-
-    const { data: ratesData } = await axios.post(
+    const { data: ratesData } = await axios.get(
       "https://apiv2.shiprocket.in/v1/external/courier/serviceability/",
-      {
-        pickup_postcode: pickupPincode,
-        delivery_postcode: deliveryPincode,
-        weight,
-        cod: 0,
-      },
+
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        params: {
+          pickup_postcode: pickupPincode,
+          delivery_postcode: deliveryPincode,
+          weight,
+          cod: 0,
+        },
       },
     );
 
-    console.log(
-      "Shiprocket API raw response:",
-      JSON.stringify(ratesData, null, 2),
-    );
-
-    if (ratesData.status === "success" && ratesData.data.length > 0) {
+    if (ratesData.data.available_courier_companies.length > 0) {
       console.log(
-        `Using rate from courier: ${ratesData.data[0].courier_name} - ₹${ratesData.data[0].rate}`,
+        `Using rate from courier: ${ratesData.data.available_courier_companies[0].courier_name} - ₹${ratesData.data.available_courier_companies[0].rate}`,
       );
       return {
         success: true,
-        rate: ratesData.data[0].rate,
+        rate: ratesData.data.available_courier_companies[0].rate * 100,
       };
     } else {
       console.warn("Shiprocket returned empty or failed data");

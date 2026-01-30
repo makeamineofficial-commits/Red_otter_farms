@@ -13,6 +13,7 @@ import {
 } from "react";
 import { getShippingRate } from "@/actions/checkout/shipping.action";
 import { useCart } from "./cart.provider";
+import { isNCRPincode } from "@/lib/utils";
 
 export interface BillingDetails {
   mobile: string;
@@ -75,6 +76,7 @@ type ContextType = {
   total: number;
   shippingRate: number;
   subtotal: number;
+  showEstimate: boolean;
 };
 
 const CheckoutContext = createContext<ContextType | undefined>(undefined);
@@ -82,18 +84,12 @@ const CheckoutContext = createContext<ContextType | undefined>(undefined);
 export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
   const [billing, setBilling] = useState<BillingDetails>(DEFAULT_BILLING);
   const [shipping, setShipping] = useState<ShippingDetails>(DEFAULT_SHIPPING);
-
   const [shippingRate, setShippingRate] = useState<number>(9900);
   const [fetchingRate, setFetchingRate] = useState<boolean>(false);
-
-  const lastFetchedPincode = useRef<string | null>(null);
+  const [showEstimate, setShowEstimate] = useState<boolean>(false);
   const { cart } = useCart();
 
   const resolveShippingRate = async (pincode: string) => {
-    if (pincode.length !== 6) return;
-
-    if (lastFetchedPincode.current === pincode) return;
-    lastFetchedPincode.current = pincode;
     try {
       setFetchingRate(true);
       const res = await getShippingRate({
@@ -113,9 +109,10 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     const pincode = shipping.zip?.trim();
     if (!pincode) return;
     if (!/^\d{6}$/.test(pincode)) return;
-
+    const isNCR = isNCRPincode(pincode);
+    setShowEstimate(!isNCR);
     resolveShippingRate(pincode);
-  }, [shipping.zip]);
+  }, [shipping.zip, cart]);
 
   const subtotal = useMemo(() => {
     return (
@@ -141,6 +138,7 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
         fetchingRate,
         total,
         subtotal,
+        showEstimate,
       }}
     >
       {children}

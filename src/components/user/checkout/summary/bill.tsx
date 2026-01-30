@@ -3,13 +3,14 @@
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/provider/cart.provider";
 import { useCheckout } from "@/provider/checkout.provider";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type BillItem = {
-  label: string;
-  value: number;
-};
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function BillSkeleton() {
   return (
@@ -37,7 +38,7 @@ function BillSkeleton() {
 
 export default function Bill() {
   const { cart, isLoading, isUpdating } = useCart();
-  const { shippingRate } = useCheckout();
+  const { shippingRate, showEstimate } = useCheckout();
 
   const subtotal = useMemo(() => {
     return (
@@ -68,7 +69,27 @@ export default function Bill() {
         </div>
         <div className="flex items-center justify-between text-muted-foreground">
           <span>Delivery Fee</span>
-          <span>₹{formatPrice(shippingRate)}</span>
+
+          <span className="flex items-center gap-1">
+            ₹{formatPrice(shippingRate)}
+            {showEstimate && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="cursor-help text-xs underline decoration-dotted">
+                      Estimated
+                    </span>
+                  </TooltipTrigger>
+
+                  <TooltipContent className="max-w-xs text-xs leading-relaxed">
+                    The pincode you’ve entered requires external shipping, so
+                    delivery charges may vary slightly at final payment based on
+                    courier availability.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </span>
         </div>
       </div>
 
