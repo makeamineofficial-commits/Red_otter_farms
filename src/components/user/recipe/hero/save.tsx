@@ -34,7 +34,6 @@ export default function Save() {
       onClick={async () => {
         try {
           setLoading(true);
-          setSaved((prev) => !prev);
 
           const res = await saveRecipe({ recipeId: data.publicId });
 
@@ -43,6 +42,7 @@ export default function Save() {
             return;
           }
 
+          setSaved((prev) => !prev);
           toast.info(res.message);
         } catch {
           toast.warning("Failed to mark recipe saved");

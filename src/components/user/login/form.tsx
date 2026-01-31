@@ -39,7 +39,7 @@ const otpSchema = z.object({
 
 export default function LoginForm({ close }: { close: () => void }) {
   const router = useRouter();
-  const [step, setStep] = useState<"phone" | "otp">("otp");
+  const [step, setStep] = useState<"phone" | "otp">("phone");
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
   const action = searchParams.get("action");

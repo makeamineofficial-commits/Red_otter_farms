@@ -3,25 +3,33 @@
 import { CircleUserRound, X } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { isValidateUser } from "@/actions/auth/user.action";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import LoginForm from "./form";
 import { useSearchParams } from "next/navigation";
 function _Login() {
   const [open, setOpen] = useState(false);
-  const { push } = useRouter();
+  const { push, replace } = useRouter();
   const searchParams = useSearchParams();
   const action = searchParams.get("login") === "true";
-
+  const pathname = usePathname();
   useEffect(() => {
     if (action) setOpen(true);
   }, [action]);
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    const body = window.document.body;
-    if (open) {
-      if (body) body.style.overflow = "hidden";
-    } else {
-      if (body) body.style.overflow = "auto";
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (!open && searchParams.has("login")) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("login");
+      const query = params.toString();
+      replace(query ? `${pathname}?${query}` : pathname);
     }
   }, [open]);
   return (
