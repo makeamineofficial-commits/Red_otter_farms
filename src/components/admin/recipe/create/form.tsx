@@ -42,6 +42,7 @@ export const recipeSchema = z.object({
   ingredients: z.array(z.string().min(1)),
   chefTips: z.array(z.string().min(1)),
   nutritionalInfo: z.unknown(),
+  healthBenefits: z.array(z.string().min(1)),
   assets: z.array(
     z.object({
       url: z.string().url(),
@@ -66,6 +67,7 @@ export default function CreateRecipeForm() {
       instructions: [],
       chefTips: [],
       ingredients: [],
+      healthBenefits: [],
       isPublished: false,
       assets: [],
       tags: [],
@@ -265,7 +267,7 @@ export default function CreateRecipeForm() {
           name="ingredients"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel></FormLabel>
+              <FormLabel>Ingredients</FormLabel>
               <FormControl>
                 <ArrayField
                   value={field.value}
@@ -281,7 +283,7 @@ export default function CreateRecipeForm() {
           name="chefTips"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel></FormLabel>
+              <FormLabel>Chef's Tips</FormLabel>
               <FormControl>
                 <ArrayField
                   value={field.value}
@@ -297,12 +299,28 @@ export default function CreateRecipeForm() {
           name="nutritionalInfo"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel></FormLabel>
+              <FormLabel>Nutritional Info</FormLabel>
               <FormControl>
                 <KeyValueArrayField
                   value={field.value as Record<string, string>}
                   onChange={field.onChange}
                 ></KeyValueArrayField>
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="healthBenefits"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Health Benefits</FormLabel>
+              <FormControl>
+                <ArrayField
+                  value={field.value}
+                  onChange={field.onChange}
+                ></ArrayField>
               </FormControl>{" "}
               <FormMessage />
             </FormItem>

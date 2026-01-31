@@ -46,6 +46,7 @@ export const recipeSchema = z.object({
   ingredients: z.array(z.string().min(1)),
   chefTips: z.array(z.string().min(1)),
   nutritionalInfo: z.unknown(),
+  healthBenefits: z.array(z.string().min(1)),
   assets: z.array(
     z.object({
       url: z.string().url(),
@@ -75,6 +76,7 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
       assets: recipe.assets,
       slug: recipe.slug,
       tags: recipe.tags,
+      healthBenefits: recipe.healthBenefits,
       cookingTime: recipe.cookingTime,
       difficulty: recipe.difficulty,
       serving: recipe.serving,
@@ -285,7 +287,22 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
             </FormItem>
           )}
         />
-
+        <FormField
+          control={form.control}
+          name="healthBenefits"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>Health Benefits</FormLabel>
+              <FormControl>
+                <ArrayField
+                  value={field.value}
+                  onChange={field.onChange}
+                ></ArrayField>
+              </FormControl>{" "}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="isPublished"

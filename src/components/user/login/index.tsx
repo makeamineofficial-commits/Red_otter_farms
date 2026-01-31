@@ -9,12 +9,12 @@ import { useSearchParams } from "next/navigation";
 function _Login() {
   const [open, setOpen] = useState(false);
   const { push } = useRouter();
-  // const searchParams = useSearchParams();
-  // const action = searchParams.get("action");
+  const searchParams = useSearchParams();
+  const action = searchParams.get("login") === "true";
 
-  // useEffect(() => {
-  //   if (action) setOpen(true);
-  // }, [action]);
+  useEffect(() => {
+    if (action) setOpen(true);
+  }, [action]);
 
   useEffect(() => {
     const body = window.document.body;

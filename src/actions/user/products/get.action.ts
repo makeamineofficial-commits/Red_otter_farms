@@ -4,11 +4,16 @@ import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
 import { Product } from "@/types/product";
+import { validateUser } from "@/actions/auth/user.action";
 
-const _getProduct = async (
+const _getProductCached = async (
   slug: string,
 ): Promise<
-  (Product & { recipes: { title: string; slug: string }[] }) | null
+  | (Product & {
+      id: string;
+      recipes: { title: string; slug: string }[];
+    })
+  | null
 > => {
   const product = await db.product.findUnique({
     where: { slug },
@@ -16,7 +21,10 @@ const _getProduct = async (
       linkedRecipes: {
         select: {
           recipe: {
-            select: { title: true, slug: true },
+            select: {
+              title: true,
+              slug: true,
+            },
           },
         },
       },
@@ -43,22 +51,9 @@ const _getProduct = async (
   });
 };
 
-export const getProduct = unstable_cache(
+const getCachedProduct = unstable_cache(
   async ({ slug }: { slug: string }) => {
-    const data = await _getProduct(slug);
-
-    if (!data) {
-      return { success: false, message: "Product not found" };
-    }
-
-    return {
-      success: true,
-      message: "Product details found",
-      product: {
-        ...data,
-        nutritionalInfo: data.nutritionalInfo as Record<string, number>,
-      },
-    };
+    return _getProductCached(slug);
   },
   // @ts-ignore
   (args) => [`product:${args.slug}`],
@@ -67,3 +62,40 @@ export const getProduct = unstable_cache(
     tags: ["product"],
   },
 );
+
+export const getProduct = async ({ slug }: { slug: string }) => {
+  const product = await getCachedProduct({ slug });
+
+  if (!product) {
+    return {
+      success: false,
+      message: "Product not found",
+    };
+  }
+  const { id, ...detail } = product;
+  const user = await validateUser();
+  let presentInWishlist = false;
+
+  if (user?.phone) {
+    const wishlistItem = await db.userWishlist.findUnique({
+      where: {
+        phone_productId: {
+          phone: user.phone,
+          productId: id,
+        },
+      },
+    });
+
+    presentInWishlist = wishlistItem !== null;
+  }
+
+  return {
+    success: true,
+    message: "Product details found",
+    product: {
+      ...detail,
+      presentInWishlist,
+      nutritionalInfo: detail.nutritionalInfo as Record<string, number>,
+    },
+  };
+};

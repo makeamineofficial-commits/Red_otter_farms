@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import React, { useState } from "react";
 import { useProductStore } from "@/store/user/product.store";
+import Wishlist from "./wishlist";
 
 export default function Images() {
   const { data, isLoading, isFetching } = useProductStore();
@@ -31,7 +32,7 @@ export default function Images() {
               className="w-full h-full object-cover rounded-3xl"
             />
           )}
-          <ActionIcons />
+          <Wishlist />
         </div>
 
         <div className="grid grid-cols-3 my-2 lg:my-4.5 gap-2 lg:gap-4.5">
@@ -67,7 +68,7 @@ export default function Images() {
 
       <article className="w-full sm:hidden block relative space-y-5">
         <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden">
-          <ActionIcons />
+          <Wishlist></Wishlist>
           <Carousel setApi={setApi}>
             <CarouselContent>
               {images.map((img, i) => (

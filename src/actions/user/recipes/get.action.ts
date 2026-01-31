@@ -1,11 +1,28 @@
 "use server";
 
+import { validateUser } from "@/actions/auth/user.action";
 import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
 import { Recipe } from "@/types/recipe";
 import { unstable_cache } from "next/cache";
 
-const _getRecipe = async (slug: string): Promise<Recipe | null> => {
+/* -------------------------------------------------------------------------- */
+/*                           CACHE-SAFE RECIPE QUERY                           */
+/* -------------------------------------------------------------------------- */
+
+const _getRecipeCached = async (
+  slug: string,
+): Promise<
+  | (Recipe & {
+      id: string;
+      linkedProducts: {
+        publicId: string;
+        name: string;
+        slug: string;
+      }[];
+    })
+  | null
+> => {
   const recipe = await db.recipe.findUnique({
     where: { slug },
     include: {
@@ -20,7 +37,6 @@ const _getRecipe = async (slug: string): Promise<Recipe | null> => {
           },
         },
       },
-
       assets: {
         select: {
           url: true,
@@ -42,19 +58,13 @@ const _getRecipe = async (slug: string): Promise<Recipe | null> => {
   });
 };
 
-export const getRecipe = unstable_cache(
+/* -------------------------------------------------------------------------- */
+/*                                CACHE LAYER                                  */
+/* -------------------------------------------------------------------------- */
+
+const getCachedRecipe = unstable_cache(
   async ({ slug }: { slug: string }) => {
-    const data = await _getRecipe(slug);
-
-    if (!data) {
-      return { success: false, message: "Recipe details not found" };
-    }
-
-    return {
-      success: true,
-      message: "Recipe details found",
-      recipe: data,
-    };
+    return _getRecipeCached(slug);
   },
   // @ts-ignore
   (args) => [`recipe:${args.slug}`],
@@ -63,3 +73,44 @@ export const getRecipe = unstable_cache(
     tags: ["recipe"],
   },
 );
+
+/* -------------------------------------------------------------------------- */
+/*                           PUBLIC SERVER ACTION                               */
+/* -------------------------------------------------------------------------- */
+
+export const getRecipe = async ({ slug }: { slug: string }) => {
+  const recipe = await getCachedRecipe({ slug });
+
+  if (!recipe) {
+    return {
+      success: false,
+      message: "Recipe details not found",
+    };
+  }
+
+  const { id, ...detail } = recipe;
+  const user = await validateUser();
+  let recipeSaved = false;
+
+  if (user?.phone) {
+    const saved = await db.recipeSaves.findUnique({
+      where: {
+        phone_recipeId: {
+          phone: user.phone,
+          recipeId: id,
+        },
+      },
+    });
+
+    recipeSaved = saved !== null;
+  }
+
+  return {
+    success: true,
+    message: "Recipe details found",
+    recipe: {
+      ...detail,
+      recipeSaved,
+    },
+  };
+};

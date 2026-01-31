@@ -9,7 +9,12 @@ interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: (Product & { recipes: { title: string; slug: string }[] }) | undefined;
+  data:
+    | (Product & {
+        recipes: { title: string; slug: string }[];
+        presentInWishlist: boolean;
+      })
+    | undefined;
   error: Error | null;
 }
 
@@ -18,7 +23,11 @@ const StoreContext = createContext<StoreInterface | null>(null);
 function StoreContent({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    (Product & { recipes: { title: string; slug: string }[] }) | undefined
+    | (Product & {
+        presentInWishlist: boolean;
+        recipes: { title: string; slug: string }[];
+      })
+    | undefined
   >({
     queryKey: ["product", slug],
     queryFn: async () => {

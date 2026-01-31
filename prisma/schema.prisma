@@ -250,7 +250,7 @@ model Recipe{
   prepTime String @default("")
   
   linkedProducts RecipeProduct[] 
-  
+  healthBenefits String[]
   assets RecipeAsset[]
 
   isPublished Boolean @default(true)
@@ -307,7 +307,6 @@ model UserOTP{
 model RecipeSaves{
   phone String
   recipeId String 
-
   recipe Recipe @relation(references:[id],fields:[recipeId])
 
   @@id([phone,recipeId])
@@ -316,7 +315,6 @@ model RecipeSaves{
 model UserWishlist{
   phone String
   productId String 
-
   product Product @relation(references:[id],fields:[productId])
 
   @@id([phone,productId])

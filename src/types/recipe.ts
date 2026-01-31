@@ -10,7 +10,7 @@ export interface RecipePropsBase {
   nutritionalInfo?: any;
   assets: Asset[];
   isPublished: boolean;
-
+  healthBenefits: string[];
   cookingTime: string;
   difficulty: string;
   serving: string;

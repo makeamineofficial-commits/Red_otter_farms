@@ -9,7 +9,7 @@ interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: Recipe | undefined;
+  data: (Recipe & { recipeSaved: boolean }) | undefined;
   error: Error | null;
 }
 
@@ -18,9 +18,9 @@ const StoreContext = createContext<StoreInterface | null>(null);
 function StoreContent({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    Recipe | undefined
+    (Recipe & { recipeSaved: boolean }) | undefined
   >({
-    queryKey: ["product", slug],
+    queryKey: ["recipe", slug],
     queryFn: async () => {
       if (!slug) return;
       const data = await getRecipe({
