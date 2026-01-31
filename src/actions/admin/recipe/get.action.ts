@@ -18,10 +18,25 @@ export const getRecipe = async ({
     include: {
       linkedProducts: {
         select: {
+          quantity: true,
           product: {
             select: {
-              name: true,
               publicId: true,
+              name: true,
+              slug: true,
+              price: true,
+              mrp: true,
+              nutritionalInfo: true,
+              displayName: true,
+              description: true,
+              weight: true,
+              weightUnit: true,
+              assets: {
+                select: {
+                  url: true,
+                  type: true,
+                },
+              },
             },
           },
         },
@@ -42,7 +57,7 @@ export const getRecipe = async ({
   const data = nullToUndefined({
     ...product,
     linkedProducts: product.linkedProducts.map((ele) => {
-      return { ...ele.product };
+      return { quantity: ele.quantity, ...ele.product };
     }),
     assets: product.assets.map((ele) => {
       return { ...ele };
