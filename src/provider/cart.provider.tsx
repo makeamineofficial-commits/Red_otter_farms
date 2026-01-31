@@ -20,6 +20,11 @@ type ContextType = {
     toggle?: boolean;
   }) => Promise<void>;
   remove: (args: { productPublicId: string }) => Promise<void>;
+  updateMany: (args: {
+    products: { product: CartProduct; quantity: number }[];
+    toggle?: boolean;
+  }) => Promise<void>;
+
   cart: Cart | null;
   isUpdating: boolean;
   isLoading: boolean;
@@ -122,7 +127,64 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         quantity,
       });
     } catch (err) {
-      // rollback on failure
+
+      setCart(previousCart);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const updateMany = async ({
+    products,
+    toggle = true,
+  }: {
+    products: { product: CartProduct; quantity: number }[];
+    toggle?: boolean;
+  }) => {
+    if (!cart) return;
+
+    const previousCart = cart;
+
+    const productMap = new Map(
+      cart.products.map((p) => [p.publicId, { ...p }]),
+    );
+
+    for (const { product, quantity } of products) {
+      const existing = productMap.get(product.publicId);
+
+      if (existing) {
+        existing.quantity += quantity; 
+      } else {
+        productMap.set(product.publicId, {
+          ...product,
+          quantity,
+        });
+      }
+    }
+
+    const updatedCart: Cart = {
+      ...cart,
+      products: Array.from(productMap.values()),
+    };
+
+    setCart(updatedCart);
+
+    if (toggle) setIsOpen(true);
+
+    try {
+      setUpdating(true);
+      await Promise.all(
+        products.map(({ product, quantity }) =>
+          updateCart({
+            productPublicId: product.publicId,
+            quantity:
+              (previousCart.products.find(
+                (p) => p.publicId === product.publicId,
+              )?.quantity ?? 0) + quantity,
+          }),
+        ),
+      );
+    } catch (err) {
       setCart(previousCart);
     } finally {
       setUpdating(false);
@@ -138,6 +200,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         remove,
         isUpdating,
         isLoading,
+        updateMany,
         cart,
       }}
     >

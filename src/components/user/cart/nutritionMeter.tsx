@@ -86,7 +86,7 @@ function NutritionContent() {
     <div className="space-y-4">
       {Object.entries(totals).length === 0 ? (
         <>
-          <div className="my-2 text-muted-foreground text-sm text-center">
+          <div className="my-2 text-muted-foreground text-sm text-center uppercase">
             No Information
           </div>
         </>

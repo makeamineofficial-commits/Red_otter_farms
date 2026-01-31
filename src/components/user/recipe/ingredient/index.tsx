@@ -1,8 +1,28 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Salad, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, ShoppingCart } from "lucide-react";
 import { Recipe } from "@/types/recipe";
-export default function Ingredients({ ingredients }: Recipe) {
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/provider/cart.provider";
+import { toast } from "sonner";
+export default function Ingredients({ ingredients, linkedProducts }: Recipe) {
+  const [added, setAdded] = useState(false);
+
+  const { isLoading, isUpdating, updateMany } = useCart();
+
+  const handleClick = async () => {
+    try {
+      await updateMany({
+        products: linkedProducts.map((ele) => {
+          return { product: ele, quantity: ele.quantity };
+        }),
+      });
+      setAdded(true);
+      toast.info("Ingredients added to cart");
+    } catch (err) {
+      toast.error("Failed to add ingredients to cart");
+    }
+  };
+
   return (
     <div className="space-y-6  bg-white p-6 rounded-2xl shadow-lg">
       <h2 className="text-xl font-semibold">Ingredients</h2>
@@ -15,6 +35,15 @@ export default function Ingredients({ ingredients }: Recipe) {
           </li>
         ))}
       </ul>
+
+      <Button
+        disabled={added || isLoading || isUpdating}
+        onClick={() => handleClick()}
+        className="bg-forest! text-white! hover:bg-forest! hover:text-white! w-full"
+      >
+        <ShoppingCart></ShoppingCart>
+        Shop Ingredients
+      </Button>
     </div>
   );
 }

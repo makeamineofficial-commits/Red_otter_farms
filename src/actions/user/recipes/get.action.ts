@@ -6,10 +6,6 @@ import { nullToUndefined } from "@/lib/utils";
 import { Recipe } from "@/types/recipe";
 import { unstable_cache } from "next/cache";
 
-/* -------------------------------------------------------------------------- */
-/*                           CACHE-SAFE RECIPE QUERY                           */
-/* -------------------------------------------------------------------------- */
-
 const _getRecipeCached = async (
   slug: string,
 ): Promise<
@@ -28,11 +24,25 @@ const _getRecipeCached = async (
     include: {
       linkedProducts: {
         select: {
+          quantity: true,
           product: {
             select: {
               publicId: true,
               name: true,
               slug: true,
+              price: true,
+              mrp: true,
+              nutritionalInfo: true,
+              displayName: true,
+              description: true,
+              weight: true,
+              weightUnit: true,
+              assets: {
+                select: {
+                  url: true,
+                  type: true,
+                },
+              },
             },
           },
         },
@@ -54,13 +64,11 @@ const _getRecipeCached = async (
   return nullToUndefined({
     ...recipe,
     summary: recipe.summary,
-    linkedProducts: recipe.linkedProducts.map((p) => p.product),
+    linkedProducts: recipe.linkedProducts.map((p) => {
+      return { quantity: p.quantity, ...p.product };
+    }),
   });
 };
-
-/* -------------------------------------------------------------------------- */
-/*                                CACHE LAYER                                  */
-/* -------------------------------------------------------------------------- */
 
 const getCachedRecipe = unstable_cache(
   async ({ slug }: { slug: string }) => {
@@ -73,10 +81,6 @@ const getCachedRecipe = unstable_cache(
     tags: ["recipe"],
   },
 );
-
-/* -------------------------------------------------------------------------- */
-/*                           PUBLIC SERVER ACTION                               */
-/* -------------------------------------------------------------------------- */
 
 export const getRecipe = async ({ slug }: { slug: string }) => {
   const recipe = await getCachedRecipe({ slug });

@@ -39,7 +39,7 @@ const otpSchema = z.object({
 
 export default function LoginForm({ close }: { close: () => void }) {
   const router = useRouter();
-  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [step, setStep] = useState<"phone" | "otp">("otp");
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
   const action = searchParams.get("action");
@@ -88,7 +88,7 @@ export default function LoginForm({ close }: { close: () => void }) {
         <Form {...phoneForm}>
           <form
             onSubmit={phoneForm.handleSubmit(onSendOTP)}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             <FormField
               control={phoneForm.control}
@@ -101,13 +101,13 @@ export default function LoginForm({ close }: { close: () => void }) {
 
                   <FormControl>
                     <div className="flex items-center gap-2 border rounded-full px-4 py-2">
-                      <span className="text-sm text-muted-foreground border-r pr-3">
+                      <span className="text-sm sm:text-base text-muted-foreground border-r pr-3">
                         +91
                       </span>
                       <Input
                         {...field}
                         placeholder="Enter mobile number"
-                        className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                        className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm sm:text-base"
                       />
                     </div>
                   </FormControl>
@@ -120,7 +120,7 @@ export default function LoginForm({ close }: { close: () => void }) {
             <div className="space-y-3 pt-2">
               <Button
                 type="submit"
-                className="w-full bg-maroon rounded-full py-6 text-sm font-semibold hover:bg-maroon/90"
+                className="w-full bg-maroon rounded-full py-4 sm:py-6 text-xs sm:text-sm font-semibold hover:bg-maroon/90"
                 disabled={isPending}
                 onClick={() => {
                   phoneForm.setValue("type", "mobile");
@@ -136,7 +136,7 @@ export default function LoginForm({ close }: { close: () => void }) {
 
               <Button
                 type="button"
-                className="w-full bg-maroon rounded-full py-6 text-sm font-semibold hover:bg-maroon/90"
+                className="w-full bg-maroon rounded-full py-4 sm:py-6 text-xs sm:text-sm font-semibold hover:bg-maroon/90"
                 disabled={isPending}
                 onClick={() => {
                   phoneForm.setValue("type", "whatsapp");
@@ -158,7 +158,7 @@ export default function LoginForm({ close }: { close: () => void }) {
         <Form {...otpForm}>
           <form
             onSubmit={otpForm.handleSubmit(onVerifyOTP)}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             <p className="text-sm text-muted-foreground">
               Enter the 6-digit OTP sent to your phone
@@ -193,7 +193,7 @@ export default function LoginForm({ close }: { close: () => void }) {
 
             <Button
               type="submit"
-              className="w-full bg-maroon rounded-full py-6 text-sm font-semibold hover:bg-maroon/90"
+              className="w-full bg-maroon rounded-full py-4 sm:py-6 text-xs sm:text-sm font-semibold hover:bg-maroon/90"
               disabled={isPending}
             >
               {isPending ? "Verifying..." : "VERIFY OTP"}
@@ -202,7 +202,7 @@ export default function LoginForm({ close }: { close: () => void }) {
             <Button
               type="button"
               variant="outline"
-              className="w-full rounded-full py-6 text-sm font-semibold border-maroon text-maroon hover:bg-maroon hover:text-white"
+              className="w-full rounded-full py-4 sm:py-6 text-xs sm:text-sm font-semibold border-maroon text-maroon hover:bg-maroon hover:text-white"
               onClick={() => setStep("phone")}
             >
               Back

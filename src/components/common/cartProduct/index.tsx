@@ -129,6 +129,13 @@ export default function Products() {
         </>
       ) : (
         <>
+          {cart?.products.length === 0 ? (
+            <span className="uppercase text-muted-foreground text-sm text-center py-4">
+              Cart is Empty
+            </span>
+          ) : (
+            <></>
+          )}
           {cart?.products.map((ele, idx) => (
             <ProductCard key={ele.publicId} {...ele} />
           ))}

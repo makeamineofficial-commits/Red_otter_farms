@@ -19,6 +19,7 @@ import {
   Zap,
   MessageSquare,
   Award,
+  X,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -81,7 +82,7 @@ function SidebarComponent() {
 
   return (
     <>
-      <div className="h-full w-60 border-r bg-background">
+      <div className="h-full w-80 md:w-60 border-r bg-background">
         <div className="p-3 space-y-2">
           <h2 className=" text-[0.65rem] text-black/70 pl-3">ACCOUNT</h2>
           <div className="flex flex-col ">
@@ -233,7 +234,7 @@ export default function Sidebar() {
         ></div>
       )}
       <aside
-        className={`block absolute overflow-y-auto no-scrollbar top-0 left-0 z-100 bg-white h-screen pt-5 md:hidden ${isOpen ? "max-w-60" : "max-w-0"} overflow-hidden transition-all duration-200`}
+        className={`block absolute overflow-y-auto no-scrollbar top-0 left-0 z-100 bg-white h-screen pt-5 md:hidden ${isOpen ? "max-w-80" : "max-w-0"} overflow-hidden transition-all duration-200`}
       >
         <SidebarComponent />
       </aside>
