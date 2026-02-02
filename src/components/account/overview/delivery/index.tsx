@@ -54,10 +54,21 @@ export default function Delivery() {
       </div>
 
       <div>
-        <h2 className="text-[1.25rem] font-bold">Free Delivery Active</h2>
-        <p className="text-[0.875rem] text-muted-foreground">
-          Unlimited free delivery on your orders for the month.
-        </p>
+        {data.otter_pass ? (
+          <>
+            <h2 className="text-[1.25rem] font-bold">Free Delivery Active</h2>
+            <p className="text-[0.875rem] text-muted-foreground">
+              Unlimited free delivery on your orders for the month.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="text-[1.25rem] font-bold">Activate Free Delivery</h2>
+            <p className="text-[0.875rem] text-muted-foreground">
+              Enjoy unlimited free delivery for the month.
+            </p>
+          </>
+        )}
       </div>
 
       <Button variant={"outline"} className="rounded-md mt-4">

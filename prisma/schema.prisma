@@ -319,3 +319,17 @@ model UserWishlist{
 
   @@id([phone,productId])
 }
+
+
+
+enum AddressLabelEnum{
+  HOME
+  WORK
+  CUSTOM
+}
+model AddressLabel{
+  id String @id @default(uuid())
+  addressId String @unique
+  label AddressLabelEnum @default(HOME)
+  customLabel String?
+}

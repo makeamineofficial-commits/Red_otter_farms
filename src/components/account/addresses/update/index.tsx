@@ -24,7 +24,8 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
+import { Address } from "@/types/account";
 
 const LABELS = [
   { value: "home", label: "Home" },
@@ -50,20 +51,27 @@ const addressSchema = z
 
 type AddressFormValues = z.infer<typeof addressSchema>;
 
-/* ---------------- Component ---------------- */
-
-export default function AddressForm() {
+export default function UpdateAddressForm({
+  address,
+  street2,
+  attention,
+  zip,
+  city,
+  state,
+  customLabel,
+  label,
+}: Address) {
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      address: "",
-      street2: "",
-      attention: "",
-      zip_code: "",
-      city: "",
-      state: "",
-      labelType: "home",
-      customLabel: "",
+      address,
+      street2,
+      attention,
+      zip_code: zip,
+      city,
+      state,
+      labelType: label,
+      customLabel: customLabel ?? undefined,
       country: "India",
     },
   });
@@ -75,20 +83,17 @@ export default function AddressForm() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="min-h-30 w-full rounded-2xl  border flex justify-center flex-col gap-2 items-center">
-          <div className="p-2 border rounded-full">
-            <Plus size={30} className="text-muted-foreground/40"></Plus>
-          </div>
-
-          <p className="text-muted-foreground text-xs">Add Address</p>
-        </div>
+        <button>
+          <Pencil size={15} className="stroke-1 "></Pencil>
+        </button>
       </DialogTrigger>
       <DialogContent className="max-h-[90%] overflow-auto">
         <div className="flex flex-col gap-2 sm:gap-4">
           <div>
-            <h2 className="text-lg font-semibold">Add Address</h2>
+            <h2 className="text-lg font-semibold">Update Address</h2>
             <p className="text-sm text-muted-foreground">
-              Use a permanent address where you can receive deliveries
+              Update this address to ensure deliveries continue without
+              interruption.
             </p>
           </div>
 

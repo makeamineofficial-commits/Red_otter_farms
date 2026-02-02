@@ -1,45 +1,56 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Address } from "@/types/account";
+import UpdateAddressForm from "../update";
+const fallback = (value?: string, placeholder?: string) =>
+  value && value.trim().length > 0 ? value : placeholder;
 
-export default function AddressCard() {
+const DUMMY_ADDRESS = {
+  address: "D-**/** J**** Flats, Sec **",
+  city: "Noida",
+  state: "Uttar Pradesh",
+  zip: "20****",
+  country: "India",
+  phone: "9XXXXXXXXX",
+};
+
+export default function AddressCard(details: Address & { name: string }) {
+  const { address, city, country, state, name, zip, phone } = details;
   return (
     <div className="w-full h-auto p-4 border rounded-2xl relative">
-      <div className="space-y-2 text-sm mt-4  ">
-        <p className="font-semibold">John Doe</p>
-        <div>
-          <p className="text-muted-foreground">
-            D-**/** J**** Flats, Sec **, Noida
+      <div className="space-y-2 text-sm mt-4">
+        <p className="font-semibold line-clamp-1">{name || "Your Name"}</p>
+
+        <div className="space-y-1">
+          <p className="text-muted-foreground line-clamp-1">
+            {fallback(address, DUMMY_ADDRESS.address)}
           </p>
-          <p className="text-muted-foreground">NOIDA, UTTAR PRADESH 201301</p>
-          <p className="text-muted-foreground">India</p>
+
+          <p className="text-muted-foreground line-clamp-1">
+            <span>{fallback(city, DUMMY_ADDRESS.city)}</span>,{" "}
+            <span>{fallback(state, DUMMY_ADDRESS.state)}</span>{" "}
+            {fallback(zip, DUMMY_ADDRESS.zip)}
+          </p>
+
+          <p className="text-muted-foreground">
+            {fallback(country, DUMMY_ADDRESS.country)}
+          </p>
         </div>
 
-        <p className="">
+        <p>
           Phone number:{" "}
-          <span className="text-muted-foreground">9650******</span>
+          <span className="text-muted-foreground line-clamp-1">
+            {fallback(phone, DUMMY_ADDRESS.phone)}
+          </span>
         </p>
       </div>
 
-      <div className="ml-auto w-fit mt-4 gap-1 flex justify-end">
-        <Badge variant={"outline"} className="">
-          Home
-        </Badge>
-        <Badge variant={"outline"} className="">
-          Work
-        </Badge>
-      </div>
-
       <div className="flex gap-2 absolute top-4 right-4">
-        <button>
-          <Pencil size={15} className="stroke-1 "></Pencil>
-        </button>
+        <UpdateAddressForm {...details}></UpdateAddressForm>
 
         <button>
-          <Trash2 size={15} className="stroke-1 text-red-500"></Trash2>
+          <Trash2 size={15} className="stroke-1 text-red-500" />
         </button>
       </div>
     </div>

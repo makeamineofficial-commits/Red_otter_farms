@@ -83,7 +83,7 @@ export default function KPI() {
             <Badge className="rounded-full  bg-maroon text-white">Active</Badge>
           ) : (
             <Badge variant={"outline"} className="rounded-full ">
-              Inactive
+              Not Active
             </Badge>
           )}
         </div>
@@ -98,7 +98,7 @@ export default function KPI() {
         <div className="flex items-center justify-center gap-1 flex-col">
           <p className="text-xs text-muted-foreground">Loyalty Badge</p>
           <Badge variant={"outline"} className="rounded-full capitalize">
-            {data.loyality_status}
+            {data.loyality_status ? data.loyality_status : "None"}
           </Badge>
         </div>
       </div>
@@ -112,7 +112,7 @@ export default function KPI() {
           <p className="text-xs text-muted-foreground">Total Saved</p>
 
           <h2 className="font-bold text-[1.05rem]">
-            ₹{data.total_saving.toFixed(2)}
+            ₹{Number(data.total_saving ?? "0").toFixed(2) ?? "0.00"}
           </h2>
         </div>
         {/*  */}

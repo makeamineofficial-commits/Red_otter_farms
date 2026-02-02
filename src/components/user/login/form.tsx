@@ -27,6 +27,7 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import { useAccountStore } from "@/store/user/account.store";
 
 const phoneSchema = z.object({
   phone: z.string().min(10, "Please enter a valid mobile number"),
@@ -38,6 +39,7 @@ const otpSchema = z.object({
 });
 
 export default function LoginForm({ close }: { close: () => void }) {
+  const { refetch } = useAccountStore();
   const router = useRouter();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [isPending, startTransition] = useTransition();
@@ -77,6 +79,7 @@ export default function LoginForm({ close }: { close: () => void }) {
       }
 
       toast.success("Login successful");
+      await refetch();
       if (action === "close") close();
       else router.push("/account/profile");
     });

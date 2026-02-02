@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { generateJWT, validateToken } from "@/utils/jwt.util";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { AdminToken } from "@/types/auth";
 const loginAdminUser = async ({
   email,
   password,
@@ -33,9 +34,13 @@ const loginAdminUser = async ({
         message: "Incorrect password provided",
       };
     }
-    const accessToken = await generateJWT({ email: user.email, id: user.id });
+    const accessToken = await generateJWT({
+      email: user.email,
+      id: user.id,
+      type: "access",
+    });
     const refreshToken = await generateJWT(
-      { email: user.email, id: user.id },
+      { email: user.email, id: user.id, type: "refresh" },
       "30d",
     );
 
@@ -67,78 +72,14 @@ const loginAdminUser = async ({
   }
 };
 
-const registerAdmin = async ({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) => {
-  try {
-    const check = await db.adminUser.findUnique({
-      where: {
-        email,
-      },
-    });
-
-    if (check) {
-      return {
-        user: null,
-        success: false,
-        message: "Admin User already registered",
-      };
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const user = await db.adminUser.create({
-      data: {
-        email,
-        passwordHash,
-      },
-    });
-    const accessToken = await generateJWT({ email: user.email, id: user.id });
-    const refreshToken = await generateJWT(
-      { email: user.email, id: user.id },
-      "30d",
-    );
-
-    const cookieStore = await cookies();
-    cookieStore.set("admin-access-token", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: true,
-      maxAge: 60 * 15,
-      path: "/",
-    });
-    cookieStore.set("admin-refresh-token", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: true,
-      maxAge: 60 * 60 * 24 * 30,
-      path: "/",
-    });
-    return {
-      success: true,
-      message: "Admin User registered successfully",
-    };
-  } catch (err) {
-    return {
-      user: null,
-      success: false,
-      message: "Admin User failed to registered",
-    };
-  }
-};
-
 const validateAdmin = async () => {
   const cookieStore = await cookies();
 
   const accessToken = cookieStore.get("admin-access-token")?.value;
   const refreshToken = cookieStore.get("admin-refresh-token")?.value;
 
-  const accessPayload = await validateToken(accessToken);
-  const refreshPayload = await validateToken(refreshToken);
+  const accessPayload = await validateToken<AdminToken>(accessToken);
+  const refreshPayload = await validateToken<AdminToken>(refreshToken);
 
   if (!accessPayload && !refreshPayload) {
     redirect("/admin/login");
@@ -154,6 +95,7 @@ const validateAdmin = async () => {
   if (!admin) redirect("/admin/login"); // admin has been deleted
   if (!accessPayload && refreshPayload) {
     const newAccessToken = await generateJWT({
+      type: "access",
       id: refreshPayload.id,
       email: refreshPayload.email,
     });
@@ -196,4 +138,4 @@ export async function adminLogout() {
   redirect("/");
 }
 
-export { loginAdminUser, registerAdmin, validateAdmin, isValidateAdmin };
+export { loginAdminUser, validateAdmin, isValidateAdmin };

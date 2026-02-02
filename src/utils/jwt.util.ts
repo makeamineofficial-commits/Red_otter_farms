@@ -1,4 +1,3 @@
-import { JWTPayload } from "@/types/common";
 import { SignJWT, jwtVerify } from "jose";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
@@ -27,13 +26,11 @@ export async function verifyJWT(token: string) {
   }
 }
 
-export const validateToken = async (
-  token?: string
-): Promise<JWTPayload | null> => {
+export const validateToken = async <T>(token?: string): Promise<T | null> => {
   if (!token) return null;
 
   const result = await verifyJWT(token);
   if (!result.valid) return null;
 
-  return result.payload as JWTPayload;
+  return result.payload as T;
 };

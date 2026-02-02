@@ -1,5 +1,3 @@
-import React from "react";
-import Progress from "@/components/account/overview/profile";
 import Balance from "@/components/account/overview/balance";
 import Delivery from "@/components/account/overview/delivery";
 import KPI from "@/components/account/overview/kpi";

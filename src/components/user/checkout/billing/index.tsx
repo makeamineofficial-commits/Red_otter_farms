@@ -34,7 +34,7 @@ export default function Billing() {
       type="single"
       defaultValue="billing"
       collapsible
-      className="w-full border rounded-lg"
+      className="w-full border rounded-lg p-6"
     >
       <AccordionItem value="billing" className="border-none">
         <AccordionTrigger2 className="px-4! py-3! h-auto! justify-start!">
@@ -46,7 +46,7 @@ export default function Billing() {
           >
             <div className="group-data-[state=open]:bg-forest p-1 rounded-full"></div>
           </div>
-          <h2 className="text-lg! font-semibold!">Billing Information</h2>
+          <h2 className="text-xl! font-semibold!">Billing Information</h2>
         </AccordionTrigger2>
 
         <AccordionContent className="px-4! py-6! space-y-5 ">
@@ -54,8 +54,9 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Mobile Number *</Label>
             <div className="flex gap-2">
-              <Input value="+91" disabled className="w-20" />
+              <Input value="+91" disabled className="w-20 h-12!" />
               <Input
+                className="h-12!"
                 placeholder="Enter mobile number"
                 name="mobile"
                 value={billing.mobile || ""}
@@ -69,6 +70,7 @@ export default function Billing() {
             <div className="space-y-1">
               <Label className="text-muted-foreground">First Name *</Label>
               <Input
+                className="h-12!"
                 value={billing.firstName || ""}
                 onChange={(e) => handleChange("firstName", e.target.value)}
               />
@@ -77,6 +79,7 @@ export default function Billing() {
             <div className="space-y-1">
               <Label className="text-muted-foreground">Last Name *</Label>
               <Input
+                className="h-12!"
                 value={billing.lastName || ""}
                 onChange={(e) => handleChange("lastName", e.target.value)}
               />
@@ -87,6 +90,7 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Email (optional)</Label>
             <Input
+              className="h-12!"
               type="email"
               value={billing.email || ""}
               onChange={(e) => handleChange("email", e.target.value)}
@@ -97,6 +101,7 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Street Address *</Label>
             <Input
+              className="h-12!"
               value={billing.address || ""}
               onChange={(e) => handleChange("address", e.target.value)}
             />
@@ -106,6 +111,7 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Town / City *</Label>
             <Input
+              className="h-12!"
               value={billing.city || ""}
               onChange={(e) => handleChange("city", e.target.value)}
             />
@@ -118,7 +124,7 @@ export default function Billing() {
               value={billing.state}
               onValueChange={(value) => handleChange("state", value)}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full h-12!">
                 <SelectValue placeholder="Select state" />
               </SelectTrigger>
               <SelectContent className="w-full">
@@ -131,6 +137,7 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Postcode / ZIP *</Label>
             <Input
+              className="h-12!"
               value={billing.zip || ""}
               onChange={(e) => handleChange("zip", e.target.value)}
             />
@@ -139,7 +146,7 @@ export default function Billing() {
           {/* Country */}
           <div className="space-y-1">
             <Label className="text-muted-foreground">Country</Label>
-            <Input value="India" disabled />
+            <Input className="h-12!" value="India" disabled />
           </div>
         </AccordionContent>
       </AccordionItem>

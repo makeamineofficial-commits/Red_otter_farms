@@ -7,6 +7,8 @@ import { validateToken } from "@/utils/jwt.util";
 import { db } from "@/lib/db";
 import { sendOTP, verifyOTP } from "@/utils/otp.util";
 import { success } from "zod";
+import axios from "axios";
+import { UserToken } from "@/types/auth";
 
 const validateUser = async () => {
   const cookieStore = await cookies();
@@ -14,8 +16,8 @@ const validateUser = async () => {
   const accessToken = cookieStore.get("access-token")?.value;
   const refreshToken = cookieStore.get("refresh-token")?.value;
 
-  const accessPayload = await validateToken(accessToken);
-  const refreshPayload = await validateToken(refreshToken);
+  const accessPayload = await validateToken<UserToken>(accessToken);
+  const refreshPayload = await validateToken<UserToken>(refreshToken);
 
   if (!accessPayload && !refreshPayload) {
     return null;
@@ -23,8 +25,8 @@ const validateUser = async () => {
 
   if (!accessPayload && refreshPayload) {
     const newAccessToken = await generateJWT({
-      id: refreshPayload.id,
-      email: refreshPayload.email,
+      phone: refreshPayload.phone,
+      customerId: refreshPayload.customerId,
     });
 
     cookieStore.set("access-token", newAccessToken, {
@@ -37,7 +39,10 @@ const validateUser = async () => {
   }
 
   return {
-    phone: refreshPayload!.phone,
+    customerId: refreshPayload!.customerId,
+    phone: refreshPayload!.phone?.startsWith("+91")
+      ? refreshPayload?.phone
+      : "+91" + refreshPayload?.phone,
   };
 };
 
@@ -47,13 +52,13 @@ const isValidateUser = async () => {
   const accessToken = cookieStore.get("access-token")?.value;
   const refreshToken = cookieStore.get("refresh-token")?.value;
 
-  const accessPayload = await validateToken(accessToken);
-  const refreshPayload = await validateToken(refreshToken);
+  const accessPayload = await validateToken<UserToken>(accessToken);
+  const refreshPayload = await validateToken<UserToken>(refreshToken);
 
   if (!accessPayload && !refreshPayload) {
     return false;
   }
-  // even with expired access token they are considered logged in
+
   return true;
 };
 
@@ -88,8 +93,24 @@ const verifyUser = async ({ otp }: { otp: string }) => {
       return { success: false, message: res.message };
     }
     const { phone } = res;
-    const accessToken = await generateJWT({ phone });
-    const refreshToken = await generateJWT({ phone }, "30d");
+    const userRes = await axios.post(
+      "https://automation.redotterfarms.com/webhook/0b38de6f-5560-4396-8204-a1874e419a2d",
+      { phone: "+91" + phone },
+      {
+        headers: { api_key: process.env.BACKEND_API_KEY as string },
+      },
+    );
+
+    const account = userRes.data;
+    const accessToken = await generateJWT({
+      type: "access",
+      phone,
+      customerId: account[0].mobile,
+    });
+    const refreshToken = await generateJWT(
+      { type: "refresh", phone, customerId: account[0].mobile },
+      "30d",
+    );
     const cookieStore = await cookies();
     cookieStore.set("access-token", accessToken, {
       httpOnly: true,

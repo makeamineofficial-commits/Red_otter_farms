@@ -42,7 +42,7 @@ export default function Balance() {
 
       <div>
         <h2 className="text-[1.25rem] font-bold">
-          Balance: ₹{data?.otter_wallet.toFixed(2)}
+          Balance: ₹{Number(data?.otter_wallet ?? "0").toFixed(2) ?? "0.00"}
         </h2>
         <p className="text-[0.875rem] text-muted-foreground">
           Use it on your next order to save time.

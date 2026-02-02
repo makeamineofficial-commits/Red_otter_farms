@@ -1,29 +1,27 @@
 "use client";
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ListAddressReturnType } from "@/types/account";
+import { listAddress } from "@/actions/user/address/list.action";
 
-import { useParams } from "next/navigation";
-import { getAccount } from "@/actions/user/account/get.action";
-import { Account } from "@/types/account";
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: Account | undefined;
+  data: ListAddressReturnType | undefined;
   error: Error | null;
-  refetch: () => Promise<any>;
 }
 
 const StoreContext = createContext<StoreInterface | null>(null);
 
 function StoreContent({ children }: { children: React.ReactNode }) {
-  const { isFetching, isError, isLoading, data, error, refetch } = useQuery<
-    Account | undefined
+  const { isFetching, isError, isLoading, data, error } = useQuery<
+    ListAddressReturnType | undefined
   >({
-    queryKey: ["account"],
+    queryKey: ["address"],
     queryFn: async () => {
-      const data = await getAccount();
-      return data.account;
+      const data = await listAddress();
+      return data.data;
     },
 
     staleTime: 1000 * 60 * 5,
@@ -33,14 +31,14 @@ function StoreContent({ children }: { children: React.ReactNode }) {
 
   return (
     <StoreContext.Provider
-      value={{ isLoading, isError, isFetching, data, error, refetch }}
+      value={{ isLoading, isError, isFetching, data, error }}
     >
       {children}
     </StoreContext.Provider>
   );
 }
 
-export const AccountStore = ({ children }: { children: React.ReactNode }) => {
+export const AddressStore = ({ children }: { children: React.ReactNode }) => {
   return (
     <Suspense fallback={<></>}>
       <StoreContent>{children}</StoreContent>
@@ -48,8 +46,8 @@ export const AccountStore = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useAccountStore = () => {
+export const useAddressStore = () => {
   const ctx = useContext(StoreContext);
-  if (!ctx) throw new Error("useAccountStore must be used inside AccountStore");
+  if (!ctx) throw new Error("useAddressStore must be used inside AddressStore");
   return ctx;
 };

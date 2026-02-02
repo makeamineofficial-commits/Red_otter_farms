@@ -29,7 +29,7 @@ export const profileSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
   lastName: z.string().min(2, "Last name is required"),
   email: z.string().email("Invalid email"),
-  phone: z
+  mobile: z
     .string()
     .optional()
     .refine((val) => !val || indianMobileRegex.test(val), {
@@ -53,10 +53,10 @@ export default function ProfileForm() {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: data?.first_name,
-      lastName: data?.last_name,
+      firstName: "",
+      lastName: "",
       email: "",
-      phone: data?.phone,
+      mobile: "",
       age: undefined,
       familySize: undefined,
       familyMemberType: undefined,
@@ -67,8 +67,8 @@ export default function ProfileForm() {
     if (!data) return;
     form.setValue("firstName", data.first_name);
     form.setValue("lastName", data.last_name);
-    form.setValue("phone", data.phone);
-  }, [data]);
+    form.setValue("mobile", data.mobile.replace("+91", ""));
+  }, [data, isLoading, isFetching]);
 
   const onSubmit = (values: ProfileFormValues) => {
     console.log("PROFILE SUBMIT", values);
@@ -140,10 +140,10 @@ export default function ProfileForm() {
         {/* Phone */}
         <FormField
           control={form.control}
-          name="phone"
+          name="mobile"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone (optional)</FormLabel>
+              <FormLabel>Phone</FormLabel>
               <FormControl>
                 <Input
                   readOnly
