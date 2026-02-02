@@ -27,13 +27,6 @@ export function RecipeCard({
   const [api, setApi] = useState<any>(null);
   const [current, setCurrent] = useState(0);
 
-  const { category } = useParams();
-  const router = useRouter();
-
-  const href = category
-    ? `/recipes/${category}/${slug}`
-    : `/recipes/all/${slug}`;
-
   useEffect(() => {
     if (!api) return;
 
@@ -44,8 +37,11 @@ export function RecipeCard({
   }, [api]);
 
   return (
-    <div className="overflow-hidden bg-white rounded-2xl border hover:shadow-md transition-all">
-      {/* IMAGE CAROUSEL */}
+    <div className="overflow-hidden relative bg-white rounded-2xl border hover:shadow-md transition-all">
+      <Link
+        href={`/recipe/${slug}`}
+        className="absolute top-0 left-0  h-full w-full  z-10 "
+      ></Link>
       <Carousel
         setApi={setApi}
         plugins={[
@@ -77,7 +73,7 @@ export function RecipeCard({
 
         {/* DOTS */}
         <div
-          className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1"
+          className="absolute z-20 bottom-2 left-1/2 -translate-x-1/2 flex gap-1"
           onClick={(e) => e.stopPropagation()}
         >
           {assets?.map((_, index) => (
@@ -112,11 +108,10 @@ export function RecipeCard({
             </span>
           </div>
         </div>
-        <Link href={href} target="_blank">
-          <Button className="w-full rounded-xl bg-forest hover:bg-forest">
-            View Recipe
-          </Button>
-        </Link>
+
+        <Button className="w-full rounded-xl bg-forest hover:bg-forest">
+          View Recipe
+        </Button>
       </div>
     </div>
   );

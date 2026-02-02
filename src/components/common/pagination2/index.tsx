@@ -16,7 +16,6 @@ import { clsx } from "clsx";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 interface Props {
-  colSpan: number;
   page: number;
   limit: number;
   total: number;
@@ -31,7 +30,6 @@ const PaginationComponent = ({
   total,
   totalPages,
   prev,
-  colSpan,
   next,
 }: Props) => {
   const router = useRouter();

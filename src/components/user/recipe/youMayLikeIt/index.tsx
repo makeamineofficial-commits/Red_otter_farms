@@ -1,11 +1,10 @@
 "use client";
-import React from "react";
 import { RecipeCard } from "@/components/common/recipeCard";
 import { RecipeCardLoader } from "@/components/common/recipeCard/loading";
-import { useRecipeListingStore } from "@/store/user/recipes.store";
+import { useSimilarRecipeStore } from "@/store/user/similar-recipe.store";
 
 export default function YouMayLikeIt() {
-  const { data, isLoading, isFetching } = useRecipeListingStore();
+  const { data, isLoading, isFetching } = useSimilarRecipeStore();
   if (!data || isFetching || isLoading)
     return (
       <>
@@ -24,7 +23,7 @@ export default function YouMayLikeIt() {
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">You May Also Like</h3>
       <article className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-        {data.data.slice(0, 4).map((recipe) => (
+        {data.slice(0, 4).map((recipe) => (
           //  @ts-ignore
           <RecipeCard key={recipe.title} {...recipe} />
         ))}

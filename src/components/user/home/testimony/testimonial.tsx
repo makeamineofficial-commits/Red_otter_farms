@@ -24,14 +24,14 @@ function TestimonialCard({
   rating = 5,
 }: TestimonialCardProps) {
   return (
-    <div className="border border-forest flex flex-col w-full overflow-hidden">
+    <div className="border border-forest flex flex-col w-full h-full">
       {/* Image */}
-      <div className="relative w-full aspect-4/3 overflow-hidden">
+      <div className="relative w-full aspect-4/3 overflow-hidden ">
         <Image src={image} alt={name} fill className="object-cover" />
       </div>
 
       {/* Content */}
-      <div className="p-8 flex flex-col gap-6">
+      <div className="p-8 flex flex-col gap-6 flex-1">
         {/* Rating */}
         <div className="flex gap-1 text-[#F5AAA3]">
           {Array.from({ length: rating }).map((_, i) => (
@@ -45,10 +45,10 @@ function TestimonialCard({
         </div>
 
         {/* Quote */}
-        <p className="text-[1.125rem]  leading-relaxed">“{quote}”</p>
+        <p className="text-[1.125rem]  leading-relaxed block">“{quote}”</p>
 
         {/* Author */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mt-auto">
           <div className="h-10 w-10 rounded-full overflow-hidden">
             <Image
               src="/home/testimonial-avatar.png"
@@ -95,22 +95,22 @@ export default function Testimonial() {
   return (
     <section className="w-full max-w-3xl ">
       <Carousel opts={{ align: "start" }} className="overflow-visible">
-        <CarouselContent className="-ml-6">
+        <CarouselContent className="">
           {testimonials.map((t, i) => (
-            <CarouselItem key={i} className="basis-[85%] md:basis-1/2">
+            <CarouselItem key={i} className=" basis-[85%] md:basis-1/2">
               <TestimonialCard {...t} />
             </CarouselItem>
           ))}
           <CarouselItem
             key={"gap"}
-            className="basis-0 md:basis-1/2"
+            className="basis-0 md:basis-1/4"
           ></CarouselItem>
         </CarouselContent>
 
         {/* Bottom controls */}
         <div className="flex md:justify-start justify-center  gap-6 mt-12 ">
-          <CarouselPrevious className="static bg-transparent! size-12.5! border-forest text-forest hover:bg-forest hover:text-mint" />
-          <CarouselNext className="static bg-transparent! size-12.5! border-forest text-forest hover:bg-forest hover:text-mint" />
+          <CarouselPrevious className="static bg-transparent! size-12.5! border-forest text-forest hover:opacity-90`" />
+          <CarouselNext className="static bg-transparent! size-12.5! border-forest text-forest hover:opacity-90`" />
         </div>
       </Carousel>
     </section>

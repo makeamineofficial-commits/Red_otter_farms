@@ -17,6 +17,7 @@ export const getCart = async (): Promise<Cart | null> => {
           product: {
             select: {
               publicId: true,
+              slug: true,
               price: true,
               displayName: true,
               description: true,

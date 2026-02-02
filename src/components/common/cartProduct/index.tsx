@@ -4,6 +4,7 @@ import Image from "next/image";
 import { CartProduct } from "@/types/cart";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
+import Link from "next/link";
 
 function ProductCard(product: CartProduct) {
   const { update, isUpdating, remove } = useCart();
@@ -64,7 +65,9 @@ function ProductCard(product: CartProduct) {
       </div>
 
       <div className="flex-1 flex flex-col gap-1">
-        <span className="font-medium">{product.displayName}</span>
+        <Link href={`/products/${product.slug}`} className="hover:underline">
+          <span className="font-medium">{product.displayName}</span>
+        </Link>
 
         {product.description && (
           <span className="text-sm text-muted-foreground line-clamp-2">

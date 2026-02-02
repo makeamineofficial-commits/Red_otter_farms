@@ -47,8 +47,7 @@ export function ProductCard(product: Product) {
     <div className="rounded-2xl border p-3 space-y-3 w-full relative flex flex-col">
       <Link
         href={`/products/${slug}`}
-        target="_blank"
-        className="absolute top-0 left-0  h-full w-full"
+        className="absolute top-0 left-0  h-full w-full  z-10"
       ></Link>
       <Carousel
         setApi={setApi}
@@ -60,7 +59,7 @@ export function ProductCard(product: Product) {
         ]}
         className="relative"
       >
-        <Badge className="absolute bottom-2 right-2 z-10 bg-muted! text-muted-foreground!">
+        <Badge className="absolute bottom-2 right-2 bg-muted! z-5 text-muted-foreground!">
           {weight}
           {weightUnit}
         </Badge>
@@ -99,7 +98,7 @@ export function ProductCard(product: Product) {
       </Carousel>
 
       {/* TITLE + PRICE */}
-      <div className="space-y-1 relative z-10  w-fit">
+      <div className="space-y-1 w-fit">
         <p className=" font-medium line-clamp-1">{name}</p>
         <p className="text-sm font-semibold">
           ₹{formatPrice(price)}
@@ -112,7 +111,7 @@ export function ProductCard(product: Product) {
       </div>
 
       {/* TAGS */}
-      <div className="flex gap-2 flex-wrap relative z-10  w-fit">
+      <div className="flex gap-2 flex-wrap   w-fit">
         {healthBenefits.map((ele) => (
           <Badge variant="outline" className="text-xs capitalize">
             {ele}

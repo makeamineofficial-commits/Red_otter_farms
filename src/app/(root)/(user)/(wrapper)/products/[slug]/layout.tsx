@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { ProductStore } from "@/store/user/product.store";
-import { SimilarStore } from "@/store/user/similar.store";
+import { SimilarStore } from "@/store/user/similar-product.store";
 export default function layout({ children }: { children: ReactNode }) {
   return (
     <>

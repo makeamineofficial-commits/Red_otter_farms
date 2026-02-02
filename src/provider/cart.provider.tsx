@@ -51,15 +51,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     fetchCart();
   }, []);
 
-  useEffect(() => {
-    const body = window.document.body;
-    if (isOpen) {
-      if (body) body.style.overflow = "hidden";
-    } else {
-      if (body) body.style.overflow = "auto";
-    }
-  }, [isOpen]);
-
   const toggle = () => setIsOpen((prev) => !prev);
 
   const remove = async ({ productPublicId }: { productPublicId: string }) => {
@@ -127,7 +118,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         quantity,
       });
     } catch (err) {
-
       setCart(previousCart);
     } finally {
       setUpdating(false);
@@ -153,7 +143,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       const existing = productMap.get(product.publicId);
 
       if (existing) {
-        existing.quantity += quantity; 
+        existing.quantity += quantity;
       } else {
         productMap.set(product.publicId, {
           ...product,

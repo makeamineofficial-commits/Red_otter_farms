@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { ChevronDownIcon, X } from "lucide-react";
+import { ChevronDownIcon, Plus, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -28,8 +28,6 @@ function AccordionItem({
   );
 }
 
-//
-
 function AccordionTrigger({
   className,
   children,
@@ -43,14 +41,21 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none ",
+          "group flex flex-1 items-center justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none",
           className,
         )}
         {...props}
       >
         {children}
+
         {showCross && (
-          <X className="text-muted-foreground pointer-events-none size-4 xl:size-6 shrink-0   duration-200" />
+          <Plus
+            className="
+              text-muted-foreground size-4 xl:size-6 shrink-0
+              transition-transform duration-200
+              group-data-[state=open]:rotate-45
+            "
+          />
         )}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>

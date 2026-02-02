@@ -69,7 +69,7 @@ const greens = [
 
 export default function GreensCarousel() {
   return (
-    <section className="bg-forest py-16 overflow-hidden">
+    <section className="py-16 overflow-hidden">
       <Carousel opts={{ align: "start" }} className="overflow-visible">
         <CarouselContent className="-ml-6">
           {greens.map((item, i) => (
@@ -79,7 +79,7 @@ export default function GreensCarousel() {
                 
                 basis-[85%]
                 sm:basis-1/2
-                2xl:basis-1/3
+                3xl:basis-1/3
               "
             >
               <GreensCard {...item} />

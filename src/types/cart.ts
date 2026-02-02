@@ -15,6 +15,7 @@ export interface CartProduct {
   nutritionalInfo: any;
   weight: number;
   weightUnit: string;
+  slug: string;
   assets: {
     url: string;
     type: any;

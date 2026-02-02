@@ -4,12 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getRecipe } from "@/actions/user/recipes/get.action";
 import { Recipe } from "@/types/recipe";
 import { useParams } from "next/navigation";
+import { similarRecipes } from "@/actions/user/recipes/similar.action";
 
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: (Recipe & { recipeSaved: boolean }) | undefined;
+  data: Recipe[] | undefined;
   error: Error | null;
 }
 
@@ -18,16 +19,13 @@ const StoreContext = createContext<StoreInterface | null>(null);
 function StoreContent({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    (Recipe & { recipeSaved: boolean }) | undefined
+    Recipe[] | undefined
   >({
-    queryKey: ["recipe", slug],
+    queryKey: ["similar-recipe", slug],
     queryFn: async () => {
       if (!slug) return;
-      const data = await getRecipe({
-        slug: slug?.toString(),
-      });
-      console.log(data.recipe);
-      return data.recipe;
+      const data = await similarRecipes(slug?.toString());
+      return data;
     },
     enabled: !!slug,
     staleTime: 1000 * 60 * 5,
@@ -44,7 +42,11 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const RecipeStore = ({ children }: { children: React.ReactNode }) => {
+export const SimilarRecipeStore = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   return (
     <Suspense fallback={<></>}>
       <StoreContent>{children}</StoreContent>
@@ -52,11 +54,11 @@ export const RecipeStore = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useRecipeStore = () => {
+export const useSimilarRecipeStore = () => {
   const ctx = useContext(StoreContext);
-  if (!ctx) throw new Error("useRecipeStore must be used inside RecipeStore");
+  if (!ctx)
+    throw new Error(
+      "useSimilarRecipeStore must be used inside SimilarRecipeStore",
+    );
   return ctx;
 };
-
-
-

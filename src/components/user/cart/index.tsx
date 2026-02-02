@@ -7,15 +7,27 @@ import { useCart } from "@/provider/cart.provider";
 import NutritionMeter from "./nutritionMeter";
 import Checkout from "./checkout";
 function _Cart() {
-  const { isOpen, toggle } = useCart();
+  const { isOpen, toggle, cart } = useCart();
   return (
     <>
-      <Handbag
-        className="stroke-1 stroke-red-500 size-8 lg:size-9 cursor-pointer"
-        onClick={() => {
-          toggle();
-        }}
-      />
+      <div className="relative">
+        {cart?.products.length === 0 ? (
+          <></>
+        ) : (
+          <div className="h-4 w-4 rounded-full bg-forest text-center text-white text-[10px] flex justify-center items-center absolute -top-1 -right-1">
+            {cart?.products.reduce(
+              (total, product) => total + product.quantity,
+              0,
+            )}
+          </div>
+        )}
+        <Handbag
+          className="stroke-1 stroke-red-500 size-8 lg:size-9 cursor-pointer"
+          onClick={() => {
+            toggle();
+          }}
+        />
+      </div>
 
       {isOpen && (
         <div

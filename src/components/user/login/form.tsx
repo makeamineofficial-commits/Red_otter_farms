@@ -110,7 +110,13 @@ export default function LoginForm({ close }: { close: () => void }) {
                       <Input
                         {...field}
                         placeholder="Enter mobile number"
+                        inputMode="numeric"
+                        maxLength={10}
                         className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm sm:text-base"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          field.onChange(value);
+                        }}
                       />
                     </div>
                   </FormControl>
@@ -131,7 +137,13 @@ export default function LoginForm({ close }: { close: () => void }) {
                 }}
               >
                 {isPending ? (
-                  <Loader2 className="animate-spin duration-300" />
+                  <>
+                    {phoneForm.getValues().type === "mobile" ? (
+                      <Loader2 className="animate-spin duration-300" />
+                    ) : (
+                      <>LOGIN WITH WHATSAPP</>
+                    )}
+                  </>
                 ) : (
                   "LOGIN WITH OTP"
                 )}
@@ -147,7 +159,13 @@ export default function LoginForm({ close }: { close: () => void }) {
                 }}
               >
                 {isPending ? (
-                  <Loader2 className="animate-spin duration-300" />
+                  <>
+                    {phoneForm.getValues().type === "whatsapp" ? (
+                      <Loader2 className="animate-spin duration-300" />
+                    ) : (
+                      <>LOGIN WITH WHATSAPP</>
+                    )}
+                  </>
                 ) : (
                   "LOGIN WITH WHATSAPP"
                 )}
@@ -166,40 +184,48 @@ export default function LoginForm({ close }: { close: () => void }) {
             <p className="text-sm text-muted-foreground">
               Enter the 6-digit OTP sent to your phone
             </p>
-
-            <FormField
-              control={otpForm.control}
-              name="otp"
-              render={({ field }) => (
-                <FormItem className="flex justify-center">
-                  <FormControl>
-                    <InputOTP
-                      maxLength={6}
-                      value={field.value}
-                      onChange={field.onChange}
-                    >
-                      <InputOTPGroup>
-                        {[...Array(3)].map((_, i) => (
-                          <InputOTPSlot key={i} index={i} />
-                        ))}
-                        <InputOTPSeparator />
-                        {[...Array(3)].map((_, i) => (
-                          <InputOTPSlot key={i + 3} index={i + 3} />
-                        ))}
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex items-center justify-center">
+              <FormField
+                control={otpForm.control}
+                name="otp"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormControl>
+                      <InputOTP
+                        className="mx-auto"
+                        maxLength={6}
+                        value={field.value}
+                        onChange={(value) => {
+                          field.onChange(value.replace(/\D/g, ""));
+                        }}
+                      >
+                        <InputOTPGroup>
+                          {[...Array(3)].map((_, i) => (
+                            <InputOTPSlot key={i} index={i} />
+                          ))}
+                          <InputOTPSeparator />
+                          {[...Array(3)].map((_, i) => (
+                            <InputOTPSlot key={i + 3} index={i + 3} />
+                          ))}
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </FormControl>
+                    <FormMessage className="text-center" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Button
               type="submit"
               className="w-full bg-maroon rounded-full py-4 sm:py-6 text-xs sm:text-sm font-semibold hover:bg-maroon/90"
               disabled={isPending}
             >
-              {isPending ? "Verifying..." : "VERIFY OTP"}
+              {isPending ? (
+                <Loader2 className="animate-spin duration-300" />
+              ) : (
+                "VERIFY OTP"
+              )}
             </Button>
 
             <Button

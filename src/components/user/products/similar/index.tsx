@@ -1,6 +1,6 @@
 "use client";
 import { ProductCardLoader } from "@/components/common/productCard/loading";
-import { useSimilarStore } from "@/store/user/similar.store";
+import { useSimilarStore } from "@/store/user/similar-product.store";
 import { ProductCard } from "@/components/common/productCard/card";
 import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";

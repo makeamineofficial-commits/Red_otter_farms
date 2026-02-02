@@ -7,7 +7,7 @@ export default function Hero() {
       <h2 className="uppercase tracking-[4.2px] text-[1.125rem]">
         Testimonials
       </h2>
-      <h1 className="text-forest font-dream-orphans uppercase flex flex-col gap-5 leading-[100%] text-[2rem] lg:text-[3.5rem] 2xl:text-[4.75rem] tracking-[6px]">
+      <h1 className="text-forest font-dream-orphans uppercase flex flex-col gap-2 md:gap-5 leading-[100%] text-[2rem] lg:text-[3.5rem] 2xl:text-[4.75rem] tracking-[6px]">
         <span>Trusted by</span>
         <span>8,000+ homes</span>
       </h1>
