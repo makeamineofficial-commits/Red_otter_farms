@@ -4,6 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge } from "@/components/ui/badge";
+
 import {
   Form,
   FormControl,
@@ -26,10 +27,11 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 
+import { useAddAddress } from "@/hooks/user/use-address";
 const LABELS = [
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "custom", label: "Other" },
+  { value: "HOME", label: "Home" },
+  { value: "WORK", label: "Work" },
+  { value: "CUSTOM", label: "Other" },
 ];
 const addressSchema = z
   .object({
@@ -39,18 +41,16 @@ const addressSchema = z
     city: z.string().min(2),
     state: z.string().min(2),
     country: z.string().min(2),
-    labelType: z.enum(["home", "work", "custom"]),
+    labelType: z.enum(["HOME", "WORK", "CUSTOM"]),
     customLabel: z.string().optional(),
     attention: z.string().optional(),
   })
-  .refine((data) => data.labelType !== "custom" || !!data.customLabel?.trim(), {
+  .refine((data) => data.labelType !== "CUSTOM" || !!data.customLabel?.trim(), {
     path: ["customLabel"],
     message: "Please enter a custom label",
   });
 
 type AddressFormValues = z.infer<typeof addressSchema>;
-
-/* ---------------- Component ---------------- */
 
 export default function AddressForm() {
   const form = useForm<AddressFormValues>({
@@ -62,14 +62,17 @@ export default function AddressForm() {
       zip_code: "",
       city: "",
       state: "",
-      labelType: "home",
+      labelType: "HOME",
       customLabel: "",
       country: "India",
     },
   });
 
-  function onSubmit(values: AddressFormValues) {
-    console.log("Address Submitted:", values);
+  const { mutateAsync } = useAddAddress();
+
+  async function onSubmit(values: AddressFormValues) {
+    await mutateAsync(values);
+    form.reset();
   }
 
   return (
@@ -196,7 +199,7 @@ export default function AddressForm() {
                     <FormItem>
                       <FormLabel>Any Delivery Instructions</FormLabel>
                       <FormControl>
-                        <Textarea className="h-10" value={field.value} />
+                        <Textarea className="h-10" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -238,7 +241,7 @@ export default function AddressForm() {
                   )}
                 />
 
-                {form.watch("labelType") === "custom" && (
+                {form.watch("labelType") === "CUSTOM" && (
                   <FormField
                     control={form.control}
                     name="customLabel"

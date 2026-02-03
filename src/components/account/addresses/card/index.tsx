@@ -3,6 +3,7 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { Address } from "@/types/account";
 import UpdateAddressForm from "../update";
+import DeleteAddress from "../delete";
 const fallback = (value?: string, placeholder?: string) =>
   value && value.trim().length > 0 ? value : placeholder;
 
@@ -48,10 +49,7 @@ export default function AddressCard(details: Address & { name: string }) {
 
       <div className="flex gap-2 absolute top-4 right-4">
         <UpdateAddressForm {...details}></UpdateAddressForm>
-
-        <button>
-          <Trash2 size={15} className="stroke-1 text-red-500" />
-        </button>
+        <DeleteAddress {...details}></DeleteAddress>
       </div>
     </div>
   );

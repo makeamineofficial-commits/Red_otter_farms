@@ -36,6 +36,7 @@ export const listAddress = async () => {
 
       return {
         ...address,
+        phone: phone!,
         label: labelEntry?.label ?? null,
         customLabel: labelEntry?.customLabel ?? null,
       };

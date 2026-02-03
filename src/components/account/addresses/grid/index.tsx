@@ -4,7 +4,7 @@ import React from "react";
 import AddressCard from "../card";
 import AddressForm from "../create";
 import { useAddressStore } from "@/store/user/address.store";
-import AddressCardLoader from "../card/laoder";
+import AddressCardLoader from "../card/loader";
 import { useAccountStore } from "@/store/user/account.store";
 export default function AddressGrid() {
   const { data, isLoading, isFetching } = useAddressStore();

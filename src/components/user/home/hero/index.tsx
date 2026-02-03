@@ -23,7 +23,7 @@ export default function Hero() {
         />
       </article>
       <article className="z-20 flex gap-7.5 flex-col  translate-y-40 lg:translate-y-26">
-        <h2 className="text-5xl md:text-6xl lg:text-7xl 3xl:text-8xl tracking-[6px] gap-0 md:gap-4 font-dream-orphans font-light flex flex-col text-white ">
+        <h2 className="text-5xl md:text-6xl lg:text-7xl 2xl:text-8xl tracking-[6px] gap-0 md:gap-4 font-dream-orphans font-light flex flex-col text-white ">
           <span>Better nutrition</span>
           <span>every day</span>
         </h2>

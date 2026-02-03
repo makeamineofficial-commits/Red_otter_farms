@@ -1,3 +1,4 @@
+"use server";
 import axios from "axios";
 import { AddressProps } from "@/types/account";
 import { validateUser } from "@/actions/auth/user.action";
@@ -11,9 +12,10 @@ export const addAddress = async (data: AddressProps) => {
         message: "Failed to authenticate user",
       };
     const { phone, customerId } = user;
+
     const res = await axios.post(
       "https://automation.redotterfarms.com/webhook/9da662fb-adc1-482e-850f-0b69c588ef85",
-      { mobile: phone, ...data },
+      { address: { mobile: phone, ...data } },
       {
         headers: { api_key: process.env.BACKEND_API_KEY as string },
         params: { customer_id: customerId },
@@ -29,7 +31,7 @@ export const addAddress = async (data: AddressProps) => {
       },
     });
     return { success: true, message: "Address created successfully" };
-  } catch (err) {
+  } catch (err: any) {
     console.log(err);
     return { success: false, message: "Failed to create address" };
   }

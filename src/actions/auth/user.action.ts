@@ -105,10 +105,10 @@ const verifyUser = async ({ otp }: { otp: string }) => {
     const accessToken = await generateJWT({
       type: "access",
       phone,
-      customerId: account[0].mobile,
+      customerId: account[0].customer_id,
     });
     const refreshToken = await generateJWT(
-      { type: "refresh", phone, customerId: account[0].mobile },
+      { type: "refresh", phone, customerId: account[0].customer_id },
       "30d",
     );
     const cookieStore = await cookies();

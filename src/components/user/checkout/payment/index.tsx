@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCheckoutHandler } from "@/hooks/use-checkout";
+import { useCheckoutHandler } from "@/hooks/user/use-checkout";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/provider/cart.provider";
 import { useCheckout } from "@/provider/checkout.provider";

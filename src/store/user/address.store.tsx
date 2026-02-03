@@ -18,7 +18,7 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
     ListAddressReturnType | undefined
   >({
-    queryKey: ["address"],
+    queryKey: ["addresses"],
     queryFn: async () => {
       const data = await listAddress();
       return data.data;

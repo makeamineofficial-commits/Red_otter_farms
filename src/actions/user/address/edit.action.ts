@@ -1,3 +1,4 @@
+"use server";
 import axios from "axios";
 import { AddressProps } from "@/types/account";
 import { validateUser } from "@/actions/auth/user.action";
@@ -15,14 +16,14 @@ export const editAddress = async (
     const { phone, customerId } = user;
     await axios.post(
       "https://automation.redotterfarms.com/webhook/cf21ea68-477f-4e50-9d20-d122a299bb21",
-      { mobile: phone, ...data },
+      { address: { mobile: phone, ...data } },
       {
         headers: { api_key: process.env.BACKEND_API_KEY as string },
         params: { customer_id: customerId, address_id: data.address_id },
       },
     );
 
-    await db.addressLabel.delete({
+    await db.addressLabel.deleteMany({
       where: {
         addressId: data.address_id,
       },
@@ -36,9 +37,9 @@ export const editAddress = async (
       },
     });
 
-    return { success: true, message: "Address created successfully" };
+    return { success: true, message: "Address update successfully" };
   } catch (err) {
     console.log(err);
-    return { success: false, message: "Failed to create address" };
+    return { success: false, message: "Failed to update address" };
   }
 };

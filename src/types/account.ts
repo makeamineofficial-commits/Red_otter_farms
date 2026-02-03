@@ -52,9 +52,9 @@ export interface ListAddressReturnType {
   customer_id: string;
 }
 
-type AddressLabel = "home" | "work" | "custom";
+type AddressLabel = "HOME" | "WORK" | "CUSTOM";
 export interface AddressProps {
-  street: string;
+  street2: string;
   city: string;
   state: string;
   country: string;

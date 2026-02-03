@@ -1,10 +1,8 @@
+"use server";
 import axios from "axios";
-import { AddressProps } from "@/types/account";
 import { validateUser } from "@/actions/auth/user.action";
 import { db } from "@/lib/db";
-export const editAddress = async (
-  data: AddressProps & { address_id: string },
-) => {
+export const deleteAddress = async (data: { address_id: string }) => {
   try {
     const user = await validateUser();
     if (!user)
@@ -20,16 +18,20 @@ export const editAddress = async (
         params: { customer_id: customerId, address_id: data.address_id },
       },
     );
+    console.log(user);
 
-    await db.addressLabel.delete({
+    await db.addressLabel.deleteMany({
       where: {
         addressId: data.address_id,
       },
     });
 
     return { success: true, message: "Address deleted successfully" };
-  } catch (err) {
-    console.log(err);
-    return { success: false, message: "Failed to deleted address" };
+  } catch (err: any) {
+    console.log(err.response.data);
+    return {
+      success: false,
+      message: err.response.data.message ?? "Failed to delete address",
+    };
   }
 };

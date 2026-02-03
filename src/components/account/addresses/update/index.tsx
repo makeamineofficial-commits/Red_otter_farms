@@ -26,11 +26,12 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil, Plus } from "lucide-react";
 import { Address } from "@/types/account";
+import { useEditAddress } from "@/hooks/user/use-address";
 
 const LABELS = [
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "custom", label: "Other" },
+  { value: "HOME", label: "Home" },
+  { value: "WORK", label: "Work" },
+  { value: "CUSTOM", label: "Other" },
 ];
 const addressSchema = z
   .object({
@@ -40,11 +41,11 @@ const addressSchema = z
     city: z.string().min(2),
     state: z.string().min(2),
     country: z.string().min(2),
-    labelType: z.enum(["home", "work", "custom"]),
+    labelType: z.enum(["HOME", "WORK", "CUSTOM"]),
     customLabel: z.string().optional(),
     attention: z.string().optional(),
   })
-  .refine((data) => data.labelType !== "custom" || !!data.customLabel?.trim(), {
+  .refine((data) => data.labelType !== "CUSTOM" || !!data.customLabel?.trim(), {
     path: ["customLabel"],
     message: "Please enter a custom label",
   });
@@ -60,6 +61,7 @@ export default function UpdateAddressForm({
   state,
   customLabel,
   label,
+  address_id,
 }: Address) {
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
@@ -76,8 +78,10 @@ export default function UpdateAddressForm({
     },
   });
 
-  function onSubmit(values: AddressFormValues) {
-    console.log("Address Submitted:", values);
+  const { mutateAsync } = useEditAddress();
+
+  async function onSubmit(values: AddressFormValues) {
+    await mutateAsync({ address_id, ...values });
   }
 
   return (
@@ -201,7 +205,7 @@ export default function UpdateAddressForm({
                     <FormItem>
                       <FormLabel>Any Delivery Instructions</FormLabel>
                       <FormControl>
-                        <Textarea className="h-10" value={field.value} />
+                        <Textarea className="h-10" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -243,7 +247,7 @@ export default function UpdateAddressForm({
                   )}
                 />
 
-                {form.watch("labelType") === "custom" && (
+                {form.watch("labelType") === "CUSTOM" && (
                   <FormField
                     control={form.control}
                     name="customLabel"
