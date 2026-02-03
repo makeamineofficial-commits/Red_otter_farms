@@ -39,6 +39,7 @@ export interface ProductProps extends ProductPropsBase {
 export interface Product extends ProductPropsBase {
   publicId: string;
   slug: string;
+  presentInWishlist: boolean;
   categories: {
     publicId: string;
     slug: string;

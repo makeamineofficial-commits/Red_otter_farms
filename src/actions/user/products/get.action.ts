@@ -44,6 +44,7 @@ const _getProductCached = async (
 
   return nullToUndefined({
     ...product,
+    presentInWishlist: false,
     description: product.description!,
     nutritionalInfo: product.nutritionalInfo as any,
     recipes: product.linkedRecipes.map((r) => r.recipe),

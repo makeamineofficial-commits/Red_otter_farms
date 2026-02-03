@@ -76,6 +76,7 @@ export const listRecipes = async (
           },
         },
         assets: {
+          where: { isPrimary: true },
           select: {
             url: true,
             thumbnail: true,

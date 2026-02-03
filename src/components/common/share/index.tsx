@@ -13,10 +13,20 @@ import { ReactNode, useState } from "react";
 
 import { FaFacebookF, FaWhatsapp } from "react-icons/fa";
 
-export function Share({ children }: { children: ReactNode }) {
+export function Share({
+  children,
+  href,
+}: {
+  children: ReactNode;
+  href?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
-  const url = typeof window !== "undefined" ? window.location.href : "";
+  const url = href
+    ? window.location.origin + href
+    : typeof window !== "undefined"
+      ? window.location.href
+      : "";
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(url);

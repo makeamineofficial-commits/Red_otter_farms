@@ -5,6 +5,7 @@ import { Product, SortBy } from "@/types/product";
 import { Prisma } from "../../../../generated/prisma/browser";
 import { PaginatedResponse } from "@/types/common";
 import { nullToUndefined } from "@/lib/utils";
+import { validateUser } from "@/actions/auth/user.action";
 
 interface Filters {
   inStock?: boolean;
@@ -28,7 +29,6 @@ export const listProducts = async (
     limit = 10,
     page = 1,
   } = filters;
-  console.log("[LIST CATEGORIES CALLED]", filters);
   const safeLimit = Math.max(1, Math.min(limit, 100));
   const safePage = Math.max(1, page);
   const skip = (safePage - 1) * safeLimit;
@@ -76,6 +76,9 @@ export const listProducts = async (
           },
         },
         assets: {
+          where: {
+            isPrimary: true,
+          },
           select: {
             url: true,
             thumbnail: true,
@@ -90,15 +93,35 @@ export const listProducts = async (
 
   const totalPages = Math.ceil(total / safeLimit);
 
-  const data = products.map((product) =>
+  let data = products.map((product) =>
     nullToUndefined({
       ...product,
       categories: product.categories.map((c) => c.category),
       description: product.description ?? undefined,
       nutritionalInfo: product.nutritionalInfo as any,
+      presentInWishlist: false,
       assets: product.assets,
     }),
   );
+  const user = await validateUser();
+
+  if (user && user.phone) {
+    const wishlistPromises = data.map(
+      async ({ presentInWishlist, id, ...rest }) => {
+        const res = await db.userWishlist.findUnique({
+          where: {
+            phone_productId: {
+              productId: id,
+              phone: user.phone as string,
+            },
+          },
+        });
+        return { id, presentInWishlist: res !== null, ...rest };
+      },
+    );
+
+    data = await Promise.all(wishlistPromises);
+  }
 
   return {
     page: safePage,

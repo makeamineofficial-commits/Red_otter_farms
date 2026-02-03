@@ -4,30 +4,16 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { ExternalLink, Minus, Plus } from "lucide-react";
-import Autoplay from "embla-carousel-autoplay";
+
+import { Minus, Plus, Share2 } from "lucide-react";
 import { Product } from "@/types/product";
 import { useCart } from "@/provider/cart.provider";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { Share } from "../share";
+import Wishlist from "./wishlist";
 export function ProductCard(product: Product) {
-  const [api, setApi] = useState<any>(null);
-  const [current, setCurrent] = useState(0);
-  useEffect(() => {
-    if (!api) return;
-
-    setCurrent(api.selectedScrollSnap());
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
-
-  const { name, price, mrp, assets, weight, weightUnit, slug, healthBenefits } =
+  const { name, price, mrp, assets, nutritionalInfo, slug, healthBenefits } =
     product;
   const { update, cart } = useCart();
   const [count, setCount] = useState(1);
@@ -49,57 +35,41 @@ export function ProductCard(product: Product) {
         href={`/products/${slug}`}
         className="absolute top-0 left-0  h-full w-full  z-10"
       ></Link>
-      <Carousel
-        setApi={setApi}
-        plugins={[
-          Autoplay({
-            delay: 5000,
-            stopOnInteraction: true,
-          }),
-        ]}
-        className="relative"
-      >
-        <Badge className="absolute bottom-2 right-2 bg-muted! z-5 text-muted-foreground!">
-          {weight}
-          {weightUnit}
-        </Badge>
-        <CarouselContent>
-          {assets?.map((asset, index) => (
-            <CarouselItem key={index}>
-              <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
-                <Image
-                  src={asset.url}
-                  alt={name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
 
-        {/* DOTS */}
-        <div
-          className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10 "
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          {assets?.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => api?.scrollTo(index)}
-              className={`h-2 w-2 rounded-full transition-all ${
-                current === index ? "bg-white scale-110" : "bg-white/50"
-              }`}
-            />
-          ))}
+      <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+        <Image src={assets[0].url} alt={name} fill className="object-cover" />
+        <Badge className="text-xs capitalize absolute z-40 bottom-3 right-3 bg-muted-foreground">
+          {Object.keys(nutritionalInfo)[0]}{" "}
+          {nutritionalInfo[Object.keys(nutritionalInfo)[0]]}
+        </Badge>
+
+        <div className="absolute z-40 top-3 right-3 flex flex-col gap-2">
+          <Share href={`/products/${slug}`}>
+            <div className="bg-white h-8 w-8 flex items-center justify-center shadow-sm rounded-full">
+              <Share2 className="size-5 stroke-1  transition-colors "></Share2>
+            </div>
+          </Share>
+
+          <Wishlist {...product}></Wishlist>
         </div>
-      </Carousel>
+      </div>
 
       {/* TITLE + PRICE */}
-      <div className="space-y-1 w-fit">
-        <p className=" font-medium line-clamp-1">{name}</p>
+      <div className="space-y-1">
+        <div className="flex items-center justify-between w-full">
+          <p className=" font-medium line-clamp-1 text-lg">{name}</p>
+          <div className="flex gap-1 items-center">
+            <Badge variant="outline" className="text-xs capitalize">
+              50g
+            </Badge>
+            <Badge variant="outline" className="text-xs capitalize">
+              100g
+            </Badge>
+            <Badge variant="outline" className="text-xs capitalize">
+              +3 More
+            </Badge>
+          </div>
+        </div>
         <p className="text-sm font-semibold">
           ₹{formatPrice(price)}
           {mrp && (
@@ -112,11 +82,20 @@ export function ProductCard(product: Product) {
 
       {/* TAGS */}
       <div className="flex gap-2 flex-wrap   w-fit">
-        {healthBenefits.map((ele) => (
+        {[...healthBenefits]
+          .sort((a, b) => a.length - b.length)
+          .slice(0, 2)
+          .slice(0, 2)
+          .map((ele) => (
+            <Badge variant="outline" className="text-xs capitalize">
+              {ele}
+            </Badge>
+          ))}
+        {healthBenefits.length > 2 && (
           <Badge variant="outline" className="text-xs capitalize">
-            {ele}
+            +{healthBenefits.length - 2} More
           </Badge>
-        ))}
+        )}
       </div>
 
       {/* QUANTITY + CART */}
