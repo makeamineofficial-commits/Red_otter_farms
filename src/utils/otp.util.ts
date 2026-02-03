@@ -19,34 +19,36 @@ export async function sendOTP({
   });
   console.log("[OTP] OTP added", { otp });
   try {
-    // const url = `https://automation.redotterfarms.com/webhook/74bbc36f-88f5-4315-9530-986b3fe60a71?type=${type}`;
+    if (process.env.NODE_ENV === "production") {
+      const url = `https://automation.redotterfarms.com/webhook/74bbc36f-88f5-4315-9530-986b3fe60a71?type=${type}`;
 
-    // console.log("[OTP] Sending OTP webhook", {
-    //   url,
-    //   phone: "+91" + phone,
-    // });
+      console.log("[OTP] Sending OTP webhook", {
+        url,
+        phone: "+91" + phone,
+      });
 
-    // const res = await fetch(url, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     api_key: process.env.BACKEND_API_KEY!,
-    //   },
-    //   body: JSON.stringify({
-    //     mobile: "+91" + phone,
-    //     otp,
-    //   }),
-    // });
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          api_key: process.env.BACKEND_API_KEY!,
+        },
+        body: JSON.stringify({
+          mobile: "+91" + phone,
+          otp,
+        }),
+      });
 
-    // const responseText = await res.text();
+      const responseText = await res.text();
 
-    // if (!res.ok) {
-    //   console.error("[OTP] Webhook failed", {
-    //     status: res.status,
-    //     body: responseText,
-    //   });
-    //   throw new Error("Failed to send OTP");
-    // }
+      if (!res.ok) {
+        console.error("[OTP] Webhook failed", {
+          status: res.status,
+          body: responseText,
+        });
+        throw new Error("Failed to send OTP");
+      }
+    }
     if (process.env.NODE_ENV === "development") console.log("[OTP]", otp);
     return otp;
   } catch (err) {

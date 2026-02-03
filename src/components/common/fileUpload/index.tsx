@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 type Props = {
   value: PreviewFile[];
   onChange: (value: PreviewFile[]) => void;
+  limit?: number;
 };
 
-export default function FileUpload({ value, onChange }: Props) {
+export default function FileUpload({ value, onChange, limit }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = useCallback(
@@ -18,16 +19,33 @@ export default function FileUpload({ value, onChange }: Props) {
       const selected = Array.from(e.target.files || []);
       if (!selected.length) return;
 
+      const remaining =
+        typeof limit === "number"
+          ? Math.max(limit - value.length, 0)
+          : Infinity;
+
+      if (remaining <= 0) {
+        toast.warning(`You can upload up to ${limit} files only`);
+        if (inputRef.current) inputRef.current.value = "";
+        return;
+      }
+
+      const filesToUpload = selected.slice(0, remaining);
+
+      if (selected.length > remaining) {
+        toast.warning(`Only ${remaining} more file(s) allowed`);
+      }
+
       const uploadedFiles: PreviewFile[] = [];
 
       try {
-        for (const file of selected) {
+        for (const file of filesToUpload) {
           const isVideo = file.type.startsWith("video");
           const sizeLimit = isVideo ? 25 * 1024 * 1024 : 5 * 1024 * 1024;
 
           if (file.size > sizeLimit) {
             toast.warning(
-              isVideo ? "Video must be under 25MB" : "Image must be under 5MB"
+              isVideo ? "Video must be under 25MB" : "Image must be under 5MB",
             );
             continue;
           }
@@ -55,21 +73,28 @@ export default function FileUpload({ value, onChange }: Props) {
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [value, onChange]
+    [value, onChange, limit],
   );
 
   const removeFile = (index: number) => {
     onChange(value.filter((_, i) => i !== index));
   };
 
+  const isLimitReached = typeof limit === "number" && value.length >= limit;
+
   return (
     <div className="space-y-3 overflow-hidden">
       <div
         className={cn(
           "border-2 border-dashed rounded-md p-6 text-center",
-          "hover:border-primary transition cursor-pointer max-w-full"
+          isLimitReached
+            ? "cursor-not-allowed opacity-50"
+            : "hover:border-primary cursor-pointer transition",
         )}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => {
+          if (!isLimitReached) inputRef.current?.click();
+          else toast.warning(`Maximum ${limit} files allowed`);
+        }}
       >
         <UploadCloud className="mx-auto mb-2 h-6 w-6 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
@@ -122,7 +147,7 @@ export default function FileUpload({ value, onChange }: Props) {
                   onClick={() => removeFile(index)}
                   className={cn(
                     "absolute top-1 right-1 rounded-full bg-black/70 p-1 text-white",
-                    "opacity-0 group-hover:opacity-100 transition"
+                    "opacity-0 group-hover:opacity-100 transition",
                   )}
                 >
                   <X size={12} />

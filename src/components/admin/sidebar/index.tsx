@@ -104,6 +104,14 @@ export default function Sidebar() {
         >
           Order
         </NavItem>
+
+        <NavItem
+          icon={<ShoppingCart size={18} />}
+          href="/admin/dashboard/testimonial"
+          active={isActive("/admin/dashboard/testimonial")}
+        >
+          Testimonial
+        </NavItem>
       </div>
     </aside>
   );

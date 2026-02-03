@@ -71,7 +71,7 @@ export default function GreensCarousel() {
   return (
     <section className="py-16 overflow-hidden">
       <Carousel opts={{ align: "start" }} className="overflow-visible">
-        <CarouselContent className="-ml-6">
+        <CarouselContent className="">
           {greens.map((item, i) => (
             <CarouselItem
               key={i}
@@ -79,7 +79,7 @@ export default function GreensCarousel() {
                 
                 basis-[85%]
                 sm:basis-1/2
-                3xl:basis-1/3
+                2xl:basis-1/3
               "
             >
               <GreensCard {...item} />

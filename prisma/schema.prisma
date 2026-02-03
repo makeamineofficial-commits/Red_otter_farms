@@ -333,3 +333,46 @@ model AddressLabel{
   label AddressLabelEnum @default(HOME)
   customLabel String?
 }
+
+
+model Testimonial{
+  id String @id @default(uuid())
+  publicId String @unique @default(dbgenerated("concat('testimonial_', gen_random_uuid())"))
+  slug String @unique
+  heroImage TestimonialAsset[]
+  review String @db.Text
+  rating Int @default(0)
+  
+  isPublished Boolean @default(true)
+  
+  avatar TestimonialUserAsset[]
+  name String
+  position String
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TestimonialAsset{
+  id String @id @default(uuid())
+  testimonialId String 
+  testimonial Testimonial @relation(fields: [testimonialId],references: [id],onDelete: Cascade)
+  url String
+  thumbnail String
+  position     Int @default(0)
+  isPrimary    Boolean @default(false)
+  type AssetType @default(IMAGE)
+}
+
+
+model TestimonialUserAsset{
+  id String @id @default(uuid())
+  testimonialId String 
+  testimonial Testimonial @relation(fields: [testimonialId],references: [id],onDelete: Cascade)
+  url String
+  thumbnail String
+  position     Int @default(0)
+  isPrimary    Boolean @default(false)
+  type AssetType @default(IMAGE)
+}

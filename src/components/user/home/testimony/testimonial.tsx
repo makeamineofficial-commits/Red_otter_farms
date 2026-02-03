@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Star } from "lucide-react";
 import {
@@ -7,34 +9,34 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-
-type TestimonialCardProps = {
-  image: string;
-  quote: string;
-  name: string;
-  role: string;
-  rating?: number;
-};
+import { useHomeStore } from "@/store/user/home.store";
+import { Testimonial as TestimonialType } from "@/types/testimonial";
 
 function TestimonialCard({
-  image,
-  quote,
+  rating,
+  heroImage,
+  avatar,
+  review,
+  position,
   name,
-  role,
-  rating = 5,
-}: TestimonialCardProps) {
+}: TestimonialType) {
   return (
     <div className="border border-forest flex flex-col w-full h-full">
       {/* Image */}
       <div className="relative w-full aspect-4/3 overflow-hidden ">
-        <Image src={image} alt={name} fill className="object-cover" />
+        <Image
+          src={heroImage[0].url ?? "/home/testimonial-1.png"}
+          alt={heroImage[0].thumbnail ?? "/home/testimonial-1.png"}
+          fill
+          className="object-cover"
+        />
       </div>
 
       {/* Content */}
       <div className="p-8 flex flex-col gap-6 flex-1">
         {/* Rating */}
         <div className="flex gap-1 text-[#F5AAA3]">
-          {Array.from({ length: rating }).map((_, i) => (
+          {Array.from({ length: Math.ceil(rating) }).map((_, i) => (
             <Star
               key={i}
               size={20}
@@ -45,14 +47,14 @@ function TestimonialCard({
         </div>
 
         {/* Quote */}
-        <p className="text-[1.125rem]  leading-relaxed block">“{quote}”</p>
+        <p className="text-[1.125rem]  leading-relaxed block">“{review}”</p>
 
         {/* Author */}
         <div className="flex items-center gap-4 mt-auto">
           <div className="h-10 w-10 rounded-full overflow-hidden">
             <Image
-              src="/home/testimonial-avatar.png"
-              alt={name}
+              src={avatar[0].url ?? "/home/testimonial-avatar.png"}
+              alt={avatar[0].thumbnail ?? "/home/testimonial-avatar.png"}
               width={40}
               height={40}
             />
@@ -60,7 +62,7 @@ function TestimonialCard({
 
           <div className="text-sm">
             <p className="font-semibold uppercase tracking-wide">{name}</p>
-            <p className="opacity-70">{role}</p>
+            <p className="opacity-70">{position}</p>
           </div>
         </div>
       </div>
@@ -68,30 +70,9 @@ function TestimonialCard({
   );
 }
 
-const testimonials = [
-  {
-    image: "/home/testimonial-1.png",
-    quote:
-      "The greens actually taste like something. No wilting, no slime, just real food.",
-    name: "Priya Sharma",
-    role: "Home cook, Bangalore",
-  },
-  {
-    image: "/home/testimonial-2.png",
-    quote:
-      "I switched from supermarkets because I wanted to know where my food comes from.",
-    name: "Priya Sharma",
-    role: "Home cook, Bangalore",
-  },
-  {
-    image: "/home/testimonial-1.png",
-    quote:
-      "You can feel the difference in freshness the moment you start cooking.",
-    name: "Priya Sharma",
-    role: "Home cook, Bangalore",
-  },
-];
 export default function Testimonial() {
+  const { data } = useHomeStore();
+  const testimonials = data?.testimonial ?? [];
   return (
     <section className="w-full max-w-3xl ">
       <Carousel opts={{ align: "start" }} className="overflow-visible">

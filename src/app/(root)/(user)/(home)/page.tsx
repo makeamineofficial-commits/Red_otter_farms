@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import Hero from "@/components/user/home/hero";
 import Trending from "@/components/user/home/trending";
 import OtterN from "@/components/user/home/otterN";
@@ -11,9 +9,12 @@ import Compare from "@/components/user/home/compare";
 import Explore from "@/components/user/home/explore";
 import Process from "@/components/user/home/process";
 import Press from "@/components/user/home/press";
+import { useHomeStore } from "@/store/user/home.store";
+import CurtainLoader from "@/components/user/home/loader";
 export default function page() {
   return (
     <>
+      <CurtainLoader />
       <Hero></Hero>
       <Explore></Explore>
       <Process></Process>
