@@ -47,7 +47,7 @@ export function ProductCardLoader() {
         <div className="flex gap-2 items-center">
           <Button
             size="sm"
-            className="rounded-lg bg-maroon! hover:bg-maroon/90"
+            className="bg-transparent! border rounded-lg! border-maroon! text-maroon!"
           >
             Add to Cart
           </Button>

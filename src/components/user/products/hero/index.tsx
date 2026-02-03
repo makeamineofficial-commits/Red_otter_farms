@@ -83,7 +83,7 @@ export default function Hero() {
               <ul className="list-disc pl-5 mt-4 text-[0.875rem] font-light tracking-[0%] flex flex-col gap-2">
                 {data.recipes.map((ele) => (
                   <Link
-                    href={`/recipes/all/${ele.slug}`}
+                    href={`/recipe/${ele.slug}`}
                     target="_blank"
                     className="hover:underline"
                   >

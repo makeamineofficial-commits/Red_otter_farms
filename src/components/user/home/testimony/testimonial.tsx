@@ -72,7 +72,7 @@ function TestimonialCard({
 
 export default function Testimonial() {
   const { data } = useHomeStore();
-  const testimonials = data?.testimonial ?? [];
+  const testimonials = data?.testimonials ?? [];
   return (
     <section className="w-full max-w-3xl ">
       <Carousel opts={{ align: "start" }} className="overflow-visible">

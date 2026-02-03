@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -5,87 +6,102 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-type ProductCardProps = {
-  image: string;
-  tag: string;
-  title: string;
-  description: string;
-  price: string;
-  isLast?: boolean;
-};
+import { useEffect, useState } from "react";
+import { Product } from "@/types/product";
+import { useCart } from "@/provider/cart.provider";
+import { useHomeStore } from "@/store/user/home.store";
+import { formatPrice } from "@/lib/utils";
+import Link from "next/link";
+import { Minus, Plus } from "lucide-react";
+export function ProductCard(product: Product & { isLast: boolean }) {
+  const {
+    name,
+    price,
+    description,
+    assets,
+    isLast,
+    slug,
+    type,
+  } = product;
+  const { update, cart } = useCart();
+  const [count, setCount] = useState(1);
+  useEffect(() => {
+    if (!cart) return;
 
-export function ProductCard({
-  image,
-  tag,
-  title,
-  description,
-  price,
-  isLast = false,
-}: ProductCardProps) {
+    const count = cart.products.find(
+      (ele) => ele.publicId === product.publicId,
+    )?.quantity;
+
+    if (count) {
+      setCount(count);
+    }
+  }, [cart]);
   return (
     <div
       className={`border border-forest ${isLast ? "border-r" : "border-r-0"} 
-         flex flex-col h-full `}
+         flex flex-col h-full relative`}
     >
+      <Link
+        href={`/products/${slug}`}
+        className="absolute top-0 left-0  h-full w-full  z-10 "
+      ></Link>
+
       {/* Image */}
       <div className="relative w-full aspect-square p-6">
         <span className="absolute top-4 left-4 text-xs border border-forest rounded-full px-3 py-1">
-          {tag}
+          {type}
         </span>
 
-        <Image src={image} alt={title} fill className="object-contain" />
+        <Image src={assets[0].url} alt={name} fill className="object-contain" />
       </div>
 
       {/* Content */}
       <div className="border-t border-forest p-6 flex flex-col">
-        <h3 className="font-semibold uppercase text-sm">{title}</h3>
+        <h3 className="font-semibold uppercase text-sm">{name}</h3>
         <p className="text-sm opacity-70">{description}</p>
         <div className="flex items-center justify-between ">
-          <span className="font-semibold">{price}</span>
-          <Button
-            variant="outline"
-            className="bg-transparent! rounded-lg! border-red-500! text-red-500!"
-          >
-            Add to cart
-          </Button>
+          <span className="font-semibold">₹{formatPrice(price)}</span>
+
+          <div className="z-40 flex gap-2">
+            <div className="flex items-center border border-muted-foreground rounded-lg">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="hover:bg-transparent cursor-pointer"
+                onClick={() => setCount((prev) => Math.max(1, prev - 1))}
+              >
+                <Minus className="size-4" />
+              </Button>
+              <span className="px-2 text-sm">{count}</span>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="hover:bg-transparent cursor-pointer"
+                onClick={() => setCount((prev) => prev + 1)}
+              >
+                <Plus className="size-4" />
+              </Button>
+            </div>
+            <Button
+              onClick={() => {
+                // @ts-ignore
+                update({ product, quantity: count });
+              }}
+              variant="outline"
+              className="bg-transparent! rounded-lg! border-maroon! text-maroon!"
+            >
+              Add to cart
+            </Button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-const products = [
-  {
-    image: "/home/explore-1.png",
-    tag: "Salads",
-    title: "Spicy Salad Blend",
-    description: "A mix of our four best sellers",
-    price: "₹120",
-  },
-  {
-    image: "/home/explore-2.png",
-    tag: "Salads",
-    title: "Iceberg Lettuce",
-    description: "Best for sandwiches and wraps",
-    price: "₹50",
-  },
-  {
-    image: "/home/explore-3.png",
-    tag: "Vegetables",
-    title: "Turnips",
-    description: "Fresh, recently harvested from local farms",
-    price: "₹44",
-  },
-  {
-    image: "/home/explore-1.png",
-    tag: "Salads",
-    title: "Spicy Salad Blend",
-    description: "A mix of our four best sellers",
-    price: "₹120",
-  },
-];
-
 export default function ProductCarousel() {
+  const { data } = useHomeStore();
+  const products = data?.products ?? [];
   return (
     <section className="w-full overflow-hidden bg-herbal">
       <Carousel opts={{ align: "start" }} className="overflow-visible">

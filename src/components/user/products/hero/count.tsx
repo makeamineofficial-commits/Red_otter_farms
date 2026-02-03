@@ -22,8 +22,8 @@ export default function Count(product: Product) {
   }, [cart]);
   return (
     <div className="flex w-full flex-col justify-between sm:flex-row gap-3">
-      <div className=" flex items-center bg-[#E5E5E5] h-fit w-fit rounded-2xl">
-        <div className="h-12   bg-white w-12 rounded-l-2xl  border-2 flex items-center justify-center">
+      <div className=" flex items-center border-2  h-fit w-fit rounded-2xl">
+        <div className="h-12    w-12 rounded-l-2xl hover:bg-muted   flex items-center justify-center">
           <Minus
             className="size-5 cursor-pointer"
             onClick={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}
@@ -33,7 +33,7 @@ export default function Count(product: Product) {
         <span className="   rounded-md h-10 w-12 items-center justify-center flex leading-0 text-[1rem] sm:text-[1.125rem] font-semibold flex-1 text-center">
           {quantity}
         </span>
-        <div className="h-12 w-12 bg-white  rounded-r-2xl  border-2  flex items-center justify-center ">
+        <div className="h-12 w-12  rounded-r-2xl hover:bg-muted   flex items-center justify-center ">
           <Plus
             className="size-5 cursor-pointer"
             onClick={() => setQuantity((quantity) => quantity + 1)}
