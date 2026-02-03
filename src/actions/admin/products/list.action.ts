@@ -68,6 +68,7 @@ export const listProduct = async (
       categories: product.categories.map((c) => c.category),
       description: product.description ?? undefined,
       nutritionalInfo: product.nutritionalInfo as any,
+      presentInWishlist: false,
       assets: product.assets.map((ele) => {
         return { ...ele };
       }),
