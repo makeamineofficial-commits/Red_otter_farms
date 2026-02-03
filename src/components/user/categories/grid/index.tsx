@@ -29,7 +29,7 @@ export function Grid() {
         ))}
       </div>
 
-      <Pagination2 colSpan={5} {...data}></Pagination2>
+      <Pagination2 {...data}></Pagination2>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { CartProduct } from "./cart";
 import { Asset, AssetType } from "./common";
 
 export interface RecipePropsBase {
@@ -24,18 +25,5 @@ export interface Recipe extends RecipePropsBase {
   publicId: string;
   slug: string;
 
-  linkedProducts: {
-    publicId: string;
-    quantity: number;
-    price: number;
-    displayName: string;
-    description?: string | null;
-    nutritionalInfo: any;
-    weight: number;
-    weightUnit: string;
-    assets: {
-      url: string;
-      type: any;
-    }[];
-  }[];
+  linkedProducts: CartProduct[];
 }
