@@ -42,51 +42,14 @@ export function RecipeCard({
         href={`/recipe/${slug}`}
         className="absolute top-0 left-0  h-full w-full  z-10 "
       ></Link>
-      <Carousel
-        setApi={setApi}
-        plugins={[
-          Autoplay({
-            delay: 5000,
-            stopOnInteraction: true,
-          }),
-        ]}
-        className="relative"
-      >
-        <CarouselContent>
-          {assets?.map((asset, index) => (
-            <CarouselItem key={index}>
-              <div className="relative aspect-video bg-muted">
-                <Image
-                  src={asset.url}
-                  alt={title}
-                  fill
-                  className="object-cover"
-                />
 
-                <Badge className="absolute right-3 top-3 rounded-full bg-white text-black">
-                  {difficulty}
-                </Badge>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
+      <div className="relative aspect-video min-h-60 bg-muted">
+        <Image src={assets[0].url} alt={title} fill className="object-cover" />
 
-        {/* DOTS */}
-        <div
-          className="absolute z-20 bottom-2 left-1/2 -translate-x-1/2 flex gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {assets?.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => api?.scrollTo(index)}
-              className={`h-2 w-2 rounded-full transition-all ${
-                current === index ? "bg-white scale-110" : "bg-white/50"
-              }`}
-            />
-          ))}
-        </div>
-      </Carousel>
+        <Badge className="absolute right-3 top-3 rounded-full bg-white text-black">
+          {difficulty}
+        </Badge>
+      </div>
 
       {/* CONTENT */}
       <div className="flex flex-col gap-4 p-4">

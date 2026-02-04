@@ -8,7 +8,7 @@ export function Grid() {
   if (!data || isFetching || isLoading)
     return (
       <>
-        <article className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        <article className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {[1, 2, 3, 4, 5].map((recipe) => (
             //  @ts-ignore
             <RecipeCardLoader key={recipe.title} />
@@ -18,7 +18,7 @@ export function Grid() {
     );
   return (
     <>
-      <article className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <article className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
         {data.data.map((recipe) => (
           //  @ts-ignore
           <RecipeCard key={recipe.title} {...recipe} />

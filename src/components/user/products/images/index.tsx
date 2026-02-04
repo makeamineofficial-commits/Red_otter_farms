@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Star, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -10,6 +10,7 @@ import {
 import React, { useState } from "react";
 import { useProductStore } from "@/store/user/product.store";
 import Wishlist from "./wishlist";
+import { Share } from "@/components/common/share";
 
 export default function Images() {
   const { data, isLoading, isFetching } = useProductStore();
@@ -32,7 +33,14 @@ export default function Images() {
               className="w-full h-full object-cover rounded-3xl"
             />
           )}
-          <Wishlist />
+          <div className="flex flex-col gap-2 absolute top-3 right-3 z-40">
+            <Wishlist></Wishlist>
+            <Share href={`/products/${data?.slug}`}>
+              <div className="bg-white shadow-sm h-10 w-10 flex items-center justify-center rounded-full">
+                <Share2 className="size-5 stroke-1  transition-colors "></Share2>
+              </div>
+            </Share>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 my-2 lg:my-4.5 gap-2 lg:gap-4.5">
@@ -67,8 +75,15 @@ export default function Images() {
       </article>
 
       <article className="w-full sm:hidden block relative space-y-5">
-        <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden">
-          <Wishlist></Wishlist>
+        <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden ">
+          <div className="flex flex-col gap-2 absolute top-3 right-3 z-40">
+            <Wishlist></Wishlist>
+            <Share href={`/products/${data?.slug}`}>
+              <div className="bg-white shadow-sm h-10 w-10 flex items-center justify-center rounded-full">
+                <Share2 className="size-5 stroke-1  transition-colors "></Share2>
+              </div>
+            </Share>
+          </div>
           <Carousel setApi={setApi}>
             <CarouselContent>
               {images.map((img, i) => (

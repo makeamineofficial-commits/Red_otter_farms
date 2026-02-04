@@ -18,41 +18,39 @@ export default function Wishlist() {
   if (isLoading || isFetching || !data) return <></>;
 
   return (
-    <div className="flex flex-col gap-2 absolute top-3 right-3 z-40">
-      <div className="bg-white shadow-sm h-10 w-10 rounded-full p-2 flex items-center justify-center">
-        <button
-          disabled={isLoading || isFetching || !data || loading}
-          onClick={async () => {
-            console.log("hello");
-            try {
-              setLoading(true);
-              const res = await updateWishlist({ productId: data.publicId });
-              if (res.authenticationRequired) {
-                router.push(`${pathname}?login=true`);
-                return;
-              }
-              if (!res.success) {
-                toast.warning("Failed to mark product in wishlist");
-                return;
-              }
-              setSelected((prev) => !prev);
-              toast.info(res.message);
-            } catch (err) {
-              toast.warning("Failed to mark product in wishlist");
-            } finally {
-              setLoading(false);
+    <div className="bg-white shadow-sm h-10 w-10 rounded-full p-2 flex items-center justify-center">
+      <button
+        disabled={isLoading || isFetching || !data || loading}
+        onClick={async () => {
+          console.log("hello");
+          try {
+            setLoading(true);
+            const res = await updateWishlist({ productId: data.publicId });
+            if (res.authenticationRequired) {
+              router.push(`${pathname}?login=true`);
+              return;
             }
-          }}
-        >
-          <Heart
-            className={`stroke-1 transition-colors ${
-              isSelected
-                ? "fill-red-500 stroke-red-500"
-                : "fill-transparent stroke-gray-500"
-            }`}
-          />
-        </button>
-      </div>
+            if (!res.success) {
+              toast.warning("Failed to mark product in wishlist");
+              return;
+            }
+            setSelected((prev) => !prev);
+            toast.info(res.message);
+          } catch (err) {
+            toast.warning("Failed to mark product in wishlist");
+          } finally {
+            setLoading(false);
+          }
+        }}
+      >
+        <Heart
+          className={`stroke-1 transition-colors ${
+            isSelected
+              ? "fill-red-500 stroke-red-500"
+              : "fill-transparent stroke-gray-500"
+          }`}
+        />
+      </button>
     </div>
   );
 }
