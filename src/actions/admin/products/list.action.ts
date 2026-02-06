@@ -2,7 +2,7 @@
 import { db } from "@/lib/db";
 import { Product } from "@/types/product";
 import { Prisma } from "../../../../generated/prisma/browser";
-import { AssetType, PaginatedResponse } from "@/types/common";
+import { PaginatedResponse } from "@/types/common";
 import { nullToUndefined } from "@/lib/utils";
 import { validateAdmin } from "@/actions/auth/admin.action";
 interface Filters {
@@ -36,6 +36,11 @@ export const listProduct = async (
       skip,
       take: safeLimit,
       include: {
+        options: {
+          include: {
+            values: true,
+          },
+        },
         categories: {
           include: {
             category: {
@@ -47,30 +52,33 @@ export const listProduct = async (
             },
           },
         },
-        assets: {
-          select: {
-            url: true,
-            thumbnail: true,
-            type: true,
-            position: true,
-            isPrimary: true,
-          },
-        },
+        assets: true,
       },
       orderBy: { createdAt: "desc" },
     }),
   ]);
 
   const totalPages = Math.ceil(total / safeLimit);
-  const data = products.map((product) => {
+  const data: Product[] = products.map((product) => {
     return nullToUndefined({
       ...product,
+      summary: product.summary ?? "",
+      description: product.description ?? "",
       categories: product.categories.map((c) => c.category),
-      description: product.description ?? undefined,
       nutritionalInfo: product.nutritionalInfo as any,
       presentInWishlist: false,
-      assets: product.assets.map((ele) => {
-        return { ...ele };
+      options: product.options.map((ele) => {
+        return {
+          displayName: ele.displayName,
+          slug: ele.slug,
+          values: ele.values.map((ele) => {
+            return {
+              displayName: ele.displayName,
+              slug: ele.slug,
+              isDefault: ele.isDefault,
+            };
+          }),
+        };
       }),
     });
   });

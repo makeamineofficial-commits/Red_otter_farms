@@ -5,12 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Testimonial } from "@/types/testimonial";
 import { listTestimonials } from "@/actions/user/testimonial/list.action";
 import { listFeaturedProducts } from "@/actions/user/products/featured.action";
-import { Product } from "@/types/product";
+import { ProductPreview } from "@/types/product";
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: { testimonials: Testimonial[]; products: Product[] } | undefined;
+  data: { testimonials: Testimonial[]; products: ProductPreview[] } | undefined;
   error: Error | null;
 }
 
@@ -18,12 +18,13 @@ const StoreContext = createContext<StoreInterface | null>(null);
 
 function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    { testimonials: Testimonial[]; products: Product[] } | undefined
+    { testimonials: Testimonial[]; products: ProductPreview[] } | undefined
   >({
     queryKey: ["home"],
     queryFn: async () => {
       const { testimonials } = await listTestimonials();
       const products = await listFeaturedProducts();
+      console.log({ testimonials, products });
       return { testimonials, products };
     },
     staleTime: 1000 * 60 * 5,

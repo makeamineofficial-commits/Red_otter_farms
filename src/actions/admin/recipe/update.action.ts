@@ -27,7 +27,7 @@ export const updateRecipe = async (recipe: UpdateRecipeProps) => {
 
     const updatedRecipe = await db.$transaction(
       async (tx: Prisma.TransactionClient): Promise<Recipe> => {
-        const { assets, publicId, linkedProducts, ...rest } = recipe;
+        const { assets, publicId, listedIngredients, ...rest } = recipe;
         const updatedRecipe = await tx.recipe.update({
           data: { ...rest },
           where: { id: check.id },
@@ -54,7 +54,7 @@ export const updateRecipe = async (recipe: UpdateRecipeProps) => {
             };
           }),
         });
-        await tx.recipeProduct.deleteMany({
+        await tx.recipeIngredient.deleteMany({
           where: {
             recipeId: updatedRecipe.id,
           },
@@ -62,17 +62,16 @@ export const updateRecipe = async (recipe: UpdateRecipeProps) => {
         const products = await tx.product.findMany({
           where: {
             publicId: {
-              in: linkedProducts.map((ele) => ele.publicId),
+              in: listedIngredients.map((ele) => ele.publicId),
             },
           },
         });
-
-        await tx.recipeProduct.createMany({
+        await tx.recipeIngredient.createMany({
           data: products.map((ele) => {
             return {
-              productId: ele.id,
+              variantId: ele.id,
               quantity:
-                linkedProducts.find(
+                listedIngredients.find(
                   (product) => product.publicId === ele.publicId,
                 )?.quantity || 1,
               recipeId: updatedRecipe.id,

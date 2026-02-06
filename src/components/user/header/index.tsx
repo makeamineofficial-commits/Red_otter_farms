@@ -5,9 +5,9 @@ import React, { useState } from "react";
 import Login from "../login";
 import Cart from "../cart";
 import { Handbag, Heart, Menu, Search } from "lucide-react";
-const collections = [
+const pages = [
   { slug: "salads", label: "The Salads World" },
-  { slug: "", label: "Convenience & Delivery" },
+  { slug: "none", label: "Convenience & Delivery" },
   { slug: "soup", label: "Soup Kit" },
   { slug: "flour-grains", label: "Flour & Grains" },
   { slug: "sweetener", label: "Sweeteners" },
@@ -26,16 +26,15 @@ export default function Header() {
           </Link>
 
           <nav className=" hidden xl:flex gap-4 xl:gap-6  3xl:gap-10 items-center justify-between  3xl:absolute 3xl:top-1/2 3xl:left-1/2 3xl:-translate-x-1/2 3xl:-translate-y-1/2">
-            {collections.map((ele) => {
+            {pages.map((ele) => {
               return (
-                <>
-                  <Link
-                    href={`/collections/${ele.slug}`}
-                    className="uppercase text-nowrap text-[1.25rem]"
-                  >
-                    {ele.label}
-                  </Link>
-                </>
+                <Link
+                  key={ele.slug}
+                  href={`#`}
+                  className="uppercase text-nowrap text-[1.25rem]"
+                >
+                  {ele.label}
+                </Link>
               );
             })}
           </nav>
@@ -77,16 +76,15 @@ export default function Header() {
           </div>
 
           <div className="flex flex-col gap-4 ">
-            {collections.map((ele) => {
+            {pages.map((ele) => {
               return (
-                <>
-                  <Link
-                    href={`/collections/${ele.slug}`}
-                    className="uppercase text-nowrap text-sm"
-                  >
-                    {ele.label}
-                  </Link>
-                </>
+                <Link
+                  key={ele.slug}
+                  href={`#`}
+                  className="uppercase text-nowrap text-sm"
+                >
+                  {ele.label}
+                </Link>
               );
             })}
           </div>

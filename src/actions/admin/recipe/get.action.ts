@@ -11,56 +11,54 @@ export const getRecipe = async ({
 }): Promise<{ recipe?: Recipe; success: boolean; message: string }> => {
   await validateAdmin();
 
-  const product = await db.recipe.findUnique({
+  const recipe = await db.recipe.findUnique({
     where: {
       publicId,
     },
     include: {
-      linkedProducts: {
+      listedIngredients: {
         select: {
           quantity: true,
-          product: {
+          variant: {
             select: {
+              sku: true,
               publicId: true,
-              name: true,
-              slug: true,
               price: true,
-              mrp: true,
-              nutritionalInfo: true,
-              displayName: true,
-              description: true,
-              weight: true,
-              weightUnit: true,
-              assets: {
+              product: {
                 select: {
-                  url: true,
-                  type: true,
+                  slug: true,
+                  nutritionalInfo: true,
+                  summary: true,
+                  displayName: true,
+                  assets: {
+                    where: {
+                      isPrimary: true,
+                    },
+                  },
                 },
               },
             },
           },
         },
       },
-      assets: {
-        select: {
-          url: true,
-          thumbnail: true,
-          type: true,
-          isPrimary: true,
-          position: true,
-        },
-      },
+      assets: true,
     },
   });
-  if (!product) return { success: false, message: "Recipe details not found" };
+  if (!recipe) return { success: false, message: "Recipe details not found" };
 
   const data = nullToUndefined({
-    ...product,
-    linkedProducts: product.linkedProducts.map((ele) => {
-      return { quantity: ele.quantity, ...ele.product };
-    }),
-    assets: product.assets.map((ele) => {
-      return { ...ele };
+    ...recipe,
+    listedIngredients: recipe.listedIngredients.map((ele) => {
+      const { product, ...variant } = ele.variant;
+      const { summary, ...detail } = product;
+      return {
+        quantity: ele.quantity,
+        product: {
+          summary: summary ?? "",
+          ...detail,
+        },
+        variant,
+      };
     }),
   });
 

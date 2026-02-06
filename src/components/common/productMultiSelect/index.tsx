@@ -95,7 +95,7 @@ export function ProductMultiSelect({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+      <PopoverContent className="w-(--radix-popover-trigger-width) max-h-64 overflow-auto p-0">
         <Command>
           <CommandInput placeholder="Search products..." />
 

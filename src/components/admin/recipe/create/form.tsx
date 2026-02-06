@@ -27,7 +27,7 @@ export const recipeSchema = z.object({
   title: z.string().trim().min(5).max(120),
   summary: z.string().trim().min(5).max(120),
   isPublished: z.boolean(),
-  linkedProducts: z.array(
+  listedIngredients: z.array(
     z.object({
       quantity: z.number().min(1),
       publicId: z.string(),
@@ -45,8 +45,8 @@ export const recipeSchema = z.object({
   healthBenefits: z.array(z.string().min(1)),
   assets: z.array(
     z.object({
-      url: z.string().url(),
-      thumbnail: z.string().url(),
+      url: z.string(),
+      thumbnail: z.string(),
       type: z.nativeEnum(AssetType),
       position: z.number().int().nonnegative(),
       isPrimary: z.boolean(),
@@ -63,7 +63,7 @@ export default function CreateRecipeForm() {
     defaultValues: {
       title: "",
       summary: "",
-      linkedProducts: [],
+      listedIngredients: [],
       instructions: [],
       chefTips: [],
       ingredients: [],
@@ -133,7 +133,7 @@ export default function CreateRecipeForm() {
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-4 gap-4">
           <FormField
             control={form.control}
             name="cookingTime"
@@ -153,12 +153,16 @@ export default function CreateRecipeForm() {
           />
           <FormField
             control={form.control}
-            name="tags"
+            name="prepTime"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Serving</FormLabel>
+                <FormLabel>Preparation Time</FormLabel>
                 <FormControl>
-                  <TagInput placeholder="Tags for the recipe..." {...field} />
+                  <Input
+                    className="w-full"
+                    placeholder="Preparation time for the recipe..."
+                    {...field}
+                  />
                 </FormControl>{" "}
                 <FormMessage />
               </FormItem>
@@ -166,12 +170,16 @@ export default function CreateRecipeForm() {
           />
           <FormField
             control={form.control}
-            name="tags"
+            name="serving"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Tags</FormLabel>
+                <FormLabel>Servings</FormLabel>
                 <FormControl>
-                  <TagInput placeholder="Tags for the recipe..." {...field} />
+                  <Input
+                    className="w-full"
+                    placeholder="Servings for the recipe..."
+                    {...field}
+                  />
                 </FormControl>{" "}
                 <FormMessage />
               </FormItem>
@@ -179,12 +187,16 @@ export default function CreateRecipeForm() {
           />
           <FormField
             control={form.control}
-            name="tags"
+            name="difficulty"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Tags</FormLabel>
+                <FormLabel>Difficulty</FormLabel>
                 <FormControl>
-                  <TagInput placeholder="Tags for the recipe..." {...field} />
+                  <Input
+                    className="w-full"
+                    placeholder="Difficulty of the recipe..."
+                    {...field}
+                  />
                 </FormControl>{" "}
                 <FormMessage />
               </FormItem>
@@ -224,7 +236,7 @@ export default function CreateRecipeForm() {
         />
         <FormField
           control={form.control}
-          name="linkedProducts"
+          name="listedIngredients"
           render={({ field }) => (
             <FormItem className="w-full">
               <FormLabel>Linked Products</FormLabel>
@@ -232,7 +244,7 @@ export default function CreateRecipeForm() {
                 <ProductMultiSelect
                   loading={isLoading}
                   options={
-                    data?.products.map((ele) => {
+                    data?.variants.map((ele) => {
                       return {
                         label: ele.name,
                         value: ele.publicId,

@@ -11,11 +11,11 @@ function _Cart() {
   return (
     <>
       <div className="relative">
-        {cart?.products.length === 0 ? (
+        {cart?.items.length === 0 ? (
           <></>
         ) : (
           <div className="h-4 w-4 rounded-full bg-forest text-center text-white text-[10px] flex justify-center items-center absolute -top-1 -right-1">
-            {cart?.products.reduce(
+            {cart?.items.reduce(
               (total, product) => total + product.quantity,
               0,
             )}

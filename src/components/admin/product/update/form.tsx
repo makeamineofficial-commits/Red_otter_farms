@@ -23,39 +23,32 @@ import { KeyValueArrayField } from "@/components/common/keyValueArrayField";
 import { useUpdateProduct } from "@/hooks/admin/product.hook";
 import { useAdminStore } from "@/store/admin/admin.store";
 import { numberField } from "@/lib/utils";
-import { NUTRITION_FIELDS, updateProductSchema } from "../schema";
+import { updateProductSchema } from "../schema";
 import { Product } from "@/types/product";
-
+import { OptionsField } from "@/components/common/optionField";
+import { FormProvider } from "react-hook-form";
 type FormValues = z.infer<typeof updateProductSchema>;
 
 export default function UpdateProductForm({ product }: { product: Product }) {
   const form = useForm({
     resolver: zodResolver(updateProductSchema),
+    // @ts-ignore
     defaultValues: {
       name: product.name,
       displayName: product.displayName,
       slug: product.slug,
-      sku: product.sku,
       type: product.type,
       description: product.description,
       categories: product.categories.map((ele) => ele.publicId),
       healthBenefits: product.healthBenefits,
-      weightUnit: product.weightUnit,
-      dimension: product.dimension,
-      quantity: product.quantity,
-      servingUnit: product.weightUnit,
       assets: product.assets,
-      inStock: product.inStock,
       isPublished: product.isPublished,
       isFeatured: product.isFeatured,
-      mrp: product.mrp / 100,
-      price: product.price / 100,
-      weight: product.weight,
-      height: product.height,
-      width: product.width,
-      breadth: product.breadth,
-      servingSize: product.servingSize,
-      nutritionalInfo: product.nutritionalInfo,
+      options: product.options,
+      minPrice: product.minPrice / 100,
+      maxPrice: product.maxPrice / 100,
+      // @ts-ignore
+      nutritionalInfo: product.nutritionalInfo ?? { key: 0 },
     },
   });
   const onError = (errors: any) => {
@@ -91,9 +84,9 @@ export default function UpdateProductForm({ product }: { product: Product }) {
               type="submit"
               className="border border-black"
               disabled={isPending}
-            >
+              >
               Save Draft
-            </Button> */}
+              </Button> */}
             <Button size={"sm"} type="submit" disabled={isPending}>
               {isPending ? (
                 <Loader2 className=" h-4 w-4 animate-spin" />
@@ -137,20 +130,6 @@ export default function UpdateProductForm({ product }: { product: Product }) {
                 </FormItem>
               )}
             />
-
-            <FormField
-              name="sku"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>SKU</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
           <div className="grid grid-cols-3  gap-4">
             <FormField
@@ -161,19 +140,6 @@ export default function UpdateProductForm({ product }: { product: Product }) {
                   <FormLabel>Type</FormLabel>
                   <FormControl>
                     <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="quantity"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quantity</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...numberField(field)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -245,17 +211,15 @@ export default function UpdateProductForm({ product }: { product: Product }) {
           />
         </section>
 
-        {/* ================= PRICING ================= */}
-        <section className="space-y-4">
-          <h3 className="font-medium ">Pricing</h3>
-
-          <div className="grid md:grid-cols-3 gap-4">
+        <section className="space-y-4 ">
+          <h3 className="font-medium ">Price Range</h3>
+          <div className="grid grid-cols-2 gap-4">
             <FormField
-              name="mrp"
+              name="minPrice"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>MRP</FormLabel>
+                  <FormLabel>Min Price</FormLabel>
                   <FormControl>
                     <Input type="number" {...numberField(field)} />
                   </FormControl>
@@ -263,13 +227,12 @@ export default function UpdateProductForm({ product }: { product: Product }) {
                 </FormItem>
               )}
             />
-
             <FormField
-              name="price"
+              name="maxPrice"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Selling Price</FormLabel>
+                  <FormLabel>Max Price</FormLabel>
                   <FormControl>
                     <Input type="number" {...numberField(field)} />
                   </FormControl>
@@ -277,14 +240,8 @@ export default function UpdateProductForm({ product }: { product: Product }) {
                 </FormItem>
               )}
             />
-
-            <FormItem>
-              <FormLabel>Currency Code</FormLabel>
-              <Input value={"INR"} disabled />
-            </FormItem>
           </div>
         </section>
-
         {/* ================= ASSETS ================= */}
         <section className="space-y-4">
           <h3 className="font-medium ">Media</h3>
@@ -314,84 +271,24 @@ export default function UpdateProductForm({ product }: { product: Product }) {
           />
         </section>
 
-        {/* ================= DIMENSIONS & WEIGHT ================= */}
         <section className="space-y-4">
-          <h3 className="font-medium ">Weight & Dimensions</h3>
-
-          <div className="grid grid-cols-4 gap-4">
-            <FormField
-              key={"weight"}
-              name={"weight"}
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="capitalize">Weight</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...numberField(field)} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              key={"weightUnit"}
-              name={"weightUnit"}
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="capitalize">Weight Unit</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              key={"servingSize"}
-              name={"servingSize"}
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="capitalize">Serving</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...numberField(field)} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              key={"servingUnit"}
-              name={"servingUnit"}
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="capitalize">Serving Unit</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="grid md:grid-cols-4 gap-4">
-            {["height", "width", "breadth"].map((key) => (
-              <FormField
-                key={key}
-                name={key as any}
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="capitalize">{key}</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            ))}
-          </div>
+          <FormField
+            name="options"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <OptionsField
+                    {...field}
+                    // @ts-ignore
+                    errors={form.formState.errors.options}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </section>
 
-        {/* ================= NUTRITION ================= */}
         <section className="space-y-4">
           <h3 className="font-medium ">Nutrition Facts</h3>
 
@@ -419,7 +316,6 @@ export default function UpdateProductForm({ product }: { product: Product }) {
           <h3 className="font-medium ">Product Status</h3>
           <div className="flex gap-4">
             {[
-              { label: "In Stock", key: "inStock" },
               { label: "Is Published", key: "isPublished" },
               { label: "Is Featured", key: "isFeatured" },
             ].map((key) => (

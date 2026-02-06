@@ -7,6 +7,9 @@ const SHIPROCKET_PASSWORD = process.env.SHIPROCKET_PASSWORD as string;
 import { getCart } from "../user/cart/get.action";
 
 import { isNCRPincode } from "@/lib/utils";
+
+import { db } from "@/lib/db";
+
 export async function getShippingRate({
   deliveryPincode,
 }: {
@@ -17,33 +20,85 @@ export async function getShippingRate({
   courier: string;
 }> {
   try {
+    /* ---------- NCR FLAT RATE ---------- */
+
     if (isNCRPincode(deliveryPincode)) {
-      console.log("NCR pincode detected, using flat rate 99");
-      return { success: true, rate: 9900, courier: "Local NCR Delivery" };
+      return {
+        success: true,
+        rate: 9900,
+        courier: "Local NCR Delivery",
+      };
     }
+
+    /* ---------- Get Cart ---------- */
 
     const cart = await getCart();
-    if (!cart) {
-      console.log("Cart is empty or failed to load, fallback rate applied");
-      return { success: false, rate: 9900, courier: "" };
+
+    if (!cart || cart.items.length === 0) {
+      return {
+        success: false,
+        rate: 9900,
+        courier: "",
+      };
     }
 
-    const weight = cart.products
-      .map((ele) => {
-        if (ele.weightUnit === "kg") return ele.weight * ele.quantity;
-        return (ele.weight / 1000) * ele.quantity;
-      })
-      .reduce((a, b) => a + b, 0);
 
-    console.log(`Total cart weight (kg): ${weight}`);
+
+    const variantIds = cart.items.map((item) => item.variant.publicId);
+
+
+
+    const variants = await db.variant.findMany({
+      where: {
+        id: {
+          in: variantIds,
+        },
+      },
+      select: {
+        id: true,
+        weight: true,
+        weightUnit: true,
+      },
+    });
+
+    const variantMap = new Map(variants.map((v) => [v.id, v]));
+
+  
+
+    let totalWeightKg = 0;
+
+    for (const item of cart.items) {
+      const variant = variantMap.get(item.variant.publicId);
+
+      if (!variant || !variant.weight) continue;
+
+      let weightKg = 0;
+
+      if (variant.weightUnit === "kg") {
+        weightKg = variant.weight;
+      } else {
+        // assume grams
+        weightKg = variant.weight / 1000;
+      }
+
+      totalWeightKg += weightKg * item.quantity;
+    }
+
+    /* ---------- Safety Fallback ---------- */
+
+    if (totalWeightKg <= 0) {
+      totalWeightKg = 1; // minimum for Shiprocket
+    }
+
+    console.log("Live cart weight (kg):", totalWeightKg);
+
+    /* ---------- Get Shiprocket Rate ---------- */
 
     const shipRocketRate = await getShiprocketRate({
       pickupPincode: PICKUP_PINCODE,
       deliveryPincode,
-      weight,
+      weight: totalWeightKg,
     });
-
-    console.log("Shiprocket API response:", shipRocketRate);
 
     if (shipRocketRate.success) {
       return {
@@ -51,13 +106,21 @@ export async function getShippingRate({
         rate: shipRocketRate.rate,
         courier: "Shiprocket (Surface)",
       };
-    } else {
-      console.warn("Shiprocket returned no valid rates, using fallback");
-      return { success: false, rate: 9900, courier: "" };
     }
+
+    return {
+      success: false,
+      rate: 9900,
+      courier: "",
+    };
   } catch (err) {
-    console.error("Error in getShippingRate:", err);
-    return { success: false, rate: 9900, courier: "" };
+    console.error("Shipping rate error:", err);
+
+    return {
+      success: false,
+      rate: 9900,
+      courier: "",
+    };
   }
 }
 

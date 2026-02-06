@@ -1,23 +1,26 @@
-import { AssetType } from "./common";
+import { Asset } from "./common";
+import { Product, Variant } from "./product";
 
 export interface Cart {
   sessionId: string;
   status: string;
-  products: CartProduct[];
+  items: CartItem[];
 }
 
-export interface CartProduct {
-  publicId: string;
+export interface Item {
+  variant: {
+    sku: string;
+    price: number;
+    publicId: string;
+  };
+  product: {
+    displayName: string;
+    summary: string;
+    nutritionalInfo: any;
+    assets: Asset[];
+    slug: string;
+  };
+}
+export interface CartItem extends Item {
   quantity: number;
-  price: number;
-  displayName: string;
-  description?: string | null;
-  nutritionalInfo: any;
-  weight: number;
-  weightUnit: string;
-  slug: string;
-  assets: {
-    url: string;
-    type: any;
-  }[];
 }

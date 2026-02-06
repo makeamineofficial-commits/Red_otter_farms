@@ -32,40 +32,32 @@ export const listRecipe = async (
     db.recipe.findMany({
       where,
       include: {
-        linkedProducts: {
+        listedIngredients: {
           select: {
             quantity: true,
-            product: {
+            variant: {
               select: {
+                sku: true,
                 publicId: true,
-                name: true,
-                slug: true,
                 price: true,
-                mrp: true,
-                nutritionalInfo: true,
-                displayName: true,
-                description: true,
-                weight: true,
-                weightUnit: true,
-                assets: {
+                product: {
                   select: {
-                    url: true,
-                    type: true,
+                    slug: true,
+                    summary: true,
+                    nutritionalInfo: true,
+                    displayName: true,
+                    assets: {
+                      where: {
+                        isPrimary: true,
+                      },
+                    },
                   },
                 },
               },
             },
           },
         },
-        assets: {
-          select: {
-            url: true,
-            thumbnail: true,
-            type: true,
-            position: true,
-            isPrimary: true,
-          },
-        },
+        assets: true,
       },
       skip,
       take: safeLimit,
@@ -77,11 +69,17 @@ export const listRecipe = async (
   const data = recipes.map((recipe) => {
     return nullToUndefined({
       ...recipe,
-      linkedProducts: recipe.linkedProducts.map((ele) => {
-        return { quantity: ele.quantity, ...ele.product };
-      }),
-      assets: recipe.assets.map((ele) => {
-        return { ...ele };
+      listedIngredients: recipe.listedIngredients.map((ele) => {
+        const { product, ...variant } = ele.variant;
+        const { summary, ...detail } = product;
+        return {
+          quantity: ele.quantity,
+          product: {
+            summary: summary ?? "",
+            ...detail,
+          },
+          variant,
+        };
       }),
     });
   });

@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import Count from "./count";
 import Nutrition from "./nutrition";
 import { ChefHat, Share2, Star } from "lucide-react";
@@ -10,97 +9,168 @@ import HeroSkeleton from "./loader";
 import { useProductStore } from "@/store/user/product.store";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { useProduct } from "@/provider/product.provider";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 export default function Hero() {
   const { data, isLoading, isFetching } = useProductStore();
+  const { selectedVariant, selectedOptions, setOptionValue } = useProduct();
 
   if (isLoading || isFetching || !data) return <HeroSkeleton />;
 
-  const { type, displayName, description, price, mrp } = data;
+  const { type, displayName, description, options, variants } = data;
+
+  /* ----------------- Check Variant Count ----------------- */
+
+  const hasMultipleVariants = variants.length > 1;
+
+  /* ----------------- Option Validation ----------------- */
+
+  const isOptionValueValid = (optionSlug: string, valueSlug: string) => {
+    return variants.some((variant) =>
+      variant.options.every((opt) => {
+        if (opt.option === optionSlug) return opt.optionValue === valueSlug;
+
+        const selected = selectedOptions[opt.option];
+        return selected ? selected.value.slug === opt.optionValue : true;
+      }),
+    );
+  };
+
   return (
     <article className="w-full xl:min-w-150 space-y-5">
-      <h2 className="uppercase font-semibold text-forest text-[0.875rem] tracking-[0.6px]">
+      {/* ---------------- Type ---------------- */}
+
+      <h2 className="uppercase font-semibold text-maroon text-[0.875rem] tracking-[0.6px]">
         {type}
       </h2>
 
-      <Nutrition {...data}></Nutrition>
+      <Nutrition {...data} />
+
+      {/* ---------------- Title ---------------- */}
 
       <div className="space-y-1.5">
         <h1 className="text-[2.375rem] leading-[120%] font-semibold">
-          <span>{displayName}</span>
+          {displayName}
         </h1>
+
         <p className="text-[1.125rem] font-light">{description}</p>
       </div>
 
-      <Benefit {...data}></Benefit>
-      <div className="mt-9">
-        <div className="flex items-end gap-2  ">
-          {price != mrp ? (
-            <>
-              <p className="text-[1.875rem] text-forest leading-none font-bold align-bottom">
-                ₹{formatPrice(price)}
+      <Benefit {...data} />
+
+      {/* ---------------- OPTIONS (Only if Needed) ---------------- */}
+
+      {hasMultipleVariants && options.length > 0 && (
+        <div className="space-y-4 mt-6">
+          {options.map((opt) => (
+            <div key={opt.slug} className="space-y-1.5">
+              <p className="text-xs font-semibold text-muted-foreground">
+                {opt.displayName}
               </p>
+
+              <Select
+                value={selectedOptions[opt.slug]?.value.slug || ""}
+                onValueChange={(value) => setOptionValue(opt.slug, value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={`Select ${opt.displayName}`} />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {opt.values.map((val) => {
+                    const isValid = isOptionValueValid(opt.slug, val.slug);
+
+                    return (
+                      <SelectItem
+                        key={val.slug}
+                        value={val.slug}
+                        disabled={!isValid}
+                      >
+                        {val.displayName}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ---------------- Price ---------------- */}
+
+      <div className="mt-9">
+        <div className="flex items-end gap-2">
+          {selectedVariant?.price !== selectedVariant?.mrp ? (
+            <>
+              <p className="text-[1.875rem] font-bold leading-none">
+                ₹{formatPrice(selectedVariant?.price ?? 0)}
+              </p>
+
               <p className="text-muted-foreground line-through">
-                ₹{formatPrice(mrp)}
+                ₹{formatPrice(selectedVariant?.mrp ?? 0)}
               </p>
             </>
           ) : (
-            <>
-              <p className="text-[1.875rem] font-bold">₹{formatPrice(price)}</p>
-            </>
+            <p className="text-[1.875rem] font-bold">
+              ₹{formatPrice(selectedVariant?.price ?? 0)}
+            </p>
           )}
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-4 flex-col w-full mt-4">
-        <Count {...data} />
+      {/* ---------------- Actions ---------------- */}
 
-        <Button
-          variant={"outline"}
-          className="w-full h-14!   border-forest text-forest hover:bg-white border-2 font-bold"
-          size="lg"
-        >
-          Subscribe (₹21.5)
-        </Button>
-        <div className="bg-muted flex items-center gap-3.25 w-full p-3 rounded-md">
-          <div className="bg-muted-foreground/10 flex items-center rounded-full justify-center p-2">
-            <Star className="fill-forest"></Star>
+      <div className="flex items-center gap-4 flex-col w-full mt-4">
+        <Count />
+
+        {/* Loyalty */}
+
+        <div className="bg-muted flex items-center gap-3 w-full p-3 rounded-md">
+          <div className="bg-muted-foreground/10 p-2 rounded-full">
+            <Star className="fill-maroon stroke-maroon" />
           </div>
 
-          <div className="text-[0.75rem] text-forest">
+          <div className="text-[0.75rem] text-maroon">
             <h2 className="font-bold">Loyalty Reward</h2>
             <p>Earn 50 pts with this purchase</p>
           </div>
         </div>
 
-        {data.recipes.length > 0 ? (
-          <>
-            <div className="border-2 rounded-md border-forest p-3 w-full">
-              <h2 className="flex items-center gap-2 font-bold">
-                <ChefHat className="fill-forest"></ChefHat>
-                <span className="text-forest">Recipe Ideas</span>
-              </h2>
+        {/* Recipes */}
 
-              <ul className="list-disc pl-5 mt-4 text-[0.875rem] font-light tracking-[0%] flex flex-col gap-2">
-                {data.recipes.map((ele) => (
-                  <Link
-                    href={`/recipe/${ele.slug}`}
-                    target="_blank"
-                    className="hover:underline"
-                  >
-                    <li>{ele.title}</li>
-                  </Link>
-                ))}
-              </ul>
-            </div>
-          </>
-        ) : (
-          <></>
+        {data.recipes.length > 0 && (
+          <div className="border-2 rounded-md  p-3 w-full">
+            <h2 className="flex items-center gap-2 font-bold">
+              <ChefHat className="fill-maroon stroke-maroon" />
+              <span className="text-maroon">Recipe Ideas</span>
+            </h2>
+
+            <ul className="list-disc pl-5 mt-4 text-sm font-light flex flex-col gap-2">
+              {data.recipes.map((ele) => (
+                <Link
+                  key={ele.slug}
+                  href={`/recipe/${ele.slug}`}
+                  target="_blank"
+                  className="hover:underline"
+                >
+                  <li>{ele.title}</li>
+                </Link>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
-      {/* <p className="text-[0.875rem] mt-5 text-muted-foreground">
-        <strong>Best For:</strong> Salads, Toast Topping, Smoothies, Baby Food,
-        Farm Origin, Based on IFCT 2017 standards.
-      </p> */}
+
+      {/* ---------------- Share ---------------- */}
 
       <Share>
         <div className="text-muted-foreground flex gap-2 items-center mt-6 cursor-pointer hover:text-black transition">

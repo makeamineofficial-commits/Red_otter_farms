@@ -11,23 +11,33 @@ export const getCart = async (): Promise<Cart | null> => {
     select: {
       sessionId: true,
       status: true,
-      products: {
+      items: {
         select: {
           quantity: true,
-          product: {
+          variant: {
             select: {
-              publicId: true,
-              slug: true,
+              sku: true,
               price: true,
-              displayName: true,
-              description: true,
-              nutritionalInfo: true,
-              weight: true,
-              weightUnit: true,
-              assets: {
+              publicId: true,
+              product: {
                 select: {
-                  url: true,
-                  type: true,
+                  summary: true,
+                  displayName: true,
+                  nutritionalInfo: true,
+                  slug: true,
+                  assets: {
+                    where: {
+                      isPrimary: true,
+                    },
+                    take: 1,
+                    select: {
+                      url: true,
+                      thumbnail: true,
+                      type: true,
+                      position: true,
+                      isPrimary: true,
+                    },
+                  },
                 },
               },
             },
@@ -42,12 +52,15 @@ export const getCart = async (): Promise<Cart | null> => {
   return {
     sessionId: cart.sessionId,
     status: cart.status,
-    products:
-      cart.products?.map(({ product, quantity }) => ({
-        ...product,
-
-        assets: product.assets as any,
-        quantity,
-      })) ?? [],
+    items:
+      cart.items?.map(({ variant, quantity }) => {
+        const { product, ...details } = variant;
+        const { summary, ...productDetails } = product;
+        return {
+          variant: details,
+          product: { summary: summary ?? "", ...productDetails },
+          quantity,
+        };
+      }) ?? [],
   };
 };

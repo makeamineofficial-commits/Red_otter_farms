@@ -11,8 +11,8 @@ export default function ChefTips({ chefTips }: Recipe) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
-        {chefTips.map((ele) => (
-          <p>• {ele}.</p>
+        {chefTips.map((ele, idx) => (
+          <p key={idx}>• {ele}.</p>
         ))}
       </CardContent>
     </Card>

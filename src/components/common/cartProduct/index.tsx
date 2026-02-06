@@ -1,21 +1,22 @@
 import { useCart } from "@/provider/cart.provider";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { CartProduct } from "@/types/cart";
+import { CartItem } from "@/types/cart";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import Link from "next/link";
 
-function ProductCard(product: CartProduct) {
+function ProductCard(item: CartItem) {
+  const { quantity, product } = item;
   const { update, isUpdating, remove } = useCart();
 
-  const [localQty, setLocalQty] = useState(product.quantity);
+  const [localQty, setLocalQty] = useState(item.quantity);
 
   // Debounced server update
   const debouncedUpdate = useDebouncedCallback(
     (qty: number) => {
       update({
-        product,
+        item,
         quantity: qty,
         toggle: false,
       });
@@ -41,14 +42,14 @@ function ProductCard(product: CartProduct) {
   };
 
   useEffect(() => {
-    setLocalQty(product.quantity);
-  }, [product.quantity]);
+    setLocalQty(quantity);
+  }, [quantity]);
 
   return (
     <div className="border-b last:border-b-0 pb-2 flex gap-3 items-end relative">
       <button
         className="absolute top-2 right-2"
-        onClick={() => remove({ productPublicId: product.publicId })}
+        onClick={() => remove({ variantId: item.variant.publicId })}
       >
         <Trash2 size={15} className="text-destructive" />
       </button>
@@ -64,18 +65,18 @@ function ProductCard(product: CartProduct) {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col gap-1">
+      <div className="flex-1 flex flex-col ">
         <Link href={`/products/${product.slug}`} className="hover:underline">
-          <span className="font-medium">{product.displayName}</span>
+          <span className="font-medium">{product.displayName.trim()}</span>
         </Link>
 
-        {product.description && (
-          <span className="text-sm text-muted-foreground line-clamp-2">
-            {product.description}
+        {product.summary && (
+          <span className="text-xs text-muted-foreground line-clamp-2 w-[90%]">
+            {product.summary}
           </span>
         )}
 
-        <div className="flex items-center justify-between mt-2">
+        <div className="flex items-center justify-between mt-1">
           <div className="flex items-center gap-2 px-2 py-1 rounded-md border">
             <button
               onClick={decrease}
@@ -127,20 +128,20 @@ export default function Products() {
       {isLoading || !cart ? (
         <>
           {[1, 2, 3, 4].map((ele) => (
-            <CartProductSkeleton />
+            <CartProductSkeleton key={ele} />
           ))}
         </>
       ) : (
         <>
-          {cart?.products.length === 0 ? (
+          {cart?.items.length === 0 ? (
             <span className="uppercase text-muted-foreground text-sm text-center py-4">
               Cart is Empty
             </span>
           ) : (
             <></>
           )}
-          {cart?.products.map((ele, idx) => (
-            <ProductCard key={ele.publicId} {...ele} />
+          {cart?.items.map((ele, idx) => (
+            <ProductCard key={ele.variant.publicId} {...ele} />
           ))}
         </>
       )}

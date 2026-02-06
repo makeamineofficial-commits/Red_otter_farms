@@ -28,12 +28,12 @@ export async function PATCH(
     );
   }
 
-  const { price, inStock, quantity } = await req.json();
+  const { price, inStock, availableInStock, stockLimit } = await req.json();
 
   const { sku } = await context.params;
 
   try {
-    const check = await db.product.findFirst({
+    const check = await db.variant.findFirst({
       where: {
         AND: [{ sku }],
       },
@@ -49,8 +49,8 @@ export async function PATCH(
       );
     const updatedProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const updatedProduct = await tx.product.update({
-          data: { inStock, price: price * 100, quantity },
+        const updatedProduct = await tx.variant.update({
+          data: { inStock, price: price * 100, availableInStock, stockLimit },
           where: { id: check.id },
         });
         return updatedProduct;

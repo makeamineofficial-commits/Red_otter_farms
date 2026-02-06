@@ -6,13 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "next/navigation";
 import { listProducts } from "@/actions/user/products/list.action";
 import { PaginatedResponse } from "@/types/common";
-import { Product, SortBy } from "@/types/product";
+import { ProductPreview, SortBy } from "@/types/product";
 
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: PaginatedResponse<Product> | undefined;
+  data: PaginatedResponse<ProductPreview> | undefined;
   error: Error | null;
 }
 
@@ -33,11 +33,12 @@ function StoreContent({ children }: { children: React.ReactNode }) {
         ? Number(searchParams.get("maxPrice"))
         : undefined,
       sortBy: searchParams.get("sortBy") as SortBy,
+      benefits: searchParams.getAll("benefit"),
     };
   }, [searchParams, slug]);
 
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    PaginatedResponse<Product> | undefined
+    PaginatedResponse<ProductPreview> | undefined
   >({
     queryKey: ["products", JSON.stringify(filter)],
     queryFn: async () => {

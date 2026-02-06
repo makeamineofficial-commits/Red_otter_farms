@@ -1,3 +1,5 @@
+import { Item } from "@/types/cart";
+import { ProductPreview } from "@/types/product";
 import { clsx, type ClassValue } from "clsx";
 import React from "react";
 import { twMerge } from "tailwind-merge";
@@ -73,3 +75,20 @@ export function isNCRPincode(pincode: string): boolean {
     prefix.startsWith("121")
   );
 }
+
+export const convertToCartItem = (product: ProductPreview): Item => {
+  return {
+    variant: {
+      sku: product.sku,
+      price: product.price,
+      publicId: product.variantId,
+    },
+    product: {
+      displayName: product.displayName,
+      summary: product.summary,
+      nutritionalInfo: product.nutritionalInfo,
+      assets: product.assets,
+      slug: product.slug,
+    },
+  };
+};

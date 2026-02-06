@@ -12,7 +12,7 @@ export const createRecipe = async (recipe: RecipeProps) => {
 
     const newRecipe = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        const { assets, linkedProducts, ...rest } = recipe;
+        const { assets, listedIngredients, ...rest } = recipe;
         const newRecipe = await tx.recipe.create({
           data: { slug, ...rest },
         });
@@ -28,17 +28,17 @@ export const createRecipe = async (recipe: RecipeProps) => {
         const products = await tx.product.findMany({
           where: {
             publicId: {
-              in: linkedProducts.map((ele) => ele.publicId),
+              in: listedIngredients.map((ele) => ele.publicId),
             },
           },
         });
 
-        await tx.recipeProduct.createMany({
+        await tx.recipeIngredient.createMany({
           data: products.map((ele) => {
             return {
-              productId: ele.id,
+              variantId: ele.id,
               quantity:
-                linkedProducts.find(
+                listedIngredients.find(
                   (product) => product.publicId === ele.publicId,
                 )?.quantity || 1,
               recipeId: newRecipe.id,

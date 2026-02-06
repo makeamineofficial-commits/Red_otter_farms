@@ -8,6 +8,7 @@ export const listTestimonials = async (): Promise<{
   message: string;
   testimonials: Testimonial[];
 }> => {
+  console.log("called");
   try {
     const testimonials = await db.testimonial.findMany({
       where: {

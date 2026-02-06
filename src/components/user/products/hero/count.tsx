@@ -2,24 +2,32 @@
 
 import React, { useEffect, useState } from "react";
 import { Plus, Minus } from "lucide-react";
-import { Product } from "@/types/product";
+import { Product, Variant } from "@/types/product";
 import { useCart } from "@/provider/cart.provider";
 import { Button } from "@/components/ui/button";
-export default function Count(product: Product) {
+import { useProduct } from "@/provider/product.provider";
+import { convertToCartItem } from "@/lib/utils";
+import { useProductStore } from "@/store/user/product.store";
+export default function Count() {
   const { update, cart } = useCart();
-
+  const { selectedVariant } = useProduct();
   const [quantity, setQuantity] = useState(1);
+  const { data } = useProductStore();
   useEffect(() => {
-    if (!cart) return;
+    if (!cart || !selectedVariant) return;
 
-    const count = cart.products.find(
-      (ele) => ele.publicId === product.publicId,
+    const count = cart.items.find(
+      (ele) => ele.variant.publicId === selectedVariant.publicId,
     )?.quantity;
 
     if (count) {
       setQuantity(count);
     }
   }, [cart]);
+
+  if (!data) return <></>;
+
+  if (!selectedVariant) return <>Please select a valid variant</>;
   return (
     <div className="flex w-full flex-col justify-between sm:flex-row gap-3">
       <div className=" flex items-center border-2  h-fit w-fit rounded-2xl">
@@ -43,15 +51,25 @@ export default function Count(product: Product) {
 
       <Button
         onClick={() => {
-          // @ts-ignore
-          update({ product, quantity });
+          update({
+            item: convertToCartItem({
+              ...data,
+              productId: data.publicId,
+              variantId: selectedVariant.publicId,
+              variants: data.variants.length,
+              sku: selectedVariant.sku,
+              mrp: selectedVariant.mrp,
+              price: selectedVariant.price,
+            }),
+            quantity,
+          });
         }}
         size="lg"
         className="
         h-14 font-bold
         w-full 
         sm:flex-1 sm:max-w-56
-        bg-forest text-white hover:bg-forest/90 hover:text-white
+        bg-white text-maroon border-maroon border hover:bg-white! 
         "
       >
         Add to Cart

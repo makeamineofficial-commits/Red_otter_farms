@@ -31,7 +31,7 @@ export const recipeSchema = z.object({
   summary: z.string().trim().min(5).max(120),
   isPublished: z.boolean(),
   slug: z.string(),
-  linkedProducts: z.array(
+  listedIngredients: z.array(
     z.object({
       quantity: z.number().min(1),
       publicId: z.string(),
@@ -49,8 +49,8 @@ export const recipeSchema = z.object({
   healthBenefits: z.array(z.string().min(1)),
   assets: z.array(
     z.object({
-      url: z.string().url(),
-      thumbnail: z.string().url(),
+      url: z.string(),
+      thumbnail: z.string(),
       type: z.nativeEnum(AssetType),
       position: z.number().int().nonnegative(),
       isPrimary: z.boolean(),
@@ -67,7 +67,12 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
     defaultValues: {
       title: recipe.title,
       summary: recipe.summary,
-      linkedProducts: recipe.linkedProducts,
+      listedIngredients: recipe.listedIngredients.map((ele) => {
+        return {
+          quantity: ele.quantity,
+          publicId: ele.variant.publicId,
+        };
+      }),
       instructions: recipe.instructions,
       chefTips: recipe.chefTips,
       ingredients: recipe.ingredients,
@@ -95,9 +100,6 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
     console.error("Validation errors:", errors);
   };
 
-  useEffect(() => {
-    console.log(recipe);
-  }, [recipe]);
   return (
     <Form {...form}>
       <form
@@ -162,6 +164,78 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
             </FormItem>
           )}
         />
+
+        <div className="grid grid-cols-4 gap-4">
+          <FormField
+            control={form.control}
+            name="cookingTime"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Cooking Time</FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-full"
+                    placeholder="Cooking time for the recipe..."
+                    {...field}
+                  />
+                </FormControl>{" "}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="prepTime"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Preparation Time</FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-full"
+                    placeholder="Preparation time for the recipe..."
+                    {...field}
+                  />
+                </FormControl>{" "}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="serving"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Servings</FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-full"
+                    placeholder="Servings for the recipe..."
+                    {...field}
+                  />
+                </FormControl>{" "}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="difficulty"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Difficulty</FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-full"
+                    placeholder="Difficulty of the recipe..."
+                    {...field}
+                  />
+                </FormControl>{" "}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="assets"
@@ -197,7 +271,7 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
 
         <FormField
           control={form.control}
-          name="linkedProducts"
+          name="listedIngredients"
           render={({ field }) => (
             <FormItem className="w-full">
               <FormLabel>Linked Products</FormLabel>
@@ -205,7 +279,7 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
                 <ProductMultiSelect
                   loading={isLoading}
                   options={
-                    data?.products.map((ele) => {
+                    data?.variants.map((ele) => {
                       return {
                         label: ele.name,
                         value: ele.publicId,
@@ -219,7 +293,6 @@ export default function UpdateRecipeForm({ recipe }: { recipe: Recipe }) {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="instructions"

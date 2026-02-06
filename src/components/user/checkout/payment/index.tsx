@@ -25,11 +25,7 @@ export default function Payment() {
   const { checkout } = useCheckoutHandler();
 
   const isDisabled =
-    isLoading ||
-    isUpdating ||
-    fetchingRate ||
-    !cart ||
-    cart.products.length === 0;
+    isLoading || isUpdating || fetchingRate || !cart || cart.items.length === 0;
 
   if (isLoading || isUpdating) {
     return <PaymentSkeleton />;
@@ -42,7 +38,7 @@ export default function Payment() {
         onClick={async () => {
           if (isDisabled) return;
           const orderId = await checkout();
-          console.log("payment flow started")
+          console.log("payment flow started");
           // use the order to start the payment
         }}
         className="w-full py-4 h-auto! text-base bg-white border-forest

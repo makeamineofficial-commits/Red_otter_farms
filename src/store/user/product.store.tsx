@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getProduct } from "@/actions/user/products/get.action";
-import { Product } from "@/types/product";
+import { Product, Variant } from "@/types/product";
 import { useParams } from "next/navigation";
 
 interface StoreInterface {
@@ -12,7 +12,7 @@ interface StoreInterface {
   data:
     | (Product & {
         recipes: { title: string; slug: string }[];
-        presentInWishlist: boolean;
+        variants: Variant[];
       })
     | undefined;
   error: Error | null;
@@ -24,19 +24,19 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   const { slug } = useParams();
   const { isFetching, isError, isLoading, data, error } = useQuery<
     | (Product & {
-        presentInWishlist: boolean;
         recipes: { title: string; slug: string }[];
+        variants: Variant[];
       })
     | undefined
   >({
     queryKey: ["product", slug],
     queryFn: async () => {
       if (!slug) return;
-      const product = await getProduct({
+      const res = await getProduct({
         slug: slug?.toString(),
       });
-      console.log(product.product);
-      return product.product;
+
+      return res.product;
     },
     enabled: !!slug,
     staleTime: 1000 * 60 * 5,

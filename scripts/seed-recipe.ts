@@ -107,10 +107,10 @@ async function main() {
 
     /* ---------- LINK PRODUCTS ---------- */
     for (const product of linkedProducts) {
-      await prisma.recipeProduct.create({
+      await prisma.recipeIngredient.create({
         data: {
           recipeId: recipe.id,
-          productId: product.id,
+          variantId: product.id,
           quantity: randomBetween(1, 3),
         },
       });

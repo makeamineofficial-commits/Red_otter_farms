@@ -3,8 +3,26 @@
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
-import { Product } from "@/types/product";
+import { Product, Variant } from "@/types/product";
 import { validateUser } from "@/actions/auth/user.action";
+
+/* -------------------- Helpers -------------------- */
+
+function getUniqueRecipes(recipes: { title: string; slug: string }[]) {
+  const seen = new Set<string>();
+  const unique: { title: string; slug: string }[] = [];
+
+  for (const r of recipes) {
+    if (!seen.has(r.slug)) {
+      seen.add(r.slug);
+      unique.push(r);
+    }
+  }
+
+  return unique;
+}
+
+/* -------------------- Main Cached Fetch -------------------- */
 
 const _getProductCached = async (
   slug: string,
@@ -12,29 +30,26 @@ const _getProductCached = async (
   | (Product & {
       id: string;
       recipes: { title: string; slug: string }[];
+      variants: Variant[];
     })
   | null
 > => {
   const product = await db.product.findUnique({
     where: { slug },
     include: {
-      linkedRecipes: {
-        select: {
-          recipe: {
+      categories: { include: { category: true } },
+      assets: true,
+      options: { include: { values: true } },
+      variants: {
+        include: {
+          options: {
             select: {
-              title: true,
-              slug: true,
+              value: { include: { option: { select: { slug: true } } } },
             },
           },
-        },
-      },
-      assets: {
-        select: {
-          url: true,
-          thumbnail: true,
-          type: true,
-          position: true,
-          isPrimary: true,
+          listedIngredients: {
+            select: { recipe: { select: { title: true, slug: true } } },
+          },
         },
       },
     },
@@ -42,15 +57,41 @@ const _getProductCached = async (
 
   if (!product) return null;
 
+  const recipes = getUniqueRecipes(
+    product.variants.flatMap((ele) =>
+      ele.listedIngredients.map((ele) => ele.recipe),
+    ),
+  );
+
   return nullToUndefined({
     ...product,
-    presentInWishlist: false,
-    description: product.description!,
     nutritionalInfo: product.nutritionalInfo as any,
-    recipes: product.linkedRecipes.map((r) => r.recipe),
-    categories: [],
+    summary: product.summary ?? "",
+    description: product.description ?? "",
+    categories: product.categories.map((c) => c.category),
+    variants: product.variants.map((ele) => {
+      return {
+        ...ele,
+        options: ele.options.map((ele) => {
+          return { option: ele.value.option.slug, optionValue: ele.value.slug };
+        }),
+      };
+    }),
+    options: product.options.map((o) => ({
+      displayName: o.displayName,
+      slug: o.slug,
+      values: o.values.map((v) => ({
+        displayName: v.displayName,
+        slug: v.slug,
+        isDefault: v.isDefault,
+      })),
+    })),
+    recipes,
+    presentInWishlist: false,
   });
 };
+
+/* -------------------- Cached Wrapper -------------------- */
 
 const getCachedProduct = unstable_cache(
   async ({ slug }: { slug: string }) => {
@@ -64,30 +105,26 @@ const getCachedProduct = unstable_cache(
   },
 );
 
+/* -------------------- Public API -------------------- */
+
 export const getProduct = async ({ slug }: { slug: string }) => {
   const product = await getCachedProduct({ slug });
 
   if (!product) {
-    return {
-      success: false,
-      message: "Product not found",
-    };
+    return { success: false, message: "Product not found" };
   }
+
   const { id, ...detail } = product;
   const user = await validateUser();
+
   let presentInWishlist = false;
-
   if (user?.phone) {
-    const wishlistItem = await db.userWishlist.findUnique({
-      where: {
-        phone_productId: {
-          phone: user.phone,
-          productId: id,
-        },
-      },
-    });
-
-    presentInWishlist = wishlistItem !== null;
+    presentInWishlist = Boolean(
+      await db.userWishlist.findUnique({
+        where: { phone_productId: { phone: user.phone, productId: id } },
+        select: { productId: true },
+      }),
+    );
   }
 
   return {

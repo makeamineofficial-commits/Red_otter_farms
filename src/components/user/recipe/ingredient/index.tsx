@@ -4,7 +4,10 @@ import { Recipe } from "@/types/recipe";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/provider/cart.provider";
 import { toast } from "sonner";
-export default function Ingredients({ ingredients, linkedProducts }: Recipe) {
+export default function Ingredients({
+  ingredients,
+  listedIngredients,
+}: Recipe) {
   const [added, setAdded] = useState(false);
 
   const { isLoading, isUpdating, updateMany } = useCart();
@@ -12,8 +15,11 @@ export default function Ingredients({ ingredients, linkedProducts }: Recipe) {
   const handleClick = async () => {
     try {
       await updateMany({
-        products: linkedProducts.map((ele) => {
-          return { product: ele, quantity: ele.quantity };
+        items: listedIngredients.map((ele) => {
+          return {
+            item: ele,
+            quantity: ele.quantity,
+          };
         }),
       });
       setAdded(true);

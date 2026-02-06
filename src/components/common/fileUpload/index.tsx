@@ -14,6 +14,8 @@ type Props = {
 export default function FileUpload({ value, onChange, limit }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  /* ---------------- Upload Handler ---------------- */
+
   const handleFiles = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const selected = Array.from(e.target.files || []);
@@ -26,15 +28,11 @@ export default function FileUpload({ value, onChange, limit }: Props) {
 
       if (remaining <= 0) {
         toast.warning(`You can upload up to ${limit} files only`);
-        if (inputRef.current) inputRef.current.value = "";
+        inputRef.current!.value = "";
         return;
       }
 
       const filesToUpload = selected.slice(0, remaining);
-
-      if (selected.length > remaining) {
-        toast.warning(`Only ${remaining} more file(s) allowed`);
-      }
 
       const uploadedFiles: PreviewFile[] = [];
 
@@ -51,20 +49,29 @@ export default function FileUpload({ value, onChange, limit }: Props) {
           }
 
           const uploaded = await upload(file);
+
           if (!uploaded?.url) {
             toast.error("Upload failed");
             continue;
           }
 
+          const isFirst = value.length === 0 && uploadedFiles.length === 0;
+
           uploadedFiles.push({
             url: uploaded.url,
             thumbnail: uploaded.thumbnail,
             type: isVideo ? AssetType.VIDEO : AssetType.IMAGE,
+
+            // ⭐ New fields
+            isPrimary: isFirst,
+            position: value.length + uploadedFiles.length,
           });
         }
 
         if (uploadedFiles.length) {
-          onChange([...value, ...uploadedFiles]);
+          const updated = [...value, ...uploadedFiles];
+
+          onChange(recalculatePositions(updated));
         }
       } catch (err) {
         console.error(err);
@@ -76,14 +83,42 @@ export default function FileUpload({ value, onChange, limit }: Props) {
     [value, onChange, limit],
   );
 
+  /* ---------------- Helpers ---------------- */
+
+  const recalculatePositions = (files: PreviewFile[]) => {
+    return files.map((file, index) => ({
+      ...file,
+      position: index,
+    }));
+  };
+
+  const setPrimary = (index: number) => {
+    const updated = value.map((file, i) => ({
+      ...file,
+      isPrimary: i === index,
+    }));
+
+    onChange(updated);
+  };
+
   const removeFile = (index: number) => {
-    onChange(value.filter((_, i) => i !== index));
+    let updated = value.filter((_, i) => i !== index);
+
+    // If removed primary → make first one primary
+    if (!updated.some((f) => f.isPrimary) && updated.length) {
+      updated[0].isPrimary = true;
+    }
+
+    onChange(recalculatePositions(updated));
   };
 
   const isLimitReached = typeof limit === "number" && value.length >= limit;
 
+  /* ---------------- UI ---------------- */
+
   return (
     <div className="space-y-3 overflow-hidden">
+      {/* Upload Box */}
       <div
         className={cn(
           "border-2 border-dashed rounded-md p-6 text-center",
@@ -100,9 +135,6 @@ export default function FileUpload({ value, onChange, limit }: Props) {
         <p className="text-sm text-muted-foreground">
           Click to upload images or videos
         </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          Images ≤ 5MB • Videos ≤ 25MB
-        </p>
 
         <input
           ref={inputRef}
@@ -114,14 +146,16 @@ export default function FileUpload({ value, onChange, limit }: Props) {
         />
       </div>
 
+      {/* Preview */}
       {value.length > 0 && (
-        <div className="">
-          <div className="flex gap-3 rounded-md border p-2 overflow-auto">
-            {value.map((item, index) => (
-              <div
-                key={index}
-                className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-md border"
-              >
+        <div className="flex gap-3 rounded-md border p-2 overflow-auto">
+          {value.map((item, index) => (
+            <div
+              key={index}
+              className="group relative w-28 shrink-0 rounded-md border p-1"
+            >
+              {/* Media */}
+              <div className="relative h-24 w-24 overflow-hidden rounded-md">
                 {item.type === AssetType.IMAGE ? (
                   <img
                     src={item.thumbnail ?? item.url}
@@ -134,27 +168,42 @@ export default function FileUpload({ value, onChange, limit }: Props) {
                   />
                 )}
 
-                <div className="absolute bottom-1 left-1 rounded bg-black/70 p-1 text-white">
-                  {item.type === AssetType.IMAGE ? (
-                    <ImageIcon size={12} />
-                  ) : (
-                    <VideoIcon size={12} />
-                  )}
-                </div>
-
+                {/* Remove */}
                 <button
                   type="button"
                   onClick={() => removeFile(index)}
-                  className={cn(
-                    "absolute top-1 right-1 rounded-full bg-black/70 p-1 text-white",
-                    "opacity-0 group-hover:opacity-100 transition",
-                  )}
+                  className="absolute top-1 right-1 rounded-full bg-black/70 p-1 text-white opacity-0 group-hover:opacity-100"
                 >
                   <X size={12} />
                 </button>
               </div>
-            ))}
-          </div>
+
+              {/* Type Icon */}
+              <div className="absolute top-1 left-1 rounded bg-black/70 p-1 text-white">
+                {item.type === AssetType.IMAGE ? (
+                  <ImageIcon size={12} />
+                ) : (
+                  <VideoIcon size={12} />
+                )}
+              </div>
+
+              {/* Primary Checkbox */}
+              <label className="mt-1 flex items-center gap-1 text-xs">
+                <input
+                  type="checkbox"
+                  checked={item.isPrimary}
+                  onChange={() => setPrimary(index)}
+                  className="h-3 w-3"
+                />
+                Primary
+              </label>
+
+              {/* Position */}
+              <p className="text-[10px] text-muted-foreground">
+                Position: {item.position}
+              </p>
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
   CarouselContent,
@@ -21,25 +24,31 @@ export function RecipeCarousel({
   title,
 }: RecipeHeroCarouselProps) {
   const [api, setApi] = useState<CarouselApi | null>(null);
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    if (!api) return;
-
-    setCurrent(api.selectedScrollSnap());
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
+  const autoplay = useRef(
+    Autoplay({
+      delay: 4000,
+      stopOnInteraction: true,
+      stopOnMouseEnter: true,
+    }),
+  );
 
   if (!assets.length) return null;
 
   return (
-    <div className="relative w-full h-140 aspect-video">
-      <Carousel setApi={setApi} className="h-full">
+    <div className="relative w-full h-140 aspect-video group">
+      {/* CAROUSEL */}
+      <Carousel
+        setApi={setApi}
+        className="h-full"
+        opts={{
+          loop: true,
+          align: "center",
+        }}
+        plugins={[autoplay.current]}
+      >
         <CarouselContent>
           {assets.map((asset, index) => (
-            <CarouselItem key={index}>
+            <CarouselItem key={index} className="-pl-6">
               <div className="relative w-full h-140 aspect-video">
                 <Image
                   src={asset.url}
@@ -55,20 +64,39 @@ export function RecipeCarousel({
       </Carousel>
 
       {/* GRADIENT OVERLAY */}
-      <div className="absolute  h-full w-full bg-black/40 top-0 left-0  z-20" />
+      <div className="absolute inset-0 bg-black/40 z-20" />
 
-      {/* DOTS – TOP RIGHT */}
-      <div className="absolute top-6 right-6 z-30 flex gap-2">
-        {assets.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => api?.scrollTo(index)}
-            className={`h-2 w-2 rounded-full transition-all ${
-              current === index ? "bg-white scale-110" : "bg-white/50"
-            }`}
-          />
-        ))}
-      </div>
+      {/* LEFT BUTTON */}
+      <button
+        onClick={() => api?.scrollPrev()}
+        className="
+          absolute left-4 top-1/2 -translate-y-1/2 z-30
+          h-10 w-10 rounded-full
+          bg-white/80 hover:bg-white
+          flex items-center justify-center
+          shadow-md
+          transition
+          opacity-0 group-hover:opacity-100
+        "
+      >
+        <ChevronLeft className="h-5 w-5 text-black" />
+      </button>
+
+      {/* RIGHT BUTTON */}
+      <button
+        onClick={() => api?.scrollNext()}
+        className="
+          absolute right-4 top-1/2 -translate-y-1/2 z-30
+          h-10 w-10 rounded-full
+          bg-white/80 hover:bg-white
+          flex items-center justify-center
+          shadow-md
+          transition
+          opacity-0 group-hover:opacity-100
+        "
+      >
+        <ChevronRight className="h-5 w-5 text-black" />
+      </button>
     </div>
   );
 }

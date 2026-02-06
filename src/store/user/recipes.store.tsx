@@ -7,14 +7,14 @@ import { useParams, useSearchParams } from "next/navigation";
 import { listProducts } from "@/actions/user/products/list.action";
 import { PaginatedResponse } from "@/types/common";
 import { Product, SortBy } from "@/types/product";
-import { Recipe } from "@/types/recipe";
+import { Recipe, RecipePreview } from "@/types/recipe";
 import { listRecipes } from "@/actions/user/recipes/list.action";
 
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: PaginatedResponse<Recipe> | undefined;
+  data: PaginatedResponse<RecipePreview> | undefined;
   error: Error | null;
 }
 
@@ -37,7 +37,7 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   }, [searchParams, category]);
 
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    PaginatedResponse<Recipe> | undefined
+    PaginatedResponse<RecipePreview> | undefined
   >({
     queryKey: ["recipes", filter],
     queryFn: async () => {

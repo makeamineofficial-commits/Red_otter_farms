@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Product, SortBy } from "@/types/product";
+import { ProductPreview, SortBy } from "@/types/product";
 import { Prisma } from "../../../../generated/prisma/browser";
 import { PaginatedResponse } from "@/types/common";
 import { nullToUndefined } from "@/lib/utils";
@@ -15,11 +15,12 @@ interface Filters {
   sortBy?: SortBy;
   limit?: number;
   page?: number;
+  benefits?: string[]; // ✅ added
 }
 
 export const listProducts = async (
   filters: Filters = {},
-): Promise<PaginatedResponse<Product>> => {
+): Promise<PaginatedResponse<ProductPreview>> => {
   const {
     inStock = true,
     q,
@@ -28,23 +29,29 @@ export const listProducts = async (
     sortBy = SortBy.LATEST,
     limit = 10,
     page = 1,
+    benefits,
   } = filters;
+
   const safeLimit = Math.max(1, Math.min(limit, 100));
   const safePage = Math.max(1, page);
   const skip = (safePage - 1) * safeLimit;
 
+  // ✅ Convert ₹ → paise
+  const maxPricePaise =
+    typeof maxPrice === "number" ? Math.round(maxPrice * 100) : undefined;
+
+  /* ---------------- WHERE ---------------- */
+
   const where: Prisma.ProductWhereInput = {
     isPublished: true,
-    ...(inStock && { inStock: true }),
-    ...(typeof maxPrice === "number" && {
-      price: { lte: Number(maxPrice) * 100 },
-    }),
+
     ...(q && {
       OR: [
         { name: { contains: q, mode: "insensitive" } },
         { displayName: { contains: q, mode: "insensitive" } },
       ],
     }),
+
     ...(category && {
       categories: {
         some: {
@@ -52,33 +59,65 @@ export const listProducts = async (
         },
       },
     }),
+
+    ...(benefits?.length
+      ? {
+          healthBenefits: {
+            hasSome: benefits, // ✅ match at least one selected benefit
+          },
+        }
+      : {}),
+
+    ...(typeof maxPricePaise === "number" && {
+      minPrice: {
+        lte: maxPricePaise,
+      },
+    }),
+
+    ...(inStock && {
+      variants: {
+        some: {
+          isDefault: true,
+          isPublished: true,
+          inStock: true,
+        },
+      },
+    }),
   };
+
+  /* ---------------- ORDER BY ---------------- */
 
   const orderBy: Prisma.ProductOrderByWithRelationInput[] =
     sortBy === SortBy.PRICE_LOW
-      ? [{ price: "asc" }, { createdAt: "desc" }]
+      ? [{ minPrice: "asc" }, { createdAt: "desc" }]
       : sortBy === SortBy.PRICE_HIGH
-        ? [{ price: "desc" }, { createdAt: "desc" }]
+        ? [{ maxPrice: "desc" }, { createdAt: "desc" }]
         : [{ createdAt: "desc" }];
+
+  /* ---------------- QUERY ---------------- */
+
   const [total, products] = await db.$transaction([
     db.product.count({ where }),
+
     db.product.findMany({
       where,
       skip,
       take: safeLimit,
       orderBy,
-      include: {
-        categories: {
-          include: {
-            category: {
-              select: { name: true, slug: true, publicId: true },
-            },
-          },
-        },
+
+      select: {
+        id: true,
+        summary: true,
+        type: true,
+        publicId: true,
+        displayName: true,
+        nutritionalInfo: true,
+        slug: true,
+        healthBenefits: true,
+
         assets: {
-          where: {
-            isPrimary: true,
-          },
+          where: { isPrimary: true },
+          take: 1,
           select: {
             url: true,
             thumbnail: true,
@@ -87,41 +126,76 @@ export const listProducts = async (
             isPrimary: true,
           },
         },
+
+        variants: {
+          where: {
+            isDefault: true,
+            isPublished: true,
+          },
+          take: 1,
+          select: {
+            sku: true,
+            mrp: true,
+            publicId: true,
+            price: true,
+            inStock: true,
+          },
+        },
+
+        _count: {
+          select: { variants: true },
+        },
       },
     }),
   ]);
 
+  /* ---------------- MAP ---------------- */
+
   const totalPages = Math.ceil(total / safeLimit);
 
-  let data = products.map((product) =>
-    nullToUndefined({
-      ...product,
-      categories: product.categories.map((c) => c.category),
-      description: product.description ?? undefined,
-      nutritionalInfo: product.nutritionalInfo as any,
-      presentInWishlist: false,
-      assets: product.assets,
-    }),
-  );
+  let data = products
+    .map((product) => {
+      const defaultVariant = product.variants[0];
+      if (!defaultVariant) return null;
+
+      return nullToUndefined({
+        id: product.id,
+        variantId: defaultVariant.publicId,
+        productId: product.publicId,
+        type: product.type,
+        displayName: product.displayName,
+        slug: product.slug,
+        summary: product.summary ?? "",
+        nutritionalInfo: product.nutritionalInfo,
+        healthBenefits: product.healthBenefits,
+        assets: product.assets,
+        presentInWishlist: false,
+        sku: defaultVariant.sku,
+        mrp: defaultVariant.mrp,
+        price: defaultVariant.price,
+        variants: product._count.variants,
+      });
+    })
+    .filter(Boolean) as (ProductPreview & { id: string })[];
+
+  /* ---------------- WISHLIST (OPTIMIZED) ---------------- */
+
   const user = await validateUser();
 
-  if (user && user.phone) {
-    const wishlistPromises = data.map(
-      async ({ presentInWishlist, id, ...rest }) => {
-        const res = await db.userWishlist.findUnique({
-          where: {
-            phone_productId: {
-              productId: id,
-              phone: user.phone as string,
-            },
-          },
-        });
-        return { id, presentInWishlist: res !== null, ...rest };
-      },
-    );
+  if (user?.phone && data.length) {
+    const ids = data.map((p) => p.id);
 
-    data = await Promise.all(wishlistPromises);
+    const wishlist = await db.userWishlist.findMany({
+      where: { phone: user.phone, productId: { in: ids } },
+      select: { productId: true },
+    });
+
+    const set = new Set(wishlist.map((w) => w.productId));
+
+    data = data.map((p) => ({ ...p, presentInWishlist: set.has(p.id) }));
   }
+
+  /* ---------------- RETURN ---------------- */
 
   return {
     page: safePage,

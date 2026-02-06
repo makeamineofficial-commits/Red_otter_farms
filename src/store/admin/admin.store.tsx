@@ -1,18 +1,24 @@
 "use client";
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { getAllVariants } from "@/actions/admin/variants/getAll.action";
 import { getAllCategory } from "@/actions/admin/category/getAll.action";
-import { getAllProducts } from "@/actions/admin/products/getAll.action";
+
+interface ContextDataReturnType {
+  categories: { publicId: string; name: string }[];
+  variants: {
+    publicId: string;
+    name: string;
+    options: string[];
+  }[];
+}
+
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data:
-    | {
-        categories: { publicId: string; name: string }[];
-        products: { publicId: string; name: string }[];
-      }
-    | undefined;
+  data: ContextDataReturnType | undefined;
+
   error: Error | null;
 }
 
@@ -20,17 +26,13 @@ const StoreContext = createContext<StoreInterface | null>(null);
 
 function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    | {
-        categories: { publicId: string; name: string }[];
-        products: { publicId: string; name: string }[];
-      }
-    | undefined
+    ContextDataReturnType | undefined
   >({
     queryKey: ["admin"],
     queryFn: async () => {
       const categories = await getAllCategory();
-      const products = await getAllProducts();
-      return { categories, products };
+      const variants = await getAllVariants();
+      return { categories, variants };
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,

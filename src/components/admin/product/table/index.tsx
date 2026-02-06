@@ -13,7 +13,7 @@ import {
 import { Pagination } from "@/components/common/pagination";
 import { ArchiveProduct } from "../archive";
 import { DeleteProduct } from "../delete";
-import { CircleCheck, Info, Pencil } from "lucide-react";
+import { CircleCheck, Info, Pencil, Option, Container } from "lucide-react";
 import TableSkeleton from "./skeleton";
 import { useProductStore } from "@/store/admin/product.store";
 import Link from "next/link";
@@ -58,9 +58,15 @@ export function ProductTable() {
                   )}
                 </TableCell>
                 <TableCell className="flex gap-2 justify-end">
-                  {/* <Link href={`/admin/dashboard/product/${product.publicId}`}>
+                  <Link href={`/products/${product.slug}`}>
                     <Info size={15} />
-                  </Link> */}
+                  </Link>
+
+                  <Link
+                    href={`/admin/dashboard/product/${product.publicId}/variant`}
+                  >
+                    <Container size={15}></Container>
+                  </Link>
                   <Link
                     href={`/admin/dashboard/product/${product.publicId}/update`}
                   >

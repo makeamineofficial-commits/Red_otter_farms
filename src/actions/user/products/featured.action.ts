@@ -1,27 +1,29 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Product } from "@/types/product";
+import { Product, ProductPreview } from "@/types/product";
 import { nullToUndefined } from "@/lib/utils";
 
-export const listFeaturedProducts = async (): Promise<Product[]> => {
+export const listFeaturedProducts = async (): Promise<ProductPreview[]> => {
+  console.log("called here");
   const products = await db.product.findMany({
     where: {
       isFeatured: true,
       isPublished: true,
     },
-    include: {
-      categories: {
-        include: {
-          category: {
-            select: { name: true, slug: true, publicId: true },
-          },
-        },
-      },
+    select: {
+      displayName: true,
+      nutritionalInfo: true,
+      slug: true,
+      summary: true,
+      type: true,
+      publicId: true,
+      healthBenefits: true,
       assets: {
         where: {
           isPrimary: true,
         },
+        take: 1,
         select: {
           url: true,
           thumbnail: true,
@@ -30,19 +32,45 @@ export const listFeaturedProducts = async (): Promise<Product[]> => {
           isPrimary: true,
         },
       },
+      variants: {
+        where: {
+          isDefault: true,
+        },
+        take: 1,
+        select: {
+          publicId: true,
+          sku: true,
+          mrp: true,
+          price: true,
+        },
+      },
+      _count: {
+        select: {
+          variants: true,
+        },
+      },
     },
   });
+  const data: ProductPreview[] = products.map((product) => {
+    const defaultVariant = product.variants[0] ?? null;
 
-  let data = products.map((product) =>
-    nullToUndefined({
-      ...product,
-      categories: product.categories.map((c) => c.category),
-      description: product.description ?? undefined,
-      nutritionalInfo: product.nutritionalInfo as any,
-      presentInWishlist: false,
+    return nullToUndefined({
+      displayName: product.displayName,
+      slug: product.slug,
+      variantId: product.variants[0].publicId,
+      productId: product.publicId,
+      type: product.type,
+      summary: product.summary ?? "",
+      nutritionalInfo: product.nutritionalInfo,
+      healthBenefits: product.healthBenefits,
       assets: product.assets,
-    }),
-  );
+      presentInWishlist: false,
+      sku: defaultVariant?.sku ?? null,
+      mrp: defaultVariant?.mrp ?? null,
+      price: defaultVariant?.price ?? null,
+      variants: product._count.variants,
+    });
+  });
 
   return data;
 };

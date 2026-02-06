@@ -7,7 +7,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useProductStore } from "@/store/user/product.store";
 import Wishlist from "./wishlist";
 import { Share } from "@/components/common/share";
@@ -15,60 +15,110 @@ import { Share } from "@/components/common/share";
 export default function Images() {
   const { data, isLoading, isFetching } = useProductStore();
   const [api, setApi] = useState<CarouselApi | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [displayImages, setDisplayImages] = useState<string[]>([]);
 
-  const images = data?.assets?.length
-    ? data.assets.map((asset) => asset.url)
-    : Array(3).fill(null);
-
+  useEffect(() => {
+    if (data?.assets?.length) {
+      setDisplayImages(data.assets.map((a) => a.url));
+    }
+  }, [data]);
   return (
     <>
+      {/* ---------------- DESKTOP ---------------- */}
       <article className="w-full hidden sm:block">
-        <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden ">
+        <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden">
+          {/* Main Image */}
           {isLoading || isFetching ? (
             <div className="animate-pulse w-full h-full bg-gray-200" />
           ) : (
             <img
-              src={images[0]}
+              src={displayImages[0]}
               alt={data?.name || "Product"}
-              className="w-full h-full object-cover rounded-3xl"
+              className={`
+          w-full h-full object-cover rounded-3xl
+          transition-all duration-300
+          ${isAnimating ? "scale-105 opacity-80" : "scale-100 opacity-100"}
+        `}
+              onLoad={() => setIsAnimating(false)}
             />
           )}
+
+          {/* Actions */}
           <div className="flex flex-col gap-2 absolute top-3 right-3 z-40">
-            <Wishlist></Wishlist>
-            <Share href={`/products/${data?.slug}`}>
-              <div className="bg-white shadow-sm h-10 w-10 flex items-center justify-center rounded-full">
-                <Share2 className="size-5 stroke-1  transition-colors "></Share2>
-              </div>
-            </Share>
+            {!isLoading && !isFetching && (
+              <Share href={`/products/${data?.slug}`}>
+                <div className="bg-white shadow-sm h-10 w-10 flex items-center justify-center rounded-full">
+                  <Share2 className="size-5 stroke-1" />
+                </div>
+              </Share>
+            )}
+            <Wishlist />
           </div>
         </div>
 
+        {/* Thumbnails */}
         <div className="grid grid-cols-3 my-2 lg:my-4.5 gap-2 lg:gap-4.5">
-          {images.slice(1, 4).map((img, i) => {
-            const isLastVisible = i === 2 && images.length > 4;
-            const remainingCount = images.length - 4;
-
+          {displayImages.slice(1, 4).map((img, i) => {
+            const realIndex = i + 1;
+            const isLast = i === 2 && displayImages.length > 4;
+            const remaining = displayImages.length - 4;
             return (
-              <div
+              <button
                 key={i}
-                className="aspect-square rounded-3xl overflow-hidden relative bg-muted group"
+                onClick={() => {
+                  setIsAnimating(true);
+
+                  setTimeout(() => {
+                    setDisplayImages((prev) => {
+                      const next = [...prev];
+
+                      // swap main (0) with clicked thumbnail
+                      const temp = next[0];
+                      next[0] = next[i + 1];
+                      next[i + 1] = temp;
+
+                      return next;
+                    });
+                  }, 150);
+                }}
+                className="
+            aspect-square rounded-3xl overflow-hidden relative
+            bg-muted group cursor-pointer
+            focus:outline-none
+          "
               >
                 {img ? (
                   <img
                     src={img}
                     alt={`Product ${i + 1}`}
-                    className="w-full h-full object-cover"
+                    className="
+                w-full h-full object-cover
+                transition-transform duration-300
+                group-hover:scale-105
+              "
                   />
                 ) : (
                   <div className="animate-pulse w-full h-full bg-gray-200" />
                 )}
 
-                {isLastVisible && (
-                  <div className="absolute group-hover:opacity-100 opacity-0 transition-all duration-200 inset-0 bg-black/50 flex items-center justify-center rounded-3xl text-white text-lg font-semibold">
-                    +{remainingCount}
+                {/* +N Overlay only on last */}
+                {isLast && (
+                  <div
+                    className="
+                absolute inset-0
+                bg-black/50
+                flex items-center justify-center
+                text-white text-lg font-semibold
+                opacity-0 group-hover:opacity-100
+                transition-opacity duration-200
+                rounded-3xl
+              "
+                  >
+                    +{remaining}
                   </div>
                 )}
-              </div>
+              </button>
             );
           })}
         </div>
@@ -77,16 +127,16 @@ export default function Images() {
       <article className="w-full sm:hidden block relative space-y-5">
         <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden ">
           <div className="flex flex-col gap-2 absolute top-3 right-3 z-40">
-            <Wishlist></Wishlist>
             <Share href={`/products/${data?.slug}`}>
               <div className="bg-white shadow-sm h-10 w-10 flex items-center justify-center rounded-full">
                 <Share2 className="size-5 stroke-1  transition-colors "></Share2>
               </div>
             </Share>
+            <Wishlist></Wishlist>
           </div>
           <Carousel setApi={setApi}>
             <CarouselContent>
-              {images.map((img, i) => (
+              {displayImages.map((img, i) => (
                 <CarouselItem key={i}>
                   <div className="aspect-square rounded-3xl overflow-hidden bg-muted">
                     {img ? (
@@ -104,32 +154,22 @@ export default function Images() {
             </CarouselContent>
           </Carousel>
         </div>
-        <div className="flex items-center justify-between px-2">
+        <div className="flex items-center justify-between w-full px-2 absolute bottom-8 left-1/2 -translate-x-1/2 z-50">
           <button
             onClick={() => api?.scrollPrev()}
-            className="h-10 w-10 rounded-full border-2 flex items-center justify-center border-muted-foreground"
+            className="h-10 w-10 rounded-full border-2 flex items-center justify-center border-white"
           >
-            <ChevronLeft className="size-5 cursor-pointer" />
+            <ChevronLeft className="size-5 cursor-pointer text-white" />
           </button>
 
           <button
             onClick={() => api?.scrollNext()}
-            className="h-10 w-10 rounded-full border-2 flex items-center justify-center border-muted-foreground"
+            className="h-10 w-10 rounded-full border-2 flex items-center justify-center border-white"
           >
-            <ChevronRight className="size-5 cursor-pointer" />
+            <ChevronRight className="size-5 cursor-pointer text-white" />
           </button>
         </div>
       </article>
     </>
-  );
-}
-
-function ActionIcons() {
-  return (
-    <div className="flex flex-col gap-2 absolute top-3 right-3 z-30">
-      <div className="bg-white shadow-sm h-10 w-10 rounded-full p-2 flex items-center justify-center">
-        <Heart className="stroke-1" />
-      </div>
-    </div>
   );
 }

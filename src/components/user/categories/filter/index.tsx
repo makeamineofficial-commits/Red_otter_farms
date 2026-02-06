@@ -23,21 +23,57 @@ const categories = [
   { label: "Flour & Grain", slug: "flour" },
 ];
 
+const specialCategories = [
+  { label: "Presented By RedOtter", slug: "by-red-otter" },
+  { label: "Under 99/-", slug: "under-99" },
+  { label: "Under 299/-", slug: "under-299" },
+];
+
+const benefits = [
+  "Low in Fat",
+  "High Protein",
+  "Rich in Fiber",
+  "No Added Sugar",
+  "Gluten Free",
+  "Heart Healthy",
+  "Rich in Vitamins",
+  "Low Sodium",
+  "Immunity Booster",
+  "Natural Ingredients",
+];
+
 function FilterSection({ children }: { children?: ReactNode }) {
   const { data } = useProductListingStore();
   const router = useRouter();
   const pathname = usePathname();
 
   const [inStock, setInStock] = useState(true);
+  const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
+
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [price, setPrice] = useState<number[]>(DEFAULT_PRICE);
 
-  const updateQuery = (params: Record<string, string | undefined>) => {
+  const updateQuery = (params: {
+    inStock?: string;
+    maxPrice?: string;
+    benefit?: string[];
+    page?: string;
+  }) => {
     const search = new URLSearchParams(window.location.search);
+
+    // Remove old multi params
+    if (params.benefit) {
+      search.delete("benefit");
+    }
 
     Object.entries(params).forEach(([key, value]) => {
       if (!value) {
         search.delete(key);
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach((v) => search.append(key, v));
       } else {
         search.set(key, value);
       }
@@ -65,6 +101,25 @@ function FilterSection({ children }: { children?: ReactNode }) {
     setPrice(DEFAULT_PRICE);
     setSelectedCategories([slug]);
     router.push(`/categories/${slug}`);
+  };
+
+  const toggleBenefit = (benefit: string) => {
+    setSelectedBenefits((prev) => {
+      let next: string[];
+
+      if (prev.includes(benefit)) {
+        next = prev.filter((b) => b !== benefit);
+      } else {
+        next = [...prev, benefit];
+      }
+
+      updateQuery({
+        benefit: next,
+        page: "1",
+      });
+
+      return next;
+    });
   };
 
   return (
@@ -135,7 +190,7 @@ function FilterSection({ children }: { children?: ReactNode }) {
       {/* PRICE */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-medium text-muted-foreground">By Price</p>
+          <p className="text-xs font-semibold">By Price</p>
           <Badge variant="secondary">₹{price[0]}</Badge>
         </div>
 
@@ -153,6 +208,58 @@ function FilterSection({ children }: { children?: ReactNode }) {
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>₹30</span>
           <span>₹300</span>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* BENEFITS */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold">Benefits</p>
+        </div>
+
+        <div className="space-y-2">
+          {benefits.map((benefit) => (
+            <div key={benefit} className="flex items-center gap-2 text-sm">
+              <Checkbox
+                id={benefit}
+                checked={selectedBenefits.includes(benefit)}
+                onCheckedChange={() => toggleBenefit(benefit)}
+              />
+
+              <label htmlFor={benefit} className="cursor-pointer">
+                {benefit}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* PRICE */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold">Specials</p>
+        </div>
+
+        <div className="space-y-2">
+          {specialCategories.map((category) => (
+            <div
+              key={category.slug}
+              className="flex items-center gap-2 text-sm"
+            >
+              <Checkbox
+                id={category.slug}
+                checked={pathname.includes(category.slug)}
+                onCheckedChange={() => handleCategoryClick(category.slug)}
+              />
+              <label htmlFor={category.slug} className="cursor-pointer">
+                {category.label}
+              </label>
+            </div>
+          ))}
         </div>
       </div>
     </div>

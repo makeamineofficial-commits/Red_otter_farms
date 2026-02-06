@@ -3,15 +3,15 @@ import { db } from "@/lib/db";
 import { getCartId } from "./util";
 
 export const updateCart = async ({
-  productPublicId,
+  variantId,
   quantity,
 }: {
-  productPublicId: string;
+  variantId: string;
   quantity: number;
 }): Promise<{ success: boolean }> => {
   const sessionId = await getCartId();
-  const product = await db.product.findUnique({
-    where: { publicId: productPublicId },
+  const variant = await db.variant.findUnique({
+    where: { publicId: variantId },
     select: {
       id: true,
     },
@@ -23,32 +23,32 @@ export const updateCart = async ({
     },
   });
 
-  if (!cart || !product) return { success: false };
-  const exist = await db.cartProduct.findUnique({
+  if (!cart || !variant) return { success: false };
+  const exist = await db.cartItem.findUnique({
     where: {
-      cartId_productId: {
+      cartId_variantId: {
         cartId: cart.id,
-        productId: product.id,
+        variantId: variant.id,
       },
     },
   });
 
   if (exist) {
     if (quantity === 0) {
-      await db.cartProduct.delete({
+      await db.cartItem.delete({
         where: {
-          cartId_productId: {
+          cartId_variantId: {
             cartId: cart.id,
-            productId: product.id,
+            variantId: variant.id,
           },
         },
       });
     } else {
-      await db.cartProduct.update({
+      await db.cartItem.update({
         where: {
-          cartId_productId: {
+          cartId_variantId: {
             cartId: cart.id,
-            productId: product.id,
+            variantId: variant.id,
           },
         },
         data: {
@@ -57,10 +57,10 @@ export const updateCart = async ({
       });
     }
   } else if (quantity > 0) {
-    await db.cartProduct.create({
+    await db.cartItem.create({
       data: {
         cartId: cart.id,
-        productId: product.id,
+        variantId: variant.id,
         quantity,
       },
     });

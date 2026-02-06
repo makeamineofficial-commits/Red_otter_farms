@@ -1,7 +1,5 @@
 "use client";
 
-import { Star, ChefHat, Share2 } from "lucide-react";
-
 export default function HeroSkeleton() {
   return (
     <article className="w-full xl:min-w-150 space-y-4 animate-pulse">

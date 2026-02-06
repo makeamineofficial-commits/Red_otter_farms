@@ -6,22 +6,30 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 import { Minus, Plus, Share2 } from "lucide-react";
-import { Product } from "@/types/product";
+import { Product, ProductPreview } from "@/types/product";
 import { useCart } from "@/provider/cart.provider";
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
+import { convertToCartItem, formatPrice } from "@/lib/utils";
 import { Share } from "../share";
 import Wishlist from "./wishlist";
-export function ProductCard(product: Product) {
-  const { name, price, mrp, assets, nutritionalInfo, slug, healthBenefits } =
-    product;
+export function ProductCard(product: ProductPreview) {
+  const {
+    displayName,
+    price,
+    mrp,
+    assets,
+    nutritionalInfo,
+    slug,
+    healthBenefits,
+    variants,
+  } = product;
   const { update, cart } = useCart();
   const [count, setCount] = useState(1);
   useEffect(() => {
     if (!cart) return;
 
-    const count = cart.products.find(
-      (ele) => ele.publicId === product.publicId,
+    const count = cart.items.find(
+      (ele) => ele.variant.publicId === product.variantId,
     )?.quantity;
 
     if (count) {
@@ -37,7 +45,12 @@ export function ProductCard(product: Product) {
       ></Link>
 
       <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
-        <Image src={assets[0].url} alt={name} fill className="object-cover" />
+        <Image
+          src={assets[0].url}
+          alt={displayName}
+          fill
+          className="object-cover"
+        />
         <Badge className="text-xs capitalize absolute z-40 bottom-3 right-3 bg-muted-foreground">
           {Object.keys(nutritionalInfo)[0]}{" "}
           {nutritionalInfo[Object.keys(nutritionalInfo)[0]]}
@@ -57,17 +70,13 @@ export function ProductCard(product: Product) {
       {/* TITLE + PRICE */}
       <div className="space-y-1">
         <div className="flex items-center justify-between w-full">
-          <p className=" font-medium line-clamp-1 text-lg">{name}</p>
+          <p className=" font-medium line-clamp-1 text-lg">{displayName}</p>
           <div className="flex gap-1 items-center">
-            <Badge variant="outline" className="text-xs capitalize">
-              50g
-            </Badge>
-            <Badge variant="outline" className="text-xs capitalize">
-              100g
-            </Badge>
-            <Badge variant="outline" className="text-xs capitalize">
-              +3 More
-            </Badge>
+            {variants > 1 && (
+              <Badge variant="outline" className="text-xs capitalize">
+                +{variants} Options
+              </Badge>
+            )}
           </div>
         </div>
         <p className="text-sm font-semibold">
@@ -87,7 +96,7 @@ export function ProductCard(product: Product) {
           .slice(0, 2)
           .slice(0, 2)
           .map((ele) => (
-            <Badge variant="outline" className="text-xs capitalize">
+            <Badge variant="outline" key={ele} className="text-xs capitalize">
               {ele}
             </Badge>
           ))}
@@ -122,8 +131,10 @@ export function ProductCard(product: Product) {
             size="sm"
             className="bg-transparent! border rounded-lg! border-maroon! text-maroon!"
             onClick={() => {
-              // @ts-ignore
-              update({ product, quantity: count });
+              update({
+                item: convertToCartItem(product),
+                quantity: count,
+              });
             }}
           >
             Add to Cart

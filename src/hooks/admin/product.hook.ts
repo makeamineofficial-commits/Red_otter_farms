@@ -40,6 +40,7 @@ export function useUpdateProduct() {
       return await updateProduct(data);
     },
     onSuccess: (res) => {
+      console.log(res)
       if (!res.success) {
         toast.error(res.message ?? "Failed to update product");
         return;

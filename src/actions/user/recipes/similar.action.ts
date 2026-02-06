@@ -3,12 +3,12 @@
 import { db } from "@/lib/db";
 import { Prisma } from "../../../../generated/prisma/browser";
 import { nullToUndefined } from "@/lib/utils";
-import { Recipe } from "@/types/recipe";
+import { RecipePreview } from "@/types/recipe";
 
 export const similarRecipes = async (
   slug: string,
   limit = 6,
-): Promise<Recipe[]> => {
+): Promise<RecipePreview[]> => {
   const baseRecipe = await db.recipe.findUnique({
     where: { slug },
     select: {
@@ -45,38 +45,19 @@ export const similarRecipes = async (
     ].filter(Boolean) as Prisma.RecipeWhereInput[],
   };
 
-  // 3️⃣ Fetch similar recipes
   const recipes = await db.recipe.findMany({
     where,
     take: limit,
     orderBy: { createdAt: "desc" },
-    include: {
-      linkedProducts: {
-        select: {
-          quantity: true,
-          product: {
-            select: {
-              publicId: true,
-              name: true,
-              slug: true,
-              price: true,
-              mrp: true,
-              nutritionalInfo: true,
-              displayName: true,
-              description: true,
-              weight: true,
-              weightUnit: true,
-              assets: {
-                select: {
-                  url: true,
-                  type: true,
-                },
-              },
-            },
-          },
-        },
-      },
+    select: {
+      slug: true,
+      title: true,
+      summary: true,
+      cookingTime: true,
+      serving: true,
+      difficulty: true,
       assets: {
+        where: { isPrimary: true },
         select: {
           url: true,
           thumbnail: true,
@@ -88,14 +69,9 @@ export const similarRecipes = async (
     },
   });
 
-  // 4️⃣ Normalize response
   return recipes.map((recipe) =>
     nullToUndefined({
       ...recipe,
-      linkedProducts: recipe.linkedProducts.map((lp) => ({
-        quantity: lp.quantity,
-        ...lp.product,
-      })),
       assets: recipe.assets,
     }),
   );

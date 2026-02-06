@@ -22,7 +22,6 @@ export default function Wishlist() {
       <button
         disabled={isLoading || isFetching || !data || loading}
         onClick={async () => {
-          console.log("hello");
           try {
             setLoading(true);
             const res = await updateWishlist({ productId: data.publicId });

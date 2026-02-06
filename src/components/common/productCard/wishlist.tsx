@@ -5,21 +5,15 @@ import { updateWishlist } from "@/actions/user/wishlist/update.action";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { Product } from "@/types/product";
+import { Product, ProductPreview } from "@/types/product";
 export default function Wishlist({
   presentInWishlist,
-  publicId,
-  name,
-}: Product) {
+  productId,
+}: ProductPreview) {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [isSelected, setSelected] = useState(presentInWishlist);
-
-  useEffect(() => {
-    console.log(presentInWishlist, name);
-    setSelected(presentInWishlist);
-  }, [presentInWishlist]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -29,7 +23,7 @@ export default function Wishlist({
           onClick={async () => {
             try {
               setLoading(true);
-              const res = await updateWishlist({ productId: publicId });
+              const res = await updateWishlist({ productId });
               if (res.authenticationRequired) {
                 router.push(`${pathname}?login=true`);
                 return;

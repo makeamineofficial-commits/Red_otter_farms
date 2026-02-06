@@ -9,19 +9,19 @@ import {
 } from "react";
 import { getCart } from "@/actions/user/cart/get.action";
 import { updateCart } from "@/actions/user/cart/update.action";
-import { Cart, CartProduct } from "@/types/cart";
+import { Cart, CartItem, Item } from "@/types/cart";
 
 type ContextType = {
   isOpen: boolean;
   toggle: () => void;
   update: (args: {
-    product: CartProduct;
+    item: Item;
     quantity: number;
     toggle?: boolean;
   }) => Promise<void>;
-  remove: (args: { productPublicId: string }) => Promise<void>;
+  remove: (args: { variantId: string }) => Promise<void>;
   updateMany: (args: {
-    products: { product: CartProduct; quantity: number }[];
+    items: { item: Item; quantity: number }[];
     toggle?: boolean;
   }) => Promise<void>;
 
@@ -53,19 +53,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const toggle = () => setIsOpen((prev) => !prev);
 
-  const remove = async ({ productPublicId }: { productPublicId: string }) => {
+  const remove = async ({ variantId }: { variantId: string }) => {
     if (!cart) return;
 
     const previousCart = cart;
     const updatedCart: Cart = {
       ...cart,
-      products: cart.products.filter((p) => p.publicId !== productPublicId),
+      items: cart.items.filter((p) => p.variant.publicId !== variantId),
     };
     setCart(updatedCart);
     try {
       setUpdating(true);
       await updateCart({
-        productPublicId,
+        variantId,
         quantity: 0,
       });
     } catch (err) {
@@ -76,11 +76,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const update = async ({
-    product,
+    item,
     quantity,
     toggle = true,
   }: {
-    product: CartProduct;
+    item: Item;
     quantity: number;
     toggle?: boolean;
   }) => {
@@ -88,23 +88,25 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     const previousCart = cart;
 
-    const exists = cart.products.some((p) => p.publicId === product.publicId);
+    const exists = cart.items.some(
+      (p) => p.variant.publicId === item.variant.publicId,
+    );
 
-    const updatedProducts = exists
-      ? cart.products.map((p) =>
-          p.publicId === product.publicId ? { ...p, quantity } : p,
+    const updatedItems = exists
+      ? cart.items.map((p) =>
+          p.variant.publicId === item.variant.publicId ? { ...p, quantity } : p,
         )
       : [
-          ...cart.products,
+          ...cart.items,
           {
-            ...product,
+            ...item,
             quantity,
           },
         ];
 
     const updatedCart: Cart = {
       ...cart,
-      products: updatedProducts,
+      items: updatedItems,
     };
 
     setCart(updatedCart);
@@ -114,7 +116,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       setUpdating(true);
       await updateCart({
-        productPublicId: product.publicId,
+        variantId: item.variant.publicId,
         quantity,
       });
     } catch (err) {
@@ -125,28 +127,28 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateMany = async ({
-    products,
+    items,
     toggle = true,
   }: {
-    products: { product: CartProduct; quantity: number }[];
+    items: { item: Item; quantity: number }[];
     toggle?: boolean;
   }) => {
     if (!cart) return;
 
     const previousCart = cart;
 
-    const productMap = new Map(
-      cart.products.map((p) => [p.publicId, { ...p }]),
+    const itemMap = new Map(
+      cart.items.map((p) => [p.variant.publicId, { ...p }]),
     );
 
-    for (const { product, quantity } of products) {
-      const existing = productMap.get(product.publicId);
+    for (const { item, quantity } of items) {
+      const existing = itemMap.get(item.variant.publicId);
 
       if (existing) {
         existing.quantity += quantity;
       } else {
-        productMap.set(product.publicId, {
-          ...product,
+        itemMap.set(item.variant.publicId, {
+          ...item,
           quantity,
         });
       }
@@ -154,7 +156,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     const updatedCart: Cart = {
       ...cart,
-      products: Array.from(productMap.values()),
+      items: Array.from(itemMap.values()),
     };
 
     setCart(updatedCart);
@@ -164,12 +166,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       setUpdating(true);
       await Promise.all(
-        products.map(({ product, quantity }) =>
+        items.map(({ item, quantity }) =>
           updateCart({
-            productPublicId: product.publicId,
+            variantId: item.variant.publicId,
             quantity:
-              (previousCart.products.find(
-                (p) => p.publicId === product.publicId,
+              (previousCart.items.find(
+                (p) => p.variant.publicId === item.variant.publicId,
               )?.quantity ?? 0) + quantity,
           }),
         ),

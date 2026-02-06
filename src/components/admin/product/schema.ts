@@ -1,43 +1,38 @@
 import { AssetType } from "@/types/common";
 import { z } from "zod";
 
+export const optionValueSchema = z.object({
+  displayName: z.string().min(1),
+
+  isDefault: z.boolean().default(false),
+});
+
+export const optionSchema = z
+  .object({
+    displayName: z.string().min(1, "Option name is required").max(100),
+
+    values: z.array(optionValueSchema).min(1, "At least one value is required"),
+  })
+  .refine((data) => data.values.filter((v) => v.isDefault).length === 1, {
+    message: "Each option must have exactly one default value",
+    path: ["values"],
+  });
+
 export const productSchema = z.object({
-  // ===== BASIC INFO =====
   name: z.string().min(3).max(120),
   displayName: z.string().min(3).max(120),
-  sku: z.string().min(3),
   type: z.string(),
-
+  minPrice: z.coerce.number().min(0),
+  maxPrice: z.coerce.number().min(0),
+  summary: z.string().optional(),
   description: z.string().optional(),
 
   categories: z.array(z.string()),
   healthBenefits: z.array(z.string()),
-  quantity: z.coerce.number().min(0),
-  // ===== PRICING =====
-  mrp: z.coerce.number().min(0),
-  price: z.coerce.number().min(0),
 
-  // ===== WEIGHT =====
-  weight: z.coerce.number().min(0),
-  weightUnit: z.string(),
-
-  // ===== DIMENSIONS =====
-  height: z.coerce.number().min(0),
-  width: z.coerce.number().min(0),
-  breadth: z.coerce.number().min(0),
-  dimension: z.string(),
-
-  // ===== SERVING INFO =====
-  servingSize: z.coerce.number().min(0),
-  servingUnit: z.string(),
-
-  // ===== NUTRITION =====
   nutritionalInfo: z.json(),
-  // ===== ASSETS =====
   assets: z.array(
     z.object({
-      // url: z.string().url(),
-      // thumbnail: z.string().url(),
       url: z.string(),
       thumbnail: z.string(),
       position: z.number().int().nonnegative(),
@@ -46,51 +41,46 @@ export const productSchema = z.object({
     }),
   ),
 
-  // ===== FLAGS =====
-  inStock: z.boolean(),
+  options: z.array(optionSchema).max(5, "Maximum 5 options allowed"),
   isPublished: z.boolean(),
   isFeatured: z.boolean(),
 });
+
+export const updateOptionValueSchema = z.object({
+  displayName: z.string().min(1),
+  slug: z.string().optional(),
+  isDefault: z.boolean().default(false),
+});
+
+export const updateOptionSchema = z
+  .object({
+    displayName: z.string().min(1, "Option name is required").max(100),
+    slug: z.string().optional(),
+    values: z
+      .array(updateOptionValueSchema)
+      .min(1, "At least one value is required"),
+  })
+  .refine((data) => data.values.filter((v) => v.isDefault).length === 1, {
+    message: "Each option must have exactly one default value",
+    path: ["values"],
+  });
 
 export const updateProductSchema = z.object({
-  // ===== BASIC INFO =====
   name: z.string().min(3).max(120),
   displayName: z.string().min(3).max(120),
-  sku: z.string().min(3),
-  slug: z.string().min(3),
+  minPrice: z.coerce.number().min(0),
+  maxPrice: z.coerce.number().min(0),
   type: z.string(),
-
+  slug: z.string(),
+  summary: z.string().optional(),
   description: z.string().optional(),
 
   categories: z.array(z.string()),
   healthBenefits: z.array(z.string()),
-  quantity: z.coerce.number().min(0),
-  // ===== PRICING =====
-  mrp: z.coerce.number().min(0),
-  price: z.coerce.number().min(0),
 
-  // ===== WEIGHT =====
-  weight: z.coerce.number().min(0),
-  weightUnit: z.string(),
-
-  // ===== DIMENSIONS =====
-  height: z.coerce.number().min(0),
-  width: z.coerce.number().min(0),
-  breadth: z.coerce.number().min(0),
-  dimension: z.string(),
-
-  // ===== SERVING INFO =====
-  servingSize: z.coerce.number().min(0),
-  servingUnit: z.string(),
-
-  // ===== NUTRITION =====
-  nutritionalInfo: z.unknown().optional(),
-
-  // ===== ASSETS =====
+  nutritionalInfo: z.json(),
   assets: z.array(
     z.object({
-      // url: z.string().url(),
-      // thumbnail: z.string().url(),
       url: z.string(),
       thumbnail: z.string(),
       position: z.number().int().nonnegative(),
@@ -99,19 +89,7 @@ export const updateProductSchema = z.object({
     }),
   ),
 
-  // ===== FLAGS =====
-  inStock: z.boolean(),
+  options: z.array(updateOptionSchema).max(5, "Maximum 5 options allowed"),
   isPublished: z.boolean(),
   isFeatured: z.boolean(),
 });
-
-export const NUTRITION_FIELDS = [
-  { key: "calories", unit: "kcal" },
-  { key: "protein", unit: "gm" },
-  { key: "fiber", unit: "gm" },
-  { key: "fat", unit: "gm" },
-  { key: "carbs", unit: "gm" },
-  { key: "sugar", unit: "gm" },
-  { key: "sodium", unit: "mg" },
-  { key: "potassium", unit: "mg" },
-] as const;

@@ -55,6 +55,7 @@ export default function Shipping() {
             <div className="space-y-1">
               <Label className="text-muted-foreground">First Name</Label>
               <Input
+                className="h-12!"
                 value={shipping.firstName || ""}
                 onChange={(e) => handleChange("firstName", e.target.value)}
               />
@@ -63,6 +64,7 @@ export default function Shipping() {
             <div className="space-y-1">
               <Label className="text-muted-foreground">Last Name</Label>
               <Input
+                className="h-12!"
                 value={shipping.lastName || ""}
                 onChange={(e) => handleChange("lastName", e.target.value)}
               />
@@ -74,6 +76,7 @@ export default function Shipping() {
               Phone for Delivery (House Help / Guard)
             </Label>
             <Input
+              className="h-12!"
               value={shipping.phone || ""}
               onChange={(e) => handleChange("phone", e.target.value)}
             />
@@ -82,6 +85,7 @@ export default function Shipping() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Street Address *</Label>
             <Input
+              className="h-12!"
               value={shipping.address || ""}
               onChange={(e) => handleChange("address", e.target.value)}
             />
@@ -90,6 +94,7 @@ export default function Shipping() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Town / City *</Label>
             <Input
+              className="h-12!"
               value={shipping.city || ""}
               onChange={(e) => handleChange("city", e.target.value)}
             />
@@ -101,7 +106,7 @@ export default function Shipping() {
               value={shipping.state}
               onValueChange={(value) => handleChange("state", value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-12!">
                 <SelectValue placeholder="Select state" />
               </SelectTrigger>
               <SelectContent>
@@ -116,6 +121,7 @@ export default function Shipping() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Postcode / ZIP *</Label>
             <Input
+              className="h-12!"
               value={shipping.zip || ""}
               onChange={(e) => handleChange("zip", e.target.value)}
             />
@@ -123,7 +129,7 @@ export default function Shipping() {
 
           <div className="space-y-1">
             <Label className="text-muted-foreground">Country</Label>
-            <Input value="India" disabled />
+            <Input className="h-12!" value="India" disabled />
           </div>
 
           <div className="space-y-1">

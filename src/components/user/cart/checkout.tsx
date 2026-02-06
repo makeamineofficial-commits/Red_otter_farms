@@ -7,14 +7,10 @@ import { useRouter } from "next/navigation";
 export default function Checkout() {
   const { cart, isLoading, isUpdating, toggle } = useCart();
   const total =
-  cart?.products.reduce(
-    (sum, product) => sum + product.price * product.quantity,
-    0,
-  ) ?? 0;
-  
+    cart?.items.reduce((sum, item) => sum + item.variant.price * item.quantity, 0) ?? 0;
+
   const { push } = useRouter();
-  const isDisabled =
-    isLoading || isUpdating || !cart || cart.products.length === 0;
+  const isDisabled = isLoading || isUpdating || !cart || cart.items.length === 0;
 
   return (
     <div className="bg-white w-full p-4 border-t">

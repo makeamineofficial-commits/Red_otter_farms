@@ -7,29 +7,23 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
-import { Product } from "@/types/product";
+import { ProductPreview } from "@/types/product";
 import { useCart } from "@/provider/cart.provider";
 import { useHomeStore } from "@/store/user/home.store";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import { Minus, Plus } from "lucide-react";
-export function ProductCard(product: Product & { isLast: boolean }) {
-  const {
-    name,
-    price,
-    description,
-    assets,
-    isLast,
-    slug,
-    type,
-  } = product;
+import { convertToCartItem } from "@/lib/utils";
+import { CartItem, Item } from "@/types/cart";
+export function ProductCard(product: ProductPreview & { isLast: boolean }) {
+  const { displayName, price, summary, assets, isLast, slug, type } = product;
   const { update, cart } = useCart();
   const [count, setCount] = useState(1);
   useEffect(() => {
     if (!cart) return;
 
-    const count = cart.products.find(
-      (ele) => ele.publicId === product.publicId,
+    const count = cart.items.find(
+      (ele) => ele.variant.publicId === product.variantId,
     )?.quantity;
 
     if (count) {
@@ -48,21 +42,26 @@ export function ProductCard(product: Product & { isLast: boolean }) {
 
       {/* Image */}
       <div className="relative w-full aspect-square p-6">
-        <span className="absolute top-4 left-4 text-xs border border-forest rounded-full px-3 py-1">
+        <span className="absolute top-4 left-4 text-xs border z-50 border-forest rounded-full px-3 py-1">
           {type}
         </span>
 
-        <Image src={assets[0].url} alt={name} fill className="object-contain" />
+        <Image
+          src={assets[0].url}
+          alt={displayName}
+          fill
+          className="object-contain"
+        />
       </div>
 
       {/* Content */}
       <div className="border-t border-forest p-6 flex flex-col">
-        <h3 className="font-semibold uppercase text-sm">{name}</h3>
-        <p className="text-sm opacity-70">{description}</p>
+        <h3 className="font-semibold uppercase text-sm">{displayName}</h3>
+        <p className="text-sm opacity-70">{summary}</p>
         <div className="flex items-center justify-between ">
           <span className="font-semibold">₹{formatPrice(price)}</span>
 
-          <div className="z-40 flex gap-2">
+          <div className="z-40 flex gap-2 sm:mt-0 mt-4">
             <div className="flex items-center border border-muted-foreground rounded-lg">
               <Button
                 size="icon"
@@ -84,8 +83,10 @@ export function ProductCard(product: Product & { isLast: boolean }) {
             </div>
             <Button
               onClick={() => {
-                // @ts-ignore
-                update({ product, quantity: count });
+                update({
+                  item: convertToCartItem(product),
+                  quantity: count,
+                });
               }}
               variant="outline"
               className="bg-transparent! rounded-lg! border-maroon! text-maroon!"

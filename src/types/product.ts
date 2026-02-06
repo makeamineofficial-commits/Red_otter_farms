@@ -1,39 +1,29 @@
-import z from "zod";
-import { Asset, AssetType } from "./common";
+import { Asset } from "./common";
 
 export interface ProductPropsBase {
+  // about
   name: string;
   displayName: string;
-  sku: string;
-
+  summary: string;
+  description: string;
   healthBenefits: string[];
   type: string;
-  description?: string;
-  quantity: number;
-  mrp: number;
-  price: number;
-
-  weight?: number;
-  weightUnit: string;
-
-  height?: number;
-  width?: number;
-  breadth?: number;
-  dimension: string;
-
-  servingSize?: number;
-  servingUnit: string;
-
-  nutritionalInfo: Record<string, number>;
   assets: Asset[];
 
-  inStock: boolean;
-  isPublished: boolean;
+  nutritionalInfo: Record<string, number>;
   isFeatured: boolean;
+  isPublished: boolean;
+
+  minPrice: number;
+  maxPrice: number;
 }
 
 export interface ProductProps extends ProductPropsBase {
   categories: string[];
+  options: {
+    displayName: string;
+    values: { displayName: string; isDefault: boolean }[];
+  }[];
 }
 
 export interface Product extends ProductPropsBase {
@@ -45,6 +35,33 @@ export interface Product extends ProductPropsBase {
     slug: string;
     name: string;
   }[];
+  options: {
+    displayName: string;
+    slug: string;
+    values: {
+      displayName: string;
+      slug: string;
+      isDefault: boolean;
+    }[];
+  }[];
+}
+
+export interface ProductPreview {
+  displayName: string;
+  summary: string;
+  presentInWishlist: boolean;
+  slug: string;
+  nutritionalInfo: any;
+  healthBenefits: string[];
+  assets: Asset[];
+  variantId: string;
+  productId: string;
+  variants: number;
+  type: string;
+  // default variant
+  sku: string;
+  mrp: number;
+  price: number;
 }
 
 export enum SortBy {
@@ -53,4 +70,54 @@ export enum SortBy {
   PRICE_HIGH = "price-high",
   LATEST = "latest",
   NONE = "all",
+}
+
+export interface VariantProps {
+  sku: string;
+
+  // about
+  name: string;
+
+  // availability
+  availableInStock: number;
+  stockLimit: number;
+  inStock: boolean;
+
+  // pricing
+  mrp: number;
+  price: number;
+
+  // weight and dimension  (For Shipping)
+  weight?: number;
+  weightUnit: string;
+  length?: number;
+  lengthUnit: string;
+  breadth?: number;
+  breadthUnit: string;
+  height?: number;
+  heightUnit: string;
+
+  // visibility
+  isPublished: boolean;
+  isDefault: boolean;
+  options: { option: string; optionValue: string }[];
+}
+
+export interface Variant extends VariantProps {
+  publicId: string;
+}
+
+export interface ProductOption {
+  displayName: string;
+  slug: string;
+  values: {
+    displayName: string;
+    slug: string;
+    isDefault: boolean;
+  }[];
+}
+
+export interface VariantOption {
+  option: string;
+  optionValue: string;
 }

@@ -68,7 +68,7 @@ export const useCheckoutHandler = () => {
     const shippingError = validateShipping(shipping);
     if (shippingError) return { success: false, message: shippingError };
 
-    if (!cart || cart.products.length === 0)
+    if (!cart || cart.items.length === 0)
       return { success: false, message: "Your cart is empty." };
 
     try {

@@ -14,8 +14,10 @@ export enum AssetType {
 }
 export type PreviewFile = {
   url: string;
-  thumbnail: string;
+  thumbnail?: string;
   type: AssetType;
+  isPrimary: boolean;
+  position: number;
 };
 
 export type Asset = {

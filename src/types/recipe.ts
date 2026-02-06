@@ -1,5 +1,6 @@
-import { CartProduct } from "./cart";
+import { CartItem } from "./cart";
 import { Asset, AssetType } from "./common";
+import { Product, Variant } from "./product";
 
 export interface RecipePropsBase {
   title: string;
@@ -18,12 +19,37 @@ export interface RecipePropsBase {
   prepTime: string;
 }
 
+export interface ListedIngredients {
+  quantity: number;
+  variant: {
+    sku: string;
+    price: number;
+    publicId: string;
+  };
+  product: {
+    displayName: string;
+    summary: string;
+    nutritionalInfo: any;
+    assets: Asset[];
+    slug: string;
+  };
+}
+
+export interface RecipePreview {
+  slug: string;
+  title: string;
+  summary: string;
+  cookingTime: string;
+  serving: string;
+  difficulty: string;
+  assets: Asset[];
+}
+
 export interface RecipeProps extends RecipePropsBase {
-  linkedProducts: { publicId: string; quantity: number }[];
+  listedIngredients: { publicId: string; quantity: number }[];
 }
 export interface Recipe extends RecipePropsBase {
   publicId: string;
   slug: string;
-
-  linkedProducts: CartProduct[];
+  listedIngredients: ListedIngredients[];
 }

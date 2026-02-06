@@ -1,4 +1,4 @@
-import { PrismaClient, AssetType } from "../../generated/prisma/client";
+import { PrismaClient, AssetType, Prisma } from "../../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = global as unknown as {
@@ -17,4 +17,4 @@ const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-export { prisma as db, AssetType };
+export { prisma as db, AssetType, Prisma };

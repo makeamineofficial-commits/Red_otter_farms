@@ -58,9 +58,9 @@ function NutritionContent() {
 
   const { cart } = useCart();
 
-  const totals = cart?.products.reduce(
-    (acc, product) => {
-      const info = product.nutritionalInfo;
+  const totals = cart?.items.reduce(
+    (acc, item) => {
+      const info = item.product.nutritionalInfo;
       if (!info) return acc;
 
       Object.entries(info).forEach(([key, value]) => {
@@ -71,7 +71,7 @@ function NutritionContent() {
           acc[key] = { amount: 0, unit: parsed.unit };
         }
 
-        acc[key].amount += parsed.amount * product.quantity;
+        acc[key].amount += parsed.amount * item.quantity;
         acc[key].unit ||= parsed.unit;
       });
 

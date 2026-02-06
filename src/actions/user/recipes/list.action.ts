@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Recipe } from "@/types/recipe";
+import { Recipe, RecipePreview } from "@/types/recipe";
 import { Prisma } from "../../../../generated/prisma/browser";
 import { PaginatedResponse } from "@/types/common";
 import { nullToUndefined } from "@/lib/utils";
@@ -15,7 +15,7 @@ interface Filters {
 
 export const listRecipes = async (
   filters: Filters = {},
-): Promise<PaginatedResponse<Recipe>> => {
+): Promise<PaginatedResponse<RecipePreview>> => {
   const { q, limit = 10, page = 1, category } = filters;
 
   const safeLimit = Math.max(1, Math.min(limit, 100));
@@ -49,32 +49,13 @@ export const listRecipes = async (
       skip,
       take: safeLimit,
       orderBy: { createdAt: "desc" },
-      include: {
-        linkedProducts: {
-          select: {
-            quantity: true,
-            product: {
-              select: {
-                publicId: true,
-                name: true,
-                slug: true,
-                price: true,
-                mrp: true,
-                nutritionalInfo: true,
-                displayName: true,
-                description: true,
-                weight: true,
-                weightUnit: true,
-                assets: {
-                  select: {
-                    url: true,
-                    type: true,
-                  },
-                },
-              },
-            },
-          },
-        },
+      select: {
+        slug: true,
+        title: true,
+        summary: true,
+        cookingTime: true,
+        serving: true,
+        difficulty: true,
         assets: {
           where: { isPrimary: true },
           select: {
@@ -94,10 +75,7 @@ export const listRecipes = async (
   const data = recipes.map((recipe) =>
     nullToUndefined({
       ...recipe,
-      linkedProducts: recipe.linkedProducts.map((ele) => {
-        return { quantity: ele.quantity, ...ele.product };
-      }),
-      assets: recipe.assets,
+      summary: recipe.summary,
     }),
   );
 

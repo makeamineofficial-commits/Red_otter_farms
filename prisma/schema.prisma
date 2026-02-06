@@ -48,79 +48,6 @@ model Category {
 }
 
 
-
-model Product {
-  // identifier
-  id        String   @id @default(uuid())
-  publicId  String   @unique @default(dbgenerated("concat('product_', gen_random_uuid())"))
-  sku       String   @unique
-  slug      String   @unique
-
-  //  about the product
-  name      String
-  displayName String
-  type       String
-  description String? @default("")
-  assets     ProductAsset[]
-  categories CategoryProduct[]
-  orderedIn  OrderProduct[]
-  addedToCart CartProduct[]
-  linkedRecipes RecipeProduct[] 
-  wishList   UserWishlist[]
-
-
-
-  // pricing
-  price     Int   // selling price
-  mrp       Int   // original price
-  currency  String  @default("INR")
-  
-  
-  // weight 
-  weight    Int @default(0)
-  weightUnit  String @default("g")
-
-  // dimension
-  height    Int @default(0)
-  width     Int @default(0)
-  breadth   Int @default(0)
-  dimension  String @default("cm")
-
-  /// serving size value
-  servingSize Int @default(0)
-
-  /// serving unit (g / ml)
-  servingUnit String @default("g")
-
-
-  // benefits
-  healthBenefits String[]
-  
-  // nutrition (per serving or per 100g)
-  /// calories in kilocalories (kcal)
-  nutritionalInfo Json?
-  // visibility
-  inStock    Boolean @default(true)
-  isPublished Boolean @default(true)
-  isFeatured  Boolean @default(false)
-
-  quantity Int @default(0)
-
-  lastUpdatedById String?
-  lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
-
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([publicId])
-  @@index([slug])
-  @@index([sku])
-  @@index([inStock])
-  @@index([isPublished])
-  @@index([isFeatured])
-}
-
 model CategoryProduct {
   category   Category @relation(fields: [categoryId], references: [id],onDelete: Cascade)
   categoryId String
@@ -132,9 +59,127 @@ model CategoryProduct {
   @@index([categoryId])
 }
 
+model Product {
+  // identifier
+  id        String   @id @default(uuid())
+  publicId  String   @unique @default(dbgenerated("concat('product_', gen_random_uuid())"))
+  slug      String   @unique
+
+
+  //  about the product
+  name      String
+  displayName String
+  summary String?  @default("")
+  description String? @default("")  @db.Text
+  assets   ProductAsset[]
+
+  categories CategoryProduct[]
+  wishList   UserWishlist[]
+  healthBenefits String[]
+
+
+  minPrice Int @default(0)
+  maxPrice Int @default(0)
+
+  // variants
+  options Option[]
+  variants Variant[]
+
+  type       String
+  nutritionalInfo Json?
+
+  isPublished Boolean @default(true)
+  isFeatured  Boolean @default(false)
+
+  lastUpdatedById String?
+  lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  @@index([isFeatured])
+}
+
+
+model Option{
+  id String @id @default(uuid())
+  displayName String
+  slug String  @unique
+  productId String 
+  product Product @relation(fields: [productId],references: [id],onDelete: Cascade)
+  values OptionValue[]
+  @@unique([productId,slug])
+}
+
+model OptionValue{
+  id String @id @default(uuid())
+  displayName String
+  optionId String 
+  option Option @relation(fields: [optionId],references: [id],onDelete: Cascade)
+  variants VariantOptionMap[]
+  slug String  @unique
+  isDefault Boolean @default(false)
+  @@unique([slug,optionId])
+}
+
+model Variant{
+
+
+  id        String   @id @default(uuid())
+  publicId  String   @unique @default(dbgenerated("concat('variant_', gen_random_uuid())"))
+  sku       String   @unique
+
+  productId String 
+  product Product @relation(fields: [productId],references: [id] ,onDelete: Cascade)
+
+  name      String
+  // pricing
+  price     Int   // selling price
+  mrp       Int   // original price
+  currency  String  @default("INR")
+  
+
+  weight    Int @default(0)   
+  weightUnit  String @default("g")
+
+
+  // dimension
+  length Int @default(0)
+  lengthUnit String @default("mm")
+
+  breadth Int @default(0)
+  breadthUnit String @default("mm")
+
+  height Int @default(0)
+  heightUnit String @default("mm")
+
+
+  availableInStock Int   @default(0)   // from in stock count
+  stockLimit       Int   @default(5)   // reserved to show low in stock banner
+  inStock    Boolean @default(true)  // to mark out of stock
+ 
+
+  ordered  OrderItem[]
+  presentInCart CartItem[]
+  options VariantOptionMap[] 
+
+  listedIngredients RecipeIngredient[] 
+
+  isPublished Boolean @default(true)
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  
+  @@index([isPublished])
+  @@index([inStock])
+}
+
 model ProductAsset {
   id String @id @default(uuid())
-  product      Product @relation(fields: [productId], references: [id],onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id],onDelete: Cascade)
   productId    String
   url     String
   thumbnail    String
@@ -145,6 +190,19 @@ model ProductAsset {
   @@index([productId])
   @@index([isPrimary])
 }
+
+model VariantOptionMap {
+  variantId String
+  valueId   String
+
+  variant Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  value   OptionValue   @relation(fields: [valueId], references: [id], onDelete: Cascade)
+
+  @@id([variantId, valueId])
+  @@index([valueId])
+    @@index([variantId])
+}
+
 
 enum CartStatus{
   ACTIVE 
@@ -157,7 +215,7 @@ model Cart{
   publicId String @unique @default(dbgenerated("concat('cart_', gen_random_uuid())"))
   userIdentifier  String?
   status CartStatus @default(ACTIVE)
-  products CartProduct[]
+  items CartItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -166,15 +224,15 @@ model Cart{
   @@index([status])
 }
 
-model CartProduct{
-  cart        Cart @relation(fields: [cartId], references: [id])
+model CartItem{
+  cart        Cart @relation(fields: [cartId], references: [id],onDelete: Cascade)
   cartId      String
-  product      Product @relation(fields: [productId], references: [id])
-  productId    String
+  variant      Variant @relation(fields: [variantId], references: [id],onDelete: Cascade)
+  variantId    String
   quantity  Int     @default(1)
 
-  @@id([cartId, productId])
-  @@index([productId])
+  @@id([cartId, variantId])
+  @@index([variantId])
   @@index([cartId])
 }
 
@@ -192,7 +250,7 @@ enum OrderStatus {
 model Order{
   id String @id @default(uuid())
   publicId String @unique @default(dbgenerated("concat('order_', gen_random_uuid())"))
-  products OrderProduct[]
+  items OrderItem[]
   status OrderStatus @default(PENDING)
   deliveryFee Int
   subTotal Int
@@ -207,19 +265,19 @@ model Order{
   @@index([createdAt])
 }
 
-model OrderProduct {
+model OrderItem {
   orderId   String
-  productId String
+  variantId String
 
-  order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id],onDelete: Cascade)
+  variant   Variant @relation(fields: [variantId], references: [id],onDelete: Cascade)
 
   quantity  Int     @default(1)
   price     Int     
   currency  String @default("INR")
 
-  @@id([orderId, productId])
-  @@index([productId])
+  @@id([orderId, variantId])
+  @@index([variantId])
   @@index([orderId])
 }
 
@@ -249,7 +307,7 @@ model Recipe{
   serving String @default("") 
   prepTime String @default("")
   
-  linkedProducts RecipeProduct[] 
+  listedIngredients RecipeIngredient[] 
   healthBenefits String[]
   assets RecipeAsset[]
 
@@ -266,14 +324,14 @@ model Recipe{
   @@index([isPublished])
 }
 
-model RecipeProduct {
+model RecipeIngredient {
   recipe       Recipe @relation(fields: [recipeId], references: [id],onDelete: Cascade)
   recipeId     String
-  product      Product @relation(fields: [productId], references: [id],onDelete: Cascade)
-  productId    String
+  variant      Variant @relation(fields: [variantId], references: [id],onDelete: Cascade)
+  variantId    String
   quantity     Int      @default(1)
-  @@id([recipeId, productId])
-  @@index([productId])
+  @@id([recipeId, variantId])
+  @@index([variantId])
   @@index([recipeId])
 }
 
@@ -307,7 +365,7 @@ model UserOTP{
 model RecipeSaves{
   phone String
   recipeId String 
-  recipe Recipe @relation(references:[id],fields:[recipeId])
+  recipe Recipe @relation(references:[id],fields:[recipeId],onDelete: Cascade)
 
   @@id([phone,recipeId])
 }
@@ -315,7 +373,7 @@ model RecipeSaves{
 model UserWishlist{
   phone String
   productId String 
-  product Product @relation(references:[id],fields:[productId])
+  product Product @relation(references:[id],fields:[productId],onDelete: Cascade)
 
   @@id([phone,productId])
 }
