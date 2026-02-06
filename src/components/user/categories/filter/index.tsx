@@ -287,7 +287,7 @@ export default function Filter() {
         className={`bg-black/30 fixed top-0 left-0 h-screen z-90 w-screen ${open ? "block lg:hidden" : "hidden"}`}
       ></div>
       <nav
-        className={`fixed top-0 left-0  bg-white shadow-xl h-screen block lg:hidden z-100 overflow-hidden transition-all duration-200 ${open ? "max-w-96" : "max-w-0"} `}
+        className={`fixed top-0 left-0  bg-white shadow-xl h-screen block lg:hidden z-100 overflow-x-hidden overflow-y-auto no-scrollbar transition-all duration-200 ${open ? "max-w-96" : "max-w-0"} `}
       >
         <div className="p-4">
           <FilterSection>
