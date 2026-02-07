@@ -1,30 +1,24 @@
 "use client";
-import { useProductStore } from "@/store/user/product.store";
 import { Heart } from "lucide-react";
 import { updateWishlist } from "@/actions/user/wishlist/update.action";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-export default function Wishlist() {
-  const { data, isLoading, isFetching } = useProductStore();
+import { Product } from "@/types/product";
+export default function Wishlist({ product }: { product: Product }) {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const [isSelected, setSelected] = useState(false);
-  useEffect(() => {
-    if (!data) return;
-    setSelected(data?.presentInWishlist);
-  }, [data]);
-  if (isLoading || isFetching || !data) return <></>;
+  const [isSelected, setSelected] = useState(product.presentInWishlist);
 
   return (
     <div className="bg-white shadow-sm h-10 w-10 rounded-full p-2 flex items-center justify-center">
       <button
-        disabled={isLoading || isFetching || !data || loading}
+        disabled={loading}
         onClick={async () => {
           try {
             setLoading(true);
-            const res = await updateWishlist({ productId: data.publicId });
+            const res = await updateWishlist({ productId: product.publicId });
             if (res.authenticationRequired) {
               router.push(`${pathname}?login=true`);
               return;

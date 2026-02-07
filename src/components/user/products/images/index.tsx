@@ -8,12 +8,18 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import React, { useEffect, useState } from "react";
-import { useProductStore } from "@/store/user/product.store";
 import Wishlist from "./wishlist";
 import { Share } from "@/components/common/share";
+import { Product, Variant } from "@/types/product";
 
-export default function Images() {
-  const { data, isLoading, isFetching } = useProductStore();
+export default function Images({
+  product: data,
+}: {
+  product: Product & {
+    recipes: { title: string; slug: string }[];
+    variants: Variant[];
+  };
+}) {
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [displayImages, setDisplayImages] = useState<string[]>([]);
@@ -25,35 +31,26 @@ export default function Images() {
   }, [data]);
   return (
     <>
-      {/* ---------------- DESKTOP ---------------- */}
       <article className="w-full hidden sm:block">
         <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden">
-          {/* Main Image */}
-          {isLoading || isFetching ? (
-            <div className="animate-pulse w-full h-full bg-gray-200" />
-          ) : (
-            <img
-              src={displayImages[0]}
-              alt={data?.name || "Product"}
-              className={`
+          <img
+            src={displayImages[0]}
+            alt={data?.name || "Product"}
+            className={`
           w-full h-full object-cover rounded-3xl
           transition-all duration-300
           ${isAnimating ? "scale-105 opacity-80" : "scale-100 opacity-100"}
         `}
-              onLoad={() => setIsAnimating(false)}
-            />
-          )}
-
-          {/* Actions */}
+            onLoad={() => setIsAnimating(false)}
+          />
           <div className="flex flex-col gap-2 absolute top-3 right-3 z-40">
-            {!isLoading && !isFetching && (
-              <Share href={`/products/${data?.slug}`}>
-                <div className="bg-white shadow-sm h-10 w-10 flex items-center justify-center rounded-full">
-                  <Share2 className="size-5 stroke-1" />
-                </div>
-              </Share>
-            )}
-            <Wishlist />
+            <Share href={`/products/${data.slug}`}>
+              <div className="bg-white shadow-sm h-10 w-10 flex items-center justify-center rounded-full">
+                <Share2 className="size-5 stroke-1" />
+              </div>
+            </Share>
+
+            <Wishlist product={data} />
           </div>
         </div>
 
@@ -132,7 +129,7 @@ export default function Images() {
                 <Share2 className="size-5 stroke-1  transition-colors "></Share2>
               </div>
             </Share>
-            <Wishlist></Wishlist>
+            <Wishlist product={data}></Wishlist>
           </div>
           <Carousel setApi={setApi}>
             <CarouselContent>

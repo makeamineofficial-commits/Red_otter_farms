@@ -49,54 +49,77 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   Carousel,
+  CarouselApi,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@/components/ui/button";
+import { useRef, useState } from "react";
 
 export default function Banner() {
+  const [api, setApi] = useState<CarouselApi | null>(null);
+  const autoplay = useRef(
+    Autoplay({
+      delay: 4000,
+      stopOnInteraction: true,
+      stopOnMouseEnter: true,
+    }),
+  );
   return (
-    <Carousel className="w-full">
-      <CarouselContent>
-        {CATEGORIES.map((category) => (
-          <CarouselItem key={category.slug}>
-            <div className="relative w-full h-125 rounded-3xl overflow-hidden ">
-              {/* LEFT CONTENT */}
-              <div className="absolute bottom-10  flex items-center z-50 ">
-                <div className="px-6 md:px-14 space-y-4 text-white max-w-xl">
-                  <p className="uppercase tracking-widest text-sm text-white/70">
-                    Explore Categories
-                  </p>
+    <div className="relative w-full h-125 aspect-video group">
+      <Carousel
+        setApi={setApi}
+        className="w-full"
+        opts={{
+          loop: true,
+          align: "center",
+        }}
+        plugins={[autoplay.current]}
+      >
+        <CarouselContent>
+          {CATEGORIES.map((category) => (
+            <CarouselItem key={category.slug} className="-pl-6 ">
+              <div className="relative w-full h-125 overflow-hidden px-5">
+                {/* LEFT CONTENT */}
+                <div className="absolute bottom-16  flex items-center z-50 ">
+                  <div className="px-6 md:px-14 space-y-4 text-white max-w-3xl">
+                    <p className="uppercase tracking-widest text-sm text-white/70">
+                      Explore Categories
+                    </p>
 
-                  <h1 className="font-dream-orphans text-4xl md:text-6xl leading-tight">
-                    {category.name}
-                  </h1>
+                    <h1 className="font-bold text-4xl md:text-6xl leading-tight">
+                      {category.name}
+                    </h1>
 
-                  <p className="text-base md:text-lg text-white/80 ">
-                    {category.summary}
-                  </p>
+                    <p className="text-base md:text-lg text-white/80 ">
+                      {category.summary}
+                    </p>
 
-                  <Link href={`/categories/${category.slug}`}>
-                    <Button className="bg-forest hover:bg-forest/90 text-white h-auto! px-8! py-4! rounded-full">
-                      Explore Now →
-                    </Button>
-                  </Link>
+                    <Link href={`/categories/${category.slug}`}>
+                      <Button className="bg-white hover:bg-white/90 text-black hover:text-black h-auto! px-8! py-4! rounded-full">
+                        Explore Now →
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
-              </div>
 
-              <div className="absolute top-0 left-0 h-full w-full bg-black/50 z-10"></div>
-              {/* RIGHT IMAGE */}
-              <Image
-                src={category.image}
-                alt={category.name}
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-    </Carousel>
+                <div className="absolute top-0 left-0 h-full w-full bg-black/50 z-10"></div>
+                {/* RIGHT IMAGE */}
+                <Image
+                  src={category.image}
+                  alt={category.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+    </div>
   );
 }

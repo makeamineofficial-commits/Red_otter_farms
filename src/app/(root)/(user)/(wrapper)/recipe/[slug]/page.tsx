@@ -1,5 +1,3 @@
-"use client";
-
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import RecipeHero from "@/components/user/recipe/hero";
@@ -9,25 +7,23 @@ import Instructions from "@/components/user/recipe/instructions";
 import ChefTips from "@/components/user/recipe/chefTips";
 import YouMayLikeIt from "@/components/user/recipe/youMayLikeIt";
 import { RecipeCarousel } from "@/components/user/recipe/recipeCarousel";
-import Image from "next/image";
-import { useRecipeStore } from "@/store/user/recipe.store";
-import { Loader2 } from "lucide-react";
 import RecipeBreadcrumb from "@/components/user/recipe/breadcrumb";
+import { getRecipe } from "@/actions/user/recipes/get.action";
+import { notFound } from "next/navigation";
 
-export default function page() {
-  const { data, isFetching, isLoading } = useRecipeStore();
+export default async function page({ params }: { params: { slug: string } }) {
+  const { slug } = await params;
+  const res = await getRecipe({
+    slug: slug?.toString(),
+  });
 
-  if (!data || isFetching || isLoading)
-    return (
-      <article className=" px-4 md:px-12  lg:px-18 pb-5 max-w-400 w-full m-auto space-y-10 text-center flex justify-center items-center">
-        <Loader2 className="animate-spin duration-300 size-10"></Loader2>
-      </article>
-    );
+  if (!res || !res.recipe) notFound();
 
+  const data = res.recipe;
   return (
     <section className="bg-mint -translate-y-5.5">
       <div className="w-full  relative ">
-        <RecipeBreadcrumb></RecipeBreadcrumb>
+        <RecipeBreadcrumb recipe={data}></RecipeBreadcrumb>
         <div className="sticky -top-5">
           <RecipeCarousel assets={data.assets} title={data.title} />
         </div>

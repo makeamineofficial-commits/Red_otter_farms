@@ -5,8 +5,6 @@ import Nutrition from "./nutrition";
 import { ChefHat, Share2, Star } from "lucide-react";
 import { Share } from "../../../common/share";
 import Benefit from "./benefit";
-import HeroSkeleton from "./loader";
-import { useProductStore } from "@/store/user/product.store";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 import { useProduct } from "@/provider/product.provider";
@@ -18,20 +16,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Product, Variant } from "@/types/product";
 
-export default function Hero() {
-  const { data, isLoading, isFetching } = useProductStore();
+export default function Hero({
+  product,
+}: {
+  product: Product & {
+    recipes: { title: string; slug: string }[];
+    variants: Variant[];
+  };
+}) {
   const { selectedVariant, selectedOptions, setOptionValue } = useProduct();
 
-  if (isLoading || isFetching || !data) return <HeroSkeleton />;
-
-  const { type, displayName, description, options, variants } = data;
-
-  /* ----------------- Check Variant Count ----------------- */
+  const { type, displayName, description, options, variants } = product;
 
   const hasMultipleVariants = variants.length > 1;
-
-  /* ----------------- Option Validation ----------------- */
 
   const isOptionValueValid = (optionSlug: string, valueSlug: string) => {
     return variants.some((variant) =>
@@ -46,15 +45,11 @@ export default function Hero() {
 
   return (
     <article className="w-full xl:min-w-150 space-y-5">
-      {/* ---------------- Type ---------------- */}
-
       <h2 className="uppercase font-semibold text-maroon text-[0.875rem] tracking-[0.6px]">
         {type}
       </h2>
 
-      <Nutrition {...data} />
-
-      {/* ---------------- Title ---------------- */}
+      <Nutrition {...product} />
 
       <div className="space-y-1.5">
         <h1 className="text-[2.375rem] leading-[120%] font-semibold">
@@ -64,9 +59,7 @@ export default function Hero() {
         <p className="text-[1.125rem] font-light">{description}</p>
       </div>
 
-      <Benefit {...data} />
-
-      {/* ---------------- OPTIONS (Only if Needed) ---------------- */}
+      <Benefit {...product} />
 
       {hasMultipleVariants && options.length > 0 && (
         <div className="space-y-4 mt-6">
@@ -105,8 +98,6 @@ export default function Hero() {
         </div>
       )}
 
-      {/* ---------------- Price ---------------- */}
-
       <div className="mt-9">
         <div className="flex items-end gap-2">
           {selectedVariant?.price !== selectedVariant?.mrp ? (
@@ -127,12 +118,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ---------------- Actions ---------------- */}
-
       <div className="flex items-center gap-4 flex-col w-full mt-4">
-        <Count />
-
-        {/* Loyalty */}
+        <Count product={product} />
 
         <div className="bg-muted flex items-center gap-3 w-full p-3 rounded-md">
           <div className="bg-muted-foreground/10 p-2 rounded-full">
@@ -145,9 +132,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Recipes */}
-
-        {data.recipes.length > 0 && (
+        {product.recipes.length > 0 && (
           <div className="border-2 rounded-md  p-3 w-full">
             <h2 className="flex items-center gap-2 font-bold">
               <ChefHat className="fill-maroon stroke-maroon" />
@@ -155,7 +140,7 @@ export default function Hero() {
             </h2>
 
             <ul className="list-disc pl-5 mt-4 text-sm font-light flex flex-col gap-2">
-              {data.recipes.map((ele) => (
+              {product.recipes.map((ele) => (
                 <Link
                   key={ele.slug}
                   href={`/recipe/${ele.slug}`}
@@ -169,8 +154,6 @@ export default function Hero() {
           </div>
         )}
       </div>
-
-      {/* ---------------- Share ---------------- */}
 
       <Share>
         <div className="text-muted-foreground flex gap-2 items-center mt-6 cursor-pointer hover:text-black transition">

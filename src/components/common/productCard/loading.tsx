@@ -1,57 +1,33 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Minus, Plus } from "lucide-react";
-import { Product } from "@/types/product";
-
 export function ProductCardLoader() {
   return (
-    <div className="rounded-2xl w-full border p-3 space-y-3 animate-pulse duration-300 transition-all">
-      <div className="relative aspect-square rounded-xl bg-muted flex items-end justify-end p-2"></div>
-      {/* <Button variant={"outline"}>
-        <ExternalLink></ExternalLink>
-      </Button> */}
-      <div className="space-y-1">
-        <p className="font-medium">Product Name</p>
-        <p className="text-sm font-semibold">
-          ₹29.00{" "}
-          <span className="text-xs text-muted-foreground line-through">
-            ₹39.00
-          </span>
-        </p>
+    <div className="rounded-2xl w-full border p-3 space-y-3">
+      {/* Image */}
+      <div className="relative aspect-square rounded-xl bg-muted" />
+
+      {/* Title + Price */}
+      <div className="space-y-2">
+        <div className="h-4 w-3/4 bg-muted rounded" />
+        <div className="h-4 w-1/2 bg-muted rounded" />
       </div>
 
       {/* Tags */}
       <div className="flex gap-2 flex-wrap">
-        <Badge variant="outline" className="text-xs">
-          Original
-        </Badge>
-        <Badge variant="outline" className="text-xs">
-          Fresh
-        </Badge>
-        <Badge variant="outline" className="text-xs">
-          Quality Check
-        </Badge>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-5 w-14 rounded-full bg-muted" />
+        ))}
       </div>
 
-      {/* Quantity + Add to Cart */}
+      {/* Quantity + Button */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center border rounded-lg">
-          <Button size="icon" variant="ghost" disabled>
-            <Minus className="size-4" />
-          </Button>
-          <span className="px-2 text-sm">1</span>
-          <Button size="icon" variant="ghost" disabled>
-            <Plus className="size-4" />
-          </Button>
+        {/* Counter */}
+        <div className="flex items-center border rounded-lg overflow-hidden">
+          <div className="h-8 w-8 bg-muted" />
+          <div className="h-8 w-8 bg-muted" />
+          <div className="h-8 w-8 bg-muted" />
         </div>
-        <div className="flex gap-2 items-center">
-          <Button
-            size="sm"
-            className="bg-transparent! border rounded-lg! border-maroon! text-maroon!"
-          >
-            Add to Cart
-          </Button>
-        </div>
+
+        {/* Add Button */}
+        <div className="h-8 w-24 bg-muted rounded-lg" />
       </div>
     </div>
   );

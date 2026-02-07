@@ -22,9 +22,6 @@ interface ProductVariantContextValue {
   selectedOptions: SelectedOptions;
   setOptionValue: (optionSlug: string, valueSlug: string) => void;
   reset: () => void;
-  isLoading: boolean;
-  isFetching: boolean;
-  data: (Product & { variants: Variant[] }) | null;
 }
 
 const ProductVariantContext = createContext<ProductVariantContextValue | null>(
@@ -33,10 +30,13 @@ const ProductVariantContext = createContext<ProductVariantContextValue | null>(
 
 interface Props {
   children: React.ReactNode;
+  product: Product & {
+    recipes: { title: string; slug: string }[];
+    variants: Variant[];
+  };
 }
 
-export const ProductProvider = ({ children }: Props) => {
-  const { data, isLoading, isFetching } = useProductStore();
+export const ProductProvider = ({ children, product: data }: Props) => {
   const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({});
 
   const variants = data?.variants || [];
@@ -140,9 +140,6 @@ export const ProductProvider = ({ children }: Props) => {
         selectedOptions,
         setOptionValue,
         reset,
-        isLoading,
-        isFetching,
-        data: product,
       }}
     >
       {children}

@@ -7,12 +7,19 @@ import { useCart } from "@/provider/cart.provider";
 import { Button } from "@/components/ui/button";
 import { useProduct } from "@/provider/product.provider";
 import { convertToCartItem } from "@/lib/utils";
-import { useProductStore } from "@/store/user/product.store";
-export default function Count() {
+
+export default function Count({
+  product: data,
+}: {
+  product: Product & {
+    recipes: { title: string; slug: string }[];
+    variants: Variant[];
+  };
+}) {
   const { update, cart } = useCart();
   const { selectedVariant } = useProduct();
   const [quantity, setQuantity] = useState(1);
-  const { data } = useProductStore();
+
   useEffect(() => {
     if (!cart || !selectedVariant) return;
 

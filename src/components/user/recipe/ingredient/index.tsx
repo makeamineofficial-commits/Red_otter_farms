@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { CheckCircle2, ShoppingCart } from "lucide-react";
 import { Recipe } from "@/types/recipe";

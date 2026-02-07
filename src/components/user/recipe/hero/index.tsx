@@ -7,15 +7,17 @@ import { Clock, Flame, Users, BarChart3, Share2 } from "lucide-react";
 import { Recipe } from "@/types/recipe";
 import { Share } from "@/components/common/share";
 import Save from "./save";
-export default function RecipeHero({
-  cookingTime,
-  difficulty,
-  serving,
-  prepTime,
-  title,
-  summary,
-  healthBenefits,
-}: Recipe) {
+export default function RecipeHero(recipe: Recipe & { recipeSaved: boolean }) {
+  const {
+    cookingTime,
+    difficulty,
+    serving,
+    prepTime,
+    title,
+    summary,
+    healthBenefits,
+  } = recipe;
+
   return (
     <section className=" -mt-60 md:-mt-55 relative space-y-5">
       <div className="text-white z-30 ">
@@ -46,7 +48,7 @@ export default function RecipeHero({
           </div>
 
           <div className="flex gap-3">
-            <Save></Save>
+            <Save recipe={recipe}></Save>
             <Share>
               <Button variant="outline" className="gap-2">
                 <Share2 className="h-4 w-4" />
