@@ -8,7 +8,6 @@ import React, {
   useEffect,
 } from "react";
 import { Product, Variant } from "@/types/product";
-import { useProductStore } from "@/store/user/product.store";
 
 interface SelectedOptions {
   [optionSlug: string]: {
