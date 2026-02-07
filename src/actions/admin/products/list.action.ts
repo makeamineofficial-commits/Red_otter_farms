@@ -41,6 +41,12 @@ export const listProduct = async (
             values: true,
           },
         },
+        faqs: {
+          select: {
+            question: true,
+            answer: true,
+          },
+        },
         categories: {
           include: {
             category: {

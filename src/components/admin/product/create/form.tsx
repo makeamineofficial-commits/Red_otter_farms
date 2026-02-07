@@ -27,6 +27,7 @@ import { KeyValueArrayField } from "@/components/common/keyValueArrayField";
 import { FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { numberField } from "@/lib/utils";
+import { FaqArrayField } from "@/components/common/faq";
 
 type FormValues = z.infer<typeof productSchema>;
 
@@ -44,6 +45,7 @@ export default function CreateProductForm() {
       isPublished: false,
       maxPrice: 0,
       minPrice: 0,
+      faqs: [],
       isFeatured: false,
       // @ts-ignore
       nutritionalInfo: { key: 0 },
@@ -276,24 +278,41 @@ export default function CreateProductForm() {
           {/* ================= NUTRITION ================= */}
           <section className="space-y-4">
             <h3 className="font-medium ">Nutrition Facts</h3>
+            <FormField
+              key={"nutritionalInfo"}
+              name={"nutritionalInfo"}
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <KeyValueArrayField
+                      value={field.value as Record<string, string>}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </section>
 
-            <div className="grid md:grid-cols-4 gap-4">
-              <FormField
-                key={"nutritionalInfo"}
-                name={"nutritionalInfo"}
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <KeyValueArrayField
-                        value={field.value as Record<string, string>}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+          <section className="space-y-4">
+            <h3 className="font-medium ">FAQs</h3>
+
+            <FormField
+              key={"faqs"}
+              name={"faqs"}
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FaqArrayField
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           </section>
           {/* ================= FLAGS ================= */}
           <section className="space-y-3">

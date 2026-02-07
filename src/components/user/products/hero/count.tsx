@@ -34,7 +34,7 @@ export default function Count({
 
   if (!data) return <></>;
 
-  if (!selectedVariant) return <>Please select a valid variant</>;
+  if (!selectedVariant) return <></>;
   return (
     <div className="flex w-full flex-col justify-between sm:flex-row gap-3">
       <div className=" flex items-center border-2  h-fit w-fit rounded-2xl">

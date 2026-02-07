@@ -48,6 +48,7 @@ export const updateProduct = async (product: UpdateProductProps) => {
           assets,
           maxPrice,
           minPrice,
+          faqs,
           options: _options,
           categories: _categories,
           ...rest
@@ -70,6 +71,18 @@ export const updateProduct = async (product: UpdateProductProps) => {
             productId: check.id,
           },
         });
+        await tx.productFAQ.deleteMany({
+          where: {
+            productId: check.id,
+          },
+        });
+
+        await tx.productFAQ.createMany({
+          data: faqs.map((ele) => {
+            return { ...ele, productId: updatedProduct.id };
+          }),
+        });
+
         await tx.categoryProduct.createMany({
           data: categories.map((ele) => {
             return { categoryId: ele.id, productId: updatedProduct.id };

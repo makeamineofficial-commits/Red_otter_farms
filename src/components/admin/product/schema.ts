@@ -7,6 +7,11 @@ export const optionValueSchema = z.object({
   isDefault: z.boolean().default(false),
 });
 
+export const faqSchema = z.object({
+  question: z.string().min(1),
+  answer: z.string().min(1),
+});
+
 export const optionSchema = z
   .object({
     displayName: z.string().min(1, "Option name is required").max(100),
@@ -40,7 +45,7 @@ export const productSchema = z.object({
       type: z.nativeEnum(AssetType),
     }),
   ),
-
+  faqs: z.array(faqSchema),
   options: z.array(optionSchema).max(5, "Maximum 5 options allowed"),
   isPublished: z.boolean(),
   isFeatured: z.boolean(),
@@ -74,7 +79,7 @@ export const updateProductSchema = z.object({
   slug: z.string(),
   summary: z.string().optional(),
   description: z.string().optional(),
-
+  faqs: z.array(faqSchema),
   categories: z.array(z.string()),
   healthBenefits: z.array(z.string()),
 

@@ -8,15 +8,9 @@ import Benefit from "./benefit";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 import { useProduct } from "@/provider/product.provider";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import ProductFAQs from "./faq";
 import { Product, Variant } from "@/types/product";
+import VariantSelector from "./variants";
 
 export default function Hero({
   product,
@@ -26,22 +20,11 @@ export default function Hero({
     variants: Variant[];
   };
 }) {
-  const { selectedVariant, selectedOptions, setOptionValue } = useProduct();
+  const { selectedVariant } = useProduct();
 
   const { type, displayName, description, options, variants } = product;
 
   const hasMultipleVariants = variants.length > 1;
-
-  const isOptionValueValid = (optionSlug: string, valueSlug: string) => {
-    return variants.some((variant) =>
-      variant.options.every((opt) => {
-        if (opt.option === optionSlug) return opt.optionValue === valueSlug;
-
-        const selected = selectedOptions[opt.option];
-        return selected ? selected.value.slug === opt.optionValue : true;
-      }),
-    );
-  };
 
   return (
     <article className="w-full xl:min-w-150 space-y-5">
@@ -62,65 +45,38 @@ export default function Hero({
       <Benefit {...product} />
 
       {hasMultipleVariants && options.length > 0 && (
-        <div className="space-y-4 mt-6">
-          {options.map((opt) => (
-            <div key={opt.slug} className="space-y-1.5">
-              <p className="text-xs font-semibold text-muted-foreground">
-                {opt.displayName}
-              </p>
+        <VariantSelector {...product} />
+      )}
+      {selectedVariant ? (
+        <>
+          <div className="mt-9">
+            <div className="flex items-end gap-2">
+              {selectedVariant?.price !== selectedVariant?.mrp ? (
+                <>
+                  <p className="text-[1.875rem] font-bold leading-none">
+                    ₹{formatPrice(selectedVariant?.price ?? 0)}
+                  </p>
 
-              <Select
-                value={selectedOptions[opt.slug]?.value.slug || ""}
-                onValueChange={(value) => setOptionValue(opt.slug, value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={`Select ${opt.displayName}`} />
-                </SelectTrigger>
-
-                <SelectContent>
-                  {opt.values.map((val) => {
-                    const isValid = isOptionValueValid(opt.slug, val.slug);
-
-                    return (
-                      <SelectItem
-                        key={val.slug}
-                        value={val.slug}
-                        disabled={!isValid}
-                      >
-                        {val.displayName}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+                  <p className="text-muted-foreground line-through">
+                    ₹{formatPrice(selectedVariant?.mrp ?? 0)}
+                  </p>
+                </>
+              ) : (
+                <p className="text-[1.875rem] font-bold">
+                  ₹{formatPrice(selectedVariant?.price ?? 0)}
+                </p>
+              )}
             </div>
-          ))}
+          </div>
+          <Count product={product} />
+        </>
+      ) : (
+        <div className="flex items-center gap-2 rounded-md border bg-muted px-3 py-2 text-sm text-maroon">
+          <span className="font-medium">Unavailable:</span>
+          <span>Please choose a different combination.</span>
         </div>
       )}
-
-      <div className="mt-9">
-        <div className="flex items-end gap-2">
-          {selectedVariant?.price !== selectedVariant?.mrp ? (
-            <>
-              <p className="text-[1.875rem] font-bold leading-none">
-                ₹{formatPrice(selectedVariant?.price ?? 0)}
-              </p>
-
-              <p className="text-muted-foreground line-through">
-                ₹{formatPrice(selectedVariant?.mrp ?? 0)}
-              </p>
-            </>
-          ) : (
-            <p className="text-[1.875rem] font-bold">
-              ₹{formatPrice(selectedVariant?.price ?? 0)}
-            </p>
-          )}
-        </div>
-      </div>
-
       <div className="flex items-center gap-4 flex-col w-full mt-4">
-        <Count product={product} />
-
         <div className="bg-muted flex items-center gap-3 w-full p-3 rounded-md">
           <div className="bg-muted-foreground/10 p-2 rounded-full">
             <Star className="fill-maroon stroke-maroon" />
@@ -155,6 +111,7 @@ export default function Hero({
         )}
       </div>
 
+      <ProductFAQs product={product}></ProductFAQs>
       <Share>
         <div className="text-muted-foreground flex gap-2 items-center mt-6 cursor-pointer hover:text-black transition">
           <Share2 />

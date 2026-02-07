@@ -27,6 +27,12 @@ export const getProduct = async ({
         },
       },
       assets: true,
+      faqs: {
+        select: {
+          question: true,
+          answer: true,
+        },
+      },
       options: {
         include: {
           values: true,

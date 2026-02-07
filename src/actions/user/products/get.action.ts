@@ -38,9 +38,18 @@ const _getProductCached = async (
     where: { slug },
     include: {
       categories: { include: { category: true } },
+      faqs: {
+        select: {
+          question: true,
+          answer: true,
+        },
+      },
       assets: true,
       options: { include: { values: true } },
       variants: {
+        where: {
+          isPublished: true,
+        },
         include: {
           options: {
             select: {

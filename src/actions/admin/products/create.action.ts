@@ -12,6 +12,7 @@ export const createProduct = async (product: ProductProps) => {
     options: _options,
     categories: _categories,
     assets: _assets,
+    faqs,
     maxPrice,
     minPrice,
     ...rest
@@ -51,6 +52,11 @@ export const createProduct = async (product: ProductProps) => {
         }),
       });
 
+      await tx.productFAQ.createMany({
+        data: faqs.map((ele) => {
+          return { ...ele, productId: product.id };
+        }),
+      });
       for (const _option of _options) {
         const { values, displayName } = _option;
 

@@ -23,9 +23,9 @@ export function Share({
   const [copied, setCopied] = useState(false);
 
   const url = href
-    ? window.location.origin + href
+    ? window?.location.origin + href
     : typeof window !== "undefined"
-      ? window.location.href
+      ? window?.location.href
       : "";
 
   const handleCopy = async () => {
