@@ -35,7 +35,7 @@ export default function Shipping() {
       type="single"
       defaultValue="shipping"
       collapsible
-      className="w-full border rounded-lg"
+      className="w-full border rounded-lg p-6"
     >
       <AccordionItem value="shipping" className="border-none">
         <AccordionTrigger2 className="px-4! py-3! h-auto! justify-start!">
@@ -75,11 +75,16 @@ export default function Shipping() {
             <Label className="text-muted-foreground">
               Phone for Delivery (House Help / Guard)
             </Label>
-            <Input
-              className="h-12!"
-              value={shipping.phone || ""}
-              onChange={(e) => handleChange("phone", e.target.value)}
-            />
+            <div className="flex gap-2">
+              <Input value="+91" disabled className="w-20 h-12!" />
+              <Input
+                className="h-12!"
+                placeholder="Enter mobile number"
+                name="mobile"
+                value={shipping.phone || ""}
+                onChange={(e) => handleChange("phone", e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="space-y-1">
@@ -106,13 +111,13 @@ export default function Shipping() {
               value={shipping.state}
               onValueChange={(value) => handleChange("state", value)}
             >
-              <SelectTrigger className="h-12!">
+              <SelectTrigger className="w-full h-12!">
                 <SelectValue placeholder="Select state" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Delhi">Delhi</SelectItem>
-                <SelectItem value="Punjab">Punjab</SelectItem>
-                <SelectItem value="Haryana">Haryana</SelectItem>
+                <SelectItem value="DL">Delhi</SelectItem>
+                <SelectItem value="PN">Punjab</SelectItem>
+                <SelectItem value="HR">Haryana</SelectItem>
                 <SelectItem value="UP">Uttar Pradesh</SelectItem>
               </SelectContent>
             </Select>

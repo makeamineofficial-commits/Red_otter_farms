@@ -4,6 +4,8 @@ import { validateUser } from "@/actions/auth/user.action";
 import { db } from "@/lib/db";
 import { cookies } from "next/headers";
 import { CartStatus } from "../../../../generated/prisma/enums";
+import { getCart } from "./get.action";
+import { Cart } from "@/types/cart";
 
 export async function getCartId() {
   const cookieStore = await cookies();
@@ -46,4 +48,12 @@ export async function getCartId() {
   });
 
   return newCart.sessionId;
+}
+
+export async function getCartTotal(cart: Cart) {
+  const total = cart.items.reduce((prev, cur) => {
+    return prev + cur.quantity * cur.variant.price;
+  }, 0);
+
+  return total;
 }

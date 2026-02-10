@@ -6,8 +6,8 @@ import Footer from "@/components/user/footer";
 import { CartProvider } from "@/provider/cart.provider";
 export default function layout({ children }: { children: React.ReactNode }) {
   return (
-    <CartProvider>
-      <body className="relative max-w-500 mx-auto">
+    <body className="relative max-w-500 mx-auto">
+      <CartProvider>
         <Header></Header>
         {children}
 
@@ -15,7 +15,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
         <Footer></Footer>
 
         <Toaster></Toaster>
-      </body>
-    </CartProvider>
+      </CartProvider>
+    </body>
   );
 }

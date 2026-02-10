@@ -1,25 +1,24 @@
-import {
-  useCheckout,
-  BillingDetails,
-  ShippingDetails,
-} from "@/provider/checkout.provider";
+import { useCheckout } from "@/provider/checkout.provider";
 import { useCart } from "@/provider/cart.provider";
 import { toast } from "sonner";
-import { getRazorpayOrderId } from "@/actions/checkout/razorpay.action";
-
-interface CheckoutResult {
-  success: boolean;
-  message: string;
-  orderId?: string;
-}
+import { getCheckout } from "@/actions/checkout/checkout.action";
+import {
+  BillingDetails,
+  PaymentMethod,
+  ShippingDetails,
+} from "@/types/payment";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export const useCheckoutHandler = () => {
-  const { billing, shipping, shippingRate, fetchingRate, total, subtotal } =
-    useCheckout();
-  const { cart, isLoading, isUpdating } = useCart();
+  const { replace } = useRouter();
+  const [isCheckingOut, setCheckingOut] = useState(false);
+  const { billing, shipping, paymentMethod } = useCheckout();
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const { cart } = useCart();
   const validateBilling = (billing: BillingDetails) => {
     const requiredFields: (keyof BillingDetails)[] = [
-      "mobile",
+      "phone",
       "firstName",
       "lastName",
       "address",
@@ -38,7 +37,7 @@ export const useCheckoutHandler = () => {
     }
     if (!/^\d{6}$/.test(billing.zip))
       return "Billing zip code must be 6 digits";
-    if (!/^\d{10}$/.test(billing.mobile))
+    if (!/^\d{10}$/.test(billing.phone))
       return "Billing mobile must be 10 digits";
     return null;
   };
@@ -61,7 +60,7 @@ export const useCheckoutHandler = () => {
     return null;
   };
 
-  const _checkout = async (): Promise<CheckoutResult> => {
+  const _checkout = async () => {
     const billingError = validateBilling(billing);
     if (billingError) return { success: false, message: billingError };
 
@@ -72,27 +71,48 @@ export const useCheckoutHandler = () => {
       return { success: false, message: "Your cart is empty." };
 
     try {
-      const orderRes = await getRazorpayOrderId({
-        shippingPincode: shipping.zip,
+      setCheckingOut(true);
+      const res = await getCheckout({
+        paymentMethod,
+        // @ts-ignore
+        shipping,
+        // @ts-ignore
+        billing,
       });
 
-      if (!orderRes.success || !orderRes.orderId) {
+      if (!res.success) {
         return {
           success: false,
-          message: "Failed to create order. Please try again.",
+          message: res.message ?? "Failed to create order. Please try again.",
+        };
+      }
+
+      if (paymentMethod === PaymentMethod.RAZORPAY && res.orderId) {
+        setOrderId(res.orderId);
+        return {
+          success: true,
+          message: "Order Created Successfully",
+        };
+      }
+      if (paymentMethod === PaymentMethod.OTTER) {
+        replace("/order-placed");
+        return {
+          success: true,
+          message: "Order Created Successfully",
         };
       }
 
       return {
-        success: true,
-        message: "Order created successfully",
-        orderId: orderRes.orderId,
+        success: false,
+        message: "Failed to create order. Please try again.",
       };
     } catch (error) {
       return {
         success: false,
-        message: "Something went wrong during checkout.",
+        message: "Failed to create order. Please try again.",
       };
+    } finally {
+      setCheckingOut(false);
     }
   };
 
@@ -102,12 +122,7 @@ export const useCheckoutHandler = () => {
       toast.error(res.message);
       return;
     }
-    if (!res.orderId) {
-      toast.warning("Failed to start a payment session");
-      return;
-    }
-    return res.orderId;
   };
 
-  return { checkout };
+  return { checkout, orderId, isCheckingOut, setOrderId };
 };

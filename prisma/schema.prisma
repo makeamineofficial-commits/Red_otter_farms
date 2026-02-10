@@ -171,8 +171,6 @@ model Variant{
   stockLimit       Int   @default(5)   // reserved to show low in stock banner
   inStock    Boolean @default(true)  // to mark out of stock
  
-
-  ordered  OrderItem[]
   presentInCart CartItem[]
   options VariantOptionMap[] 
 
@@ -218,6 +216,7 @@ model VariantOptionMap {
 
 enum CartStatus{
   ACTIVE 
+  CHECKEDOUT
   CONVERTED
 }
 
@@ -228,6 +227,13 @@ model Cart{
   userIdentifier  String?
   status CartStatus @default(ACTIVE)
   items CartItem[]
+
+  shipping Json?
+  billing Json?
+  paymentId String?
+
+  order Order? @relation("cart_to_order")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -248,50 +254,94 @@ model CartItem{
   @@index([cartId])
 }
 
+
 enum OrderStatus {
-  PENDING      
-  FAILED       
-  ON_HOLD      
-  PROCESSING   
-  SHIPPED      
-  DELIVERED    
-  CANCELLED    
-  REFUNDED     
+  CREATED
+
+  PROCESSING 
+
+  FAILED            
+  PLACED  
+
+  REFUNDED
+
+  CANCELLED
 }
 
 model Order{
   id String @id @default(uuid())
   publicId String @unique @default(dbgenerated("concat('order_', gen_random_uuid())"))
-  items OrderItem[]
-  status OrderStatus @default(PENDING)
-  deliveryFee Int
-  subTotal Int
-  tax Int
-  total Int 
-  currency  String @default("INR")
+  
+  userIdentifier String  
+
+  cartId String  @unique
+  cart Cart  @relation("cart_to_order",fields: [cartId],references: [id])
+
+  status OrderStatus  @default(CREATED)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-
-  @@index([publicId])
-  @@index([createdAt])
 }
 
-model OrderItem {
-  orderId   String
-  variantId String
+enum PaymentStatus {
+  CREATED
+  PENDING     
 
-  order     Order   @relation(fields: [orderId], references: [id],onDelete: Cascade)
-  variant   Variant @relation(fields: [variantId], references: [id],onDelete: Cascade)
 
-  quantity  Int     @default(1)
-  price     Int     
-  currency  String @default("INR")
+  IN_PROGRESS 
+  PROCESSING 
 
-  @@id([orderId, variantId])
-  @@index([variantId])
-  @@index([orderId])
+
+  FAILED            
+  VERIFIED   
+  REFUNDED
+  UNDERPAID
+  OVERPAID     
+  EXPIRED 
+  CANCELLED
 }
+
+enum PaymentPurpose {
+    ORDER   
+}
+
+
+model Payment {
+  id String @id @default(uuid())
+  publicId String @unique @default(dbgenerated("concat('payment_', gen_random_uuid())"))
+
+  referenceId String 
+
+  purpose PaymentPurpose
+
+  amount Int
+  currency String @default("INR")
+
+  status PaymentStatus @default(CREATED)
+
+  razorpayOrderId String?
+  razorpayPaymentId String? 
+  razorpayEvent String?
+
+  method String?
+  provider String?
+
+  errorCode String?
+  errorDescription String?
+
+  refundId String?
+  refundAmount Int?
+  refundedAt DateTime?
+
+  rawWebhook Json?
+
+  paidAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
 
 
 enum AssetType{

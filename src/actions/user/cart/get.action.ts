@@ -2,6 +2,7 @@
 import { db } from "@/lib/db";
 import { getCartId } from "./util";
 import { Cart } from "@/types/cart";
+import { BillingDetails, ShippingDetails } from "@/types/payment";
 
 export const getCart = async (): Promise<Cart | null> => {
   const sessionId = await getCartId();
@@ -9,8 +10,11 @@ export const getCart = async (): Promise<Cart | null> => {
   const cart = await db.cart.findUnique({
     where: { sessionId },
     select: {
+      shipping: true,
+      billing: true,
       sessionId: true,
       status: true,
+      paymentId: true,
       items: {
         select: {
           quantity: true,
@@ -50,7 +54,10 @@ export const getCart = async (): Promise<Cart | null> => {
   if (!cart) return null;
 
   return {
+    shipping: (cart.shipping as unknown as ShippingDetails) ?? undefined,
+    billing: (cart.billing as unknown as BillingDetails) ?? undefined,
     sessionId: cart.sessionId,
+    paymentId: cart.paymentId ?? undefined,
     status: cart.status,
     items:
       cart.items?.map(({ variant, quantity }) => {

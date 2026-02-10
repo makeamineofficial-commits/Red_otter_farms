@@ -1,9 +1,11 @@
 import { Asset } from "./common";
-import { Product, Variant } from "./product";
 
 export interface Cart {
   sessionId: string;
   status: string;
+  paymentId?: string;
+  shipping?: any;
+  billing?: any;
   items: CartItem[];
 }
 
@@ -23,4 +25,15 @@ export interface Item {
 }
 export interface CartItem extends Item {
   quantity: number;
+}
+
+export interface CartExtended {
+  id: string;
+  userIdentifier: string | null;
+  sessionId: string;
+  status: string;
+  paymentId?: string;
+  shipping?: any;
+  billing?: any;
+  items: CartItem[];
 }

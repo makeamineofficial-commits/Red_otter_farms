@@ -8,7 +8,8 @@ import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/provider/cart.provider";
 import { useCheckout } from "@/provider/checkout.provider";
 import Image from "next/image";
-
+import { Check } from "lucide-react";
+import { PaymentMethod } from "@/types/payment";
 function PaymentSkeleton() {
   return (
     <div className="flex flex-col gap-2 p-4 border rounded-2xl animate-pulse">
@@ -20,61 +21,88 @@ function PaymentSkeleton() {
 }
 
 export default function Payment() {
-  const { fetchingRate, total } = useCheckout();
+  const { isFetching, paymentMethod, setPaymentMethod } = useCheckout();
+
   const { cart, isLoading, isUpdating } = useCart();
-  const { checkout } = useCheckoutHandler();
 
   const isDisabled =
-    isLoading || isUpdating || fetchingRate || !cart || cart.items.length === 0;
+    isLoading || isUpdating || isFetching || !cart || cart.items.length === 0;
 
-  if (isLoading || isUpdating) {
+  if (isDisabled) {
     return <PaymentSkeleton />;
   }
 
   return (
-    <div className="flex flex-col gap-2 p-4 border rounded-2xl">
+    <div className="flex flex-col gap-3 p-4 border rounded-2xl">
       {/* Razorpay */}
-      <Button
-        onClick={async () => {
-          if (isDisabled) return;
-          const orderId = await checkout();
-          console.log("payment flow started");
-          // use the order to start the payment
-        }}
-        className="w-full py-4 h-auto! text-base bg-white border-forest
-                   flex items-center gap-1.5"
-        size="lg"
-        variant="outline"
-        disabled={isDisabled}
+      <PaymentOption
+        selected={paymentMethod === PaymentMethod.RAZORPAY}
+        onClick={() => setPaymentMethod(PaymentMethod.RAZORPAY)}
       >
-        <span className="text-forest">{`Pay ₹${formatPrice(total)} with`}</span>
+        <div className="flex items-center gap-2">
+          <Image
+            height={20}
+            width={90}
+            alt="Razorpay"
+            src="/extras/razorpay.png"
+            className="object-contain"
+          />
 
-        <Image
-          height={20}
-          width={90}
-          alt="Razorpay"
-          src="/extras/razorpay.png"
-          className="object-contain"
-        />
-      </Button>
+          <span className="text-sm text-muted-foreground">
+            Pay using UPI / Card / Netbanking
+          </span>
+        </div>
+      </PaymentOption>
 
       <Separator />
 
       {/* Wallet */}
-      <Button
-        onClick={() => {
-          if (isDisabled) return;
-        }}
-        className="w-full py-4 h-auto! text-base bg-white border-forest
-                   flex items-center gap-1.5"
-        size="lg"
-        variant="outline"
-        disabled={isDisabled}
+      <PaymentOption
+        selected={paymentMethod === PaymentMethod.OTTER}
+        onClick={() => setPaymentMethod(PaymentMethod.OTTER)}
       >
-        <span className="text-forest">
-          {`Pay ₹${formatPrice(total)} with Otter Wallet`}
-        </span>
-      </Button>
+        <span className="font-medium text-forest">Otter Wallet</span>
+      </PaymentOption>
     </div>
+  );
+}
+
+function PaymentOption({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`
+        w-full flex items-center justify-between
+        p-3 rounded-xl border transition
+        ${
+          selected
+            ? "border-forest bg-forest/5"
+            : "border-gray-200 hover:border-forest/60"
+        }
+      `}
+    >
+      <div className="flex items-center gap-2">
+        {/* Checkbox */}
+        <div
+          className={`
+            h-5 w-5 rounded-full border flex items-center justify-center
+            ${selected ? "bg-forest border-forest" : "border-gray-400"}
+          `}
+        >
+          {selected && <Check size={14} className="text-white" />}
+        </div>
+
+        {children}
+      </div>
+    </button>
   );
 }

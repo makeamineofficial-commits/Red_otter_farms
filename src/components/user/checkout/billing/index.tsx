@@ -59,8 +59,8 @@ export default function Billing() {
                 className="h-12!"
                 placeholder="Enter mobile number"
                 name="mobile"
-                value={billing.mobile || ""}
-                onChange={(e) => handleChange("mobile", e.target.value)}
+                value={billing.phone || ""}
+                onChange={(e) => handleChange("phone", e.target.value)}
               />
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function Billing() {
                 <SelectValue placeholder="Select state" />
               </SelectTrigger>
               <SelectContent className="w-full">
-                <SelectItem value="Delhi">Delhi</SelectItem>
+                <SelectItem value="DL">Delhi</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -146,7 +146,7 @@ export default function Billing() {
           {/* Country */}
           <div className="space-y-1">
             <Label className="text-muted-foreground">Country</Label>
-            <Input className="h-12!" value="India" disabled />
+            <Input className="h-12!" value="IN" readOnly />
           </div>
         </AccordionContent>
       </AccordionItem>

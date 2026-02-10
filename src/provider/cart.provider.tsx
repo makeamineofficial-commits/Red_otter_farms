@@ -9,7 +9,7 @@ import {
 } from "react";
 import { getCart } from "@/actions/user/cart/get.action";
 import { updateCart } from "@/actions/user/cart/update.action";
-import { Cart, CartItem, Item } from "@/types/cart";
+import { Cart, Item } from "@/types/cart";
 
 type ContextType = {
   isOpen: boolean;
@@ -28,6 +28,7 @@ type ContextType = {
   cart: Cart | null;
   isUpdating: boolean;
   isLoading: boolean;
+  refetch: Function;
 };
 
 const Context = createContext<ContextType | undefined>(undefined);
@@ -38,17 +39,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setLoading] = useState(false);
   const [isUpdating, setUpdating] = useState(false);
 
+  const refetch = async () => {
+    try {
+      setLoading(true);
+      const cart = await getCart();
+      setCart(cart);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        setLoading(true);
-        const cart = await getCart();
-        setCart(cart);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCart();
+    refetch();
   }, []);
 
   const toggle = () => setIsOpen((prev) => !prev);
@@ -194,6 +195,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         updateMany,
         cart,
+        refetch,
       }}
     >
       {children}

@@ -38,7 +38,7 @@ function BillSkeleton() {
 
 export default function Bill() {
   const { cart, isLoading, isUpdating } = useCart();
-  const { shippingRate, showEstimate } = useCheckout();
+  const { shippingRate, showEstimate, isFetching } = useCheckout();
 
   const subtotal = useMemo(() => {
     return (
@@ -54,7 +54,7 @@ export default function Bill() {
     [subtotal, shippingRate],
   );
 
-  if (isLoading || isUpdating) {
+  if (isLoading || isUpdating || isFetching) {
     return <BillSkeleton />;
   }
 

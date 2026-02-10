@@ -1,6 +1,7 @@
 "use server";
-import { db } from "@/lib/db";
+import { CartStatus, db } from "@/lib/db";
 import { getCartId } from "./util";
+import { BillingDetails, ShippingDetails } from "@/types/payment";
 
 export const updateCart = async ({
   variantId,
@@ -65,6 +66,89 @@ export const updateCart = async ({
       },
     });
   }
+  return {
+    success: true,
+  };
+};
+
+export const syncAddress = async ({
+  shipping,
+  billing,
+}: {
+  shipping: ShippingDetails;
+  billing: BillingDetails;
+}): Promise<{ success: boolean }> => {
+  const sessionId = await getCartId();
+  const cart = await db.cart.findUnique({
+    where: { sessionId },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!cart) return { success: false };
+
+  await db.cart.update({
+    where: { sessionId },
+    data: {
+      shipping: shipping as any,
+      billing: billing as any,
+    },
+  });
+
+  return {
+    success: true,
+  };
+};
+
+export const updateCartPayment = async ({
+  paymentId,
+}: {
+  paymentId: string;
+}): Promise<{ success: boolean }> => {
+  const sessionId = await getCartId();
+  const cart = await db.cart.findUnique({
+    where: { sessionId },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!cart) return { success: false };
+
+  await db.cart.update({
+    where: { sessionId },
+    data: {
+      paymentId,
+    },
+  });
+
+  return {
+    success: true,
+  };
+};
+
+export const updateCartStatus = async ({
+  sessionId,
+  status,
+}: {
+  sessionId: string;
+  status: CartStatus;
+}): Promise<{ success: boolean }> => {
+  const cart = await db.cart.findUnique({
+    where: { sessionId },
+   
+  });
+
+  if (!cart || cart.status==="CONVERTED") return { success: false };
+
+  await db.cart.update({
+    where: { sessionId },
+    data: {
+      status,
+    },
+  });
+
   return {
     success: true,
   };

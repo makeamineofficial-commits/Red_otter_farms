@@ -42,11 +42,7 @@ export async function getShippingRate({
       };
     }
 
-
-
     const variantIds = cart.items.map((item) => item.variant.publicId);
-
-
 
     const variants = await db.variant.findMany({
       where: {
@@ -62,8 +58,6 @@ export async function getShippingRate({
     });
 
     const variantMap = new Map(variants.map((v) => [v.id, v]));
-
-  
 
     let totalWeightKg = 0;
 
