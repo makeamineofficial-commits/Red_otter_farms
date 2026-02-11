@@ -36,7 +36,7 @@ model Category {
   lastUpdatedById String?
   lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
 
-
+  quickShop Boolean @default(false)
   isPublished  Boolean  @default(true)
 
   createdAt DateTime @default(now())

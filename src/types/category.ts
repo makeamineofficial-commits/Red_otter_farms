@@ -3,13 +3,10 @@ export interface CategoryProps {
   displayName: string;
   description?: string;
   isPublished: boolean;
+  quickShop: boolean;
 }
 
-export interface Category {
+export interface Category extends CategoryProps {
   publicId: string;
-  name: string;
-  displayName: string;
-  description?: string;
   slug: string;
-  isPublished: boolean;
 }

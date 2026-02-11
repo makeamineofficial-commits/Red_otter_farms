@@ -15,14 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateCategory } from "@/hooks/admin/category.hook";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import FileUpload from "@/components/common/fileUpload";
-import { AssetType } from "@/types/common";
+
 const categorySchema = z.object({
   name: z.string().min(5).max(120),
   displayName: z.string().min(5).max(120),
   description: z.string().optional(),
   isPublished: z.boolean(),
-
+  quickShop: z.boolean(),
   //   assets: z.array(
   //     z.object({
   //       url: z.string().url(),
@@ -42,6 +41,7 @@ export default function CreateCategoryForm() {
       displayName: "",
       description: "",
       isPublished: false,
+      quickShop: false,
       //   assets: [],
     },
   });
@@ -142,6 +142,23 @@ export default function CreateCategoryForm() {
               </FormControl>
 
               <FormLabel>Publish Category</FormLabel>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="quickShop"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start gap-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+
+              <FormLabel>Show in Quick Shop</FormLabel>
               <FormMessage />
             </FormItem>
           )}

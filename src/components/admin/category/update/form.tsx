@@ -16,11 +16,13 @@ import { useUpdateCategory } from "@/hooks/admin/category.hook";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { Category } from "@/types/category";
+import quickShop from "@/actions/user/products/quickshop.action";
 const categorySchema = z.object({
   name: z.string().min(5).max(120),
   displayName: z.string().min(5).max(120),
   description: z.string().optional(),
   isPublished: z.boolean(),
+  quickShop: z.boolean(),
   slug: z.string(),
 });
 
@@ -39,6 +41,7 @@ export default function UpdateCategoryForm({
       description: category.description,
       isPublished: category.isPublished,
       slug: category.slug,
+      quickShop: category.quickShop,
     },
   });
 
@@ -143,6 +146,24 @@ export default function UpdateCategoryForm({
               </FormControl>
 
               <FormLabel>Publish Category</FormLabel>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="quickShop"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start gap-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+
+              <FormLabel>Show to Quick Shop</FormLabel>
               <FormMessage />
             </FormItem>
           )}
