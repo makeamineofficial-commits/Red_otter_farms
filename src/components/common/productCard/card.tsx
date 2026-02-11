@@ -21,6 +21,8 @@ export function ProductCard(product: ProductPreview) {
     nutritionalInfo,
     slug,
     healthBenefits,
+    availableInStock,
+    stockLimit,
     variants,
   } = product;
   const { update, cart } = useCart();
@@ -38,13 +40,22 @@ export function ProductCard(product: ProductPreview) {
   }, [cart]);
 
   return (
-    <div className="rounded-2xl border p-3 space-y-3 w-full relative flex flex-col">
+    <div className="rounded-2xl border p-3 space-y-3 w-full relative flex flex-col ">
       <Link
         href={`/products/${slug}`}
         className="absolute top-0 left-0  h-full w-full  z-10"
       ></Link>
 
       <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+        {stockLimit > availableInStock ? (
+          <>
+            <div className="absolute top-7 -left-9 z-40 -rotate-45 bg-maroon py-1 px-10 text-white text-xs font-semibold shadow-md">
+              Low In Stock
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
         <Image
           src={assets[0].url}
           alt={displayName}

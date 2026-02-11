@@ -16,7 +16,17 @@ import { Minus, Plus } from "lucide-react";
 import { convertToCartItem } from "@/lib/utils";
 import { CartItem, Item } from "@/types/cart";
 export function ProductCard(product: ProductPreview & { isLast: boolean }) {
-  const { displayName, price, summary, assets, isLast, slug, type } = product;
+  const {
+    displayName,
+    price,
+    summary,
+    assets,
+    isLast,
+    slug,
+    type,
+    stockLimit,
+    availableInStock,
+  } = product;
   const { update, cart } = useCart();
   const [count, setCount] = useState(1);
   useEffect(() => {
@@ -33,8 +43,17 @@ export function ProductCard(product: ProductPreview & { isLast: boolean }) {
   return (
     <div
       className={`border border-forest ${isLast ? "border-r" : "border-r-0"} 
-         flex flex-col h-full relative`}
+         flex flex-col h-full relative overflow-hidden`}
     >
+      {stockLimit > availableInStock ? (
+        <>
+          <div className="absolute top-9 -right-9 z-40 rotate-45 bg-maroon py-1 px-10 text-white text-xs font-semibold shadow-md">
+            Low In Stock
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
       <Link
         href={`/products/${slug}`}
         className="absolute top-0 left-0  h-full w-full  z-10 "

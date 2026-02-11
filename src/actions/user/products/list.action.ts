@@ -139,6 +139,8 @@ export const listProducts = async (
             publicId: true,
             price: true,
             inStock: true,
+            stockLimit: true,
+            availableInStock: true,
           },
         },
 
@@ -174,6 +176,8 @@ export const listProducts = async (
         mrp: defaultVariant.mrp,
         price: defaultVariant.price,
         variants: product._count.variants,
+        stockLimit: product.variants[0].stockLimit,
+        availableInStock: product.variants[0].availableInStock,
       });
     })
     .filter(Boolean) as (ProductPreview & { id: string })[];

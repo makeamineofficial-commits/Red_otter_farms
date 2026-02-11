@@ -60,6 +60,8 @@ export async function getSimilarProducts(slug: string) {
           sku: true,
           mrp: true,
           price: true,
+          stockLimit: true,
+          availableInStock: true,
         },
       },
       _count: {
@@ -89,6 +91,8 @@ export async function getSimilarProducts(slug: string) {
       mrp: defaultVariant?.mrp ?? null,
       price: defaultVariant?.price ?? null,
       variants: product._count.variants,
+      stockLimit: product.variants[0].stockLimit,
+      availableInStock: product.variants[0].availableInStock,
     });
   });
 

@@ -62,6 +62,9 @@ export interface ProductPreview {
   sku: string;
   mrp: number;
   price: number;
+
+  stockLimit: number;
+  availableInStock: number;
 }
 
 export enum SortBy {

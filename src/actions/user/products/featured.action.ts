@@ -42,6 +42,8 @@ export const listFeaturedProducts = async (): Promise<ProductPreview[]> => {
           sku: true,
           mrp: true,
           price: true,
+          stockLimit: true,
+          availableInStock: true,
         },
       },
       _count: {
@@ -69,6 +71,8 @@ export const listFeaturedProducts = async (): Promise<ProductPreview[]> => {
       mrp: defaultVariant?.mrp ?? null,
       price: defaultVariant?.price ?? null,
       variants: product._count.variants,
+      stockLimit: product.variants[0].stockLimit,
+      availableInStock: product.variants[0].availableInStock,
     });
   });
 

@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import Wishlist from "./wishlist";
 import { Share } from "@/components/common/share";
 import { Product, Variant } from "@/types/product";
-
+import { useProduct } from "@/provider/product.provider";
 export default function Images({
   product: data,
 }: {
@@ -29,10 +29,22 @@ export default function Images({
       setDisplayImages(data.assets.map((a) => a.url));
     }
   }, [data]);
+
+  const { selectedVariant } = useProduct();
+  if (!selectedVariant) return <></>;
   return (
     <>
       <article className="w-full hidden sm:block">
         <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden">
+          {selectedVariant?.stockLimit > selectedVariant?.availableInStock ? (
+            <>
+              <div className="absolute top-6 -left-11.25 z-40 -rotate-45 bg-maroon py-1 px-10 text-white text-sm font-semibold shadow-md">
+                Low In Stock
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
           <img
             src={displayImages[0]}
             alt={data?.name || "Product"}
@@ -121,7 +133,16 @@ export default function Images({
         </div>
       </article>
 
-      <article className="w-full sm:hidden block relative space-y-5">
+      <article className="w-full sm:hidden block relative space-y-5 overflow-hidden">
+        {selectedVariant?.stockLimit > selectedVariant?.availableInStock ? (
+          <>
+            <div className="absolute top-6 -left-11.25 z-40 -rotate-45 bg-maroon py-1 px-10 text-white text-sm font-semibold shadow-md">
+              Low In Stock
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
         <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden ">
           <div className="flex flex-col gap-2 absolute top-3 right-3 z-40">
             <Share href={`/products/${data?.slug}`}>
