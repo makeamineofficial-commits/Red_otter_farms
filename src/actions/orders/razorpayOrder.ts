@@ -1,7 +1,12 @@
 "use server";
 
 import { CartExtended } from "@/types/cart";
-import { finalizeOrder, saveOrderToFile } from "./utils";
+import {
+  finalizeOrder,
+  saveOrderToFile,
+  sendDryStoreOrder,
+  sendNormalOrder,
+} from "./utils";
 import {
   buildNormalItems,
   buildDrystoreAddress,
@@ -105,7 +110,7 @@ export async function createNormalRazorpayOrder(
 
     place_of_supply: cart.shipping.state,
   };
-
+  await sendNormalOrder(order);
   await finalizeOrder(cart.id, cart.userIdentifier!, finalStatus);
   await saveOrderToFile(`order_${cart.sessionId}`, order);
   return order;
@@ -155,7 +160,7 @@ export async function createDrystoreRazorpayOrder(cart: CartExtended) {
 
     line_items: buildDrystoreItems(cart),
   };
-
+  await sendDryStoreOrder(order);
   await finalizeOrder(cart.id, cart.userIdentifier!, finalStatus);
   await saveOrderToFile(`order_${cart.sessionId}`, order);
   return order;

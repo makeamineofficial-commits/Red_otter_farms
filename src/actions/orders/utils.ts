@@ -3,7 +3,7 @@
 import { CartStatus, OrderStatus, PaymentStatus } from "@/lib/db";
 import { db } from "@/lib/db";
 import { Cart } from "@/types/cart";
-
+import axios from "axios";
 import fs from "fs/promises";
 import path from "path";
 import { getShippingRate } from "../checkout/shipping.action";
@@ -87,4 +87,36 @@ export async function calculateTotal(
     total: subTotal + shipping.rate / 100,
     shipping: shipping.rate / 100,
   };
+}
+
+export async function sendNormalOrder(payload: any) {
+  try {
+    await axios.post(
+      "https://automation.redotterfarms.com/webhook/7a3574f2-2373-40f5-bb58-16e38c8ea72c",
+      payload,
+      {
+        headers: { api_key: process.env.BACKEND_API_KEY as string },
+      },
+    );
+    return { success: true, message: "Order sent successfully" };
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Failed to send order" };
+  }
+}
+
+export async function sendDryStoreOrder(payload: any) {
+  try {
+    await axios.post(
+      "https://automation.redotterfarms.com/webhook/9bb9613a-bbec-4ffb-b562-6ba7cdee3461",
+      payload,
+      {
+        headers: { api_key: process.env.BACKEND_API_KEY as string },
+      },
+    );
+    return { success: true, message: "DryStore Order sent successfully" };
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Failed to send drystore order" };
+  }
 }

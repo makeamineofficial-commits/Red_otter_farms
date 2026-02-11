@@ -1,7 +1,13 @@
 "use server";
 
 import { CartExtended } from "@/types/cart";
-import { finalizeOrder, saveOrderToFile, calculateTotal } from "./utils";
+import {
+  finalizeOrder,
+  saveOrderToFile,
+  calculateTotal,
+  sendNormalOrder,
+  sendDryStoreOrder,
+} from "./utils";
 import {
   buildNormalItems,
   buildDrystoreAddress,
@@ -38,8 +44,6 @@ export async function createNormalWalletOrder(cart: CartExtended) {
     order_items: {
       items: buildNormalItems(cart),
     },
-
-    /* ✅ FULL PAYMENT OBJECT */
     payment_object: {
       cart_value: total,
       otterwallet: total,
@@ -49,16 +53,12 @@ export async function createNormalWalletOrder(cart: CartExtended) {
       },
 
       split_payment: total,
-
       delivery_charge: 0,
       discount_amount: 0,
-
       customer_payment: {
         useRazorpay: false,
         useOtterWallet: true,
-
         total_payment_due: total,
-
         razorpay_payment_amount: 0,
         otterwallet_payment_amount: total,
       },
@@ -70,8 +70,7 @@ export async function createNormalWalletOrder(cart: CartExtended) {
 
     place_of_supply: cart.shipping.state,
   };
-
-  /* ✅ Mark paid */
+  await sendNormalOrder(order);
   await finalizeOrder(cart.id, cart.userIdentifier!, PaymentStatus.VERIFIED);
   await saveOrderToFile(`order_${cart.sessionId}`, order);
   return order;
@@ -85,7 +84,7 @@ export async function createDrystoreWalletOrder(cart: CartExtended) {
 
     number: cart.sessionId,
 
-    status: "processing", 
+    status: "processing",
 
     currency: "INR",
 
@@ -128,7 +127,7 @@ export async function createDrystoreWalletOrder(cart: CartExtended) {
 
     fee_lines: [],
   };
-
+  await sendDryStoreOrder(order);
   await finalizeOrder(cart.id, cart.userIdentifier!, PaymentStatus.VERIFIED);
   await saveOrderToFile(`order_${cart.sessionId}`, order);
   return order;

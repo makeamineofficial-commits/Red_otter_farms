@@ -1,13 +1,6 @@
-import { QueryProvider } from "@/provider/query.provider";
 import { AccountStore } from "@/store/user/account.store";
-export default function UserLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <>
-      <AccountStore>{children}</AccountStore>
-    </>
-  );
+import { ReactNode } from "react";
+
+export default function layout({ children }: { children: ReactNode }) {
+  return <AccountStore>{children}</AccountStore>;
 }

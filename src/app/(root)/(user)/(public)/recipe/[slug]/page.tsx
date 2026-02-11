@@ -21,7 +21,7 @@ export default async function page({ params }: { params: { slug: string } }) {
 
   const data = res.recipe;
   return (
-    <section className="bg-mint -translate-y-5.5">
+    <section className="bg-mint">
       <div className="w-full  relative ">
         <RecipeBreadcrumb recipe={data}></RecipeBreadcrumb>
         <div className="sticky -top-5">

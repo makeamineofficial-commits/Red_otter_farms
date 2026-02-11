@@ -4,7 +4,7 @@ import React from "react";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen max-h-full xl:max-h-270  flex px-4 md:px-12 lg:px-18 items-start lg:items-center">
+    <section className="relative min-h-screen max-h-full xl:max-h-270  flex px-4 md:px-12 lg:px-18 items-start lg:items-center -mt-28 lg:-mt-38">
       <article className="absolute top-0 left-0 h-screen w-full">
         <Image
           fill

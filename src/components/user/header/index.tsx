@@ -6,18 +6,17 @@ import Login from "../login";
 import Cart from "../cart";
 import { Handbag, Heart, Menu, Search } from "lucide-react";
 const pages = [
-  { slug: "salads", label: "The Salads World" },
-  { slug: "none", label: "Convenience & Delivery" },
-  { slug: "soup", label: "Soup Kit" },
-  { slug: "flour-grains", label: "Flour & Grains" },
-  { slug: "sweetener", label: "Sweeteners" },
+  { slug: "salads", href: "/about", label: "Founder's Note" },
+  { slug: "none", href: "/recipes", label: "Recipes" },
+  { slug: "soup", href: "#", label: "Gifting" },
+  { slug: "flour-grains", href: "#", label: "Blogs" },
 ];
 
 export default function Header() {
   const [isOpen, setOpen] = useState(false);
   return (
     <>
-      <header className="bg-mint max-w-500 fixed z-50 w-full top-0 px-4 md:px-12 lg:px-18 py-4 ">
+      <header className="bg-mint max-w-500 sticky z-50 w-full top-0 px-4 md:px-12 lg:px-18 py-4 ">
         <div className="w-full  relative flex justify-between items-center  ">
           <Link href="/">
             <div className="min-w-21  lg:w-31.5 aspect-square relative">
@@ -30,7 +29,7 @@ export default function Header() {
               return (
                 <Link
                   key={ele.slug}
-                  href={`#`}
+                  href={ele.href}
                   className="uppercase text-nowrap text-[1.25rem]"
                 >
                   {ele.label}
