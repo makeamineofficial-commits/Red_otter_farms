@@ -1,6 +1,6 @@
 "use server";
 
-import { validateUser } from "@/actions/auth/user.action";
+import { validateUser, validateUserReadOnly } from "@/actions/auth/user.action";
 import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
 import { Recipe } from "@/types/recipe";
@@ -103,7 +103,7 @@ export const getRecipe = async ({ slug }: { slug: string }) => {
   }
 
   const { id, ...detail } = recipe;
-  const user = await validateUser();
+  const user = await validateUserReadOnly();
   let recipeSaved = false;
 
   if (user?.phone) {

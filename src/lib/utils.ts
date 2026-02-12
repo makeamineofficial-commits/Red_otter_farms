@@ -3,6 +3,7 @@ import { ProductPreview } from "@/types/product";
 import { clsx, type ClassValue } from "clsx";
 import React from "react";
 import { twMerge } from "tailwind-merge";
+import { randomUUID } from "crypto";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -12,14 +13,19 @@ export const generateSlug = (prefix: string, content: string) => {
   const slugBase = content
     .toLowerCase()
     .trim()
+    .normalize("NFKD") // handle accents
+    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "_")
-    .replace(/-+/g, "_");
+    .replace(/-+/g, "_")
+    .replace(/_+/g, "_")
+    .slice(0, 50);
 
-  const randomNumber = Math.floor(1000 + Math.random() * 9000);
+  const uuid = randomUUID().replace(/-/g, "");
 
-  return `${prefix}_${slugBase}_${randomNumber}`;
+  return `${prefix}_${slugBase}_${uuid}`;
 };
+
 export const nullToUndefined = <T extends Record<string, any>>(obj: T) => {
   return Object.fromEntries(
     Object.entries(obj).map(([key, value]) => [

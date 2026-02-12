@@ -4,7 +4,7 @@ import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
 import { Product, Variant } from "@/types/product";
-import { validateUser } from "@/actions/auth/user.action";
+import { validateUser, validateUserReadOnly } from "@/actions/auth/user.action";
 
 /* -------------------- Helpers -------------------- */
 
@@ -124,7 +124,7 @@ export const getProduct = async ({ slug }: { slug: string }) => {
   }
 
   const { id, ...detail } = product;
-  const user = await validateUser();
+  const user = await validateUserReadOnly();
 
   let presentInWishlist = false;
   if (user?.phone) {

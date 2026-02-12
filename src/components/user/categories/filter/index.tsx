@@ -47,7 +47,7 @@ function FilterSection({ children }: { children?: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [inStock, setInStock] = useState(true);
+  const [inStock, setInStock] = useState(false);
   const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);

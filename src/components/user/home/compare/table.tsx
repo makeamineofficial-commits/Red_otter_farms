@@ -7,7 +7,7 @@ function Stars({ filled }: { filled: number }) {
         <Star
           key={i}
           size={20}
-          className="stroke-forest"
+          className={i < filled ? "#F5AAA3" : "transparent"}
           fill={i < filled ? "#F5AAA3" : "transparent"}
         />
       ))}
@@ -29,21 +29,22 @@ export default function ComparisonTable() {
         {/* LEFT COLUMN */}
         <div
           className="
-            shrink-0
-            min-w-max
-            lg:min-w-sm
+         flex-[1_1_220px]
+min-w-51
+lg:flex-[0_0_300px]
+
             border-r
             border-forest/40
           "
         >
-          <div className="h-45.5 px-6 flex items-center text-sm font-semibold uppercase text-forest">
+          <div className="h-25 lg:h-45 px-6 flex items-center text-sm font-semibold uppercase text-forest">
             Benefits
           </div>
 
           {rows.map((label) => (
             <div
               key={label}
-              className="px-6 py-8 text-sm font-semibold uppercase border-t border-forest/30 whitespace-nowrap"
+              className="px-6 py-8 h-20 flex items-center justify-start text-sm font-semibold uppercase border-t border-forest/30 wrap-break-word lg:whitespace-nowrap"
             >
               {label}
             </div>
@@ -61,33 +62,32 @@ export default function ComparisonTable() {
         >
           <div
             className="
-              grid
-              grid-cols-[minmax(240px,1fr)_minmax(240px,1fr)]
-              min-w-max
-              lg:min-w-2xl
-              lg:grid-cols-2 
-            "
+    grid
+    w-full
+    grid-cols-[minmax(160px,1fr)_minmax(160px,1fr)]
+    lg:grid-cols-[minmax(240px,1fr)_minmax(240px,1fr)]
+  "
           >
             {/* Headers */}
-            <div className="h-45.5 flex justify-center items-center bg-forest">
+            <div className="h-25 lg:h-45 flex justify-center items-center bg-forest">
               <img
                 src="/logo-white.webp"
                 alt="Red Otter Farms"
-                className="h-37.5"
+                className="h-20 lg:h-37.5"
               />
             </div>
 
-            <div className="h-45.5 flex justify-center items-center text-sm font-semibold uppercase text-forest">
+            <div className="h-25 lg:h-45 flex justify-center items-center text-sm font-semibold uppercase text-forest">
               Others
             </div>
 
             {/* Rows */}
             {rows.map((label) => (
               <React.Fragment key={label}>
-                <div className="py-8 flex justify-center bg-forest border-t border-forest/30">
+                <div className=" h-20 flex justify-center items-center bg-forest border-t border-herbal">
                   <Stars filled={5} />
                 </div>
-                <div className="py-8 flex justify-center border-t border-forest/30">
+                <div className=" h-20 flex justify-center items-center border-t border-forest/30">
                   <Stars filled={1} />
                 </div>
               </React.Fragment>

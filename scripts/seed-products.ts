@@ -1,222 +1,216 @@
 import { db as prisma } from "@/lib/db";
 
-/* ---------------- CONFIG ---------------- */
+export const PRODUCT_IMAGES = [
+  "https://images.unsplash.com/photo-1610832958506-aa56368176cf",
+  "https://images.unsplash.com/photo-1542838132-92c53300491e",
+  "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce",
+  "https://images.unsplash.com/photo-1573246123716-6b1782bfc499",
+  "https://images.unsplash.com/photo-1606787366850-de6330128bfc",
+  "https://images.unsplash.com/photo-1597362925123-77861d3fbac7",
+  "https://images.unsplash.com/photo-1518843875459-f738682238a6",
+];
 
-const PRODUCT_COUNT = 100;
+const CATEGORY_MAP: Record<string, string> = {
+  salads: "1509d9cf-0486-4240-93b8-7d367fb64c28",
+  cheese: "258fcbae-00fc-4c6b-8697-492424e80ef6",
+  soup: "7de7605d-afc2-4b8c-ab52-6535bd7d72e1",
+  dairy: "96d3e85a-2fe5-4bda-9036-579457581583",
+  flour: "d25cb277-9589-4ade-98ab-17a7861dca26",
+  fruits: "e85137a0-c89d-4647-b71a-3d8c995ebbbe",
+  vegetables: "fda18a30-68ae-44bc-a049-5455ab2eb25e",
+};
 
-// % distribution
-const MULTI_VARIANT_PERCENT = 0.4; // 40% multi
-const RECIPE_LINK_PERCENT = 0.3; // 30% linked to recipes
+const PRODUCTS_PER_CATEGORY = 12;
 
-/* ---------------- HELPERS ---------------- */
+/* -------------------- Helpers -------------------- */
 
-function randomInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .slice(0, 50);
 }
 
 function randomFrom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function slugify(str: string) {
-  return str
-    .toLowerCase()
-    .replace(/ /g, "-")
-    .replace(/[^\w-]+/g, "");
+function randomPrice(min = 50, max = 400) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function getUnsplashImage(seed: string, size = "800x800") {
-  return `https://source.unsplash.com/${size}/?food,product,organic&sig=${seed}`;
+function generateSKU() {
+  return `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 }
-/* ---------------- MAIN ---------------- */
 
-async function main() {
-  console.log("🌱 Starting seed...");
+/* -------------------- Main Seeder -------------------- */
 
-  /* ---------- Fetch Existing Data ---------- */
+async function seed() {
+  console.log("🌱 Starting product seeding...");
 
-  const categories = await prisma.category.findMany();
-  const recipes = await prisma.recipe.findMany();
+  for (const [category, categoryId] of Object.entries(CATEGORY_MAP)) {
+    console.log(`\n📦 Seeding category: ${category}`);
 
-  if (!categories.length) {
-    throw new Error("No categories found. Create categories first.");
-  }
+    for (let i = 1; i <= PRODUCTS_PER_CATEGORY; i++) {
+      const name = `${category} product ${i}`;
+      const slug = `${category}-${slugify(name)}-${i}`;
 
-  if (!recipes.length) {
-    console.warn("⚠️ No recipes found. Recipe linking skipped.");
-  }
+      const basePrice = randomPrice();
+      const mrp = basePrice + randomPrice(20, 80);
 
-  console.log(`Found ${categories.length} categories`);
-  console.log(`Found ${recipes.length} recipes`);
+      /* ---------------- Create Product ---------------- */
 
-  /* ---------- Clear Old Data (Optional) ---------- */
+      const product = await prisma.product.create({
+        data: {
+          name,
+          displayName: name.toUpperCase(),
+          slug,
+          summary: `Fresh ${name} from organic farms`,
+          description: `High quality ${name}. Rich in nutrients and freshness.`,
+          type: "grocery",
+          minPrice: basePrice,
+          maxPrice: basePrice + 100,
+          healthBenefits: ["Rich in vitamins", "Boosts immunity", "Organic"],
 
-  await prisma.variantOptionMap.deleteMany();
-  await prisma.recipeIngredient.deleteMany();
-
-  await prisma.variant.deleteMany();
-  await prisma.optionValue.deleteMany();
-  await prisma.option.deleteMany();
-  await prisma.product.deleteMany();
-
-  console.log("Old products cleared");
-
-  /* ---------- Product Loop ---------- */
-
-  for (let i = 1; i <= PRODUCT_COUNT; i++) {
-    const isMulti = Math.random() < MULTI_VARIANT_PERCENT;
-    const isRecipeLinked = Math.random() < RECIPE_LINK_PERCENT;
-
-    /* ---------- Name ---------- */
-
-    let label = isMulti ? "[MULTI]" : "[SINGLE]";
-    if (isRecipeLinked) label += "[RECIPE]";
-
-    const baseName = `Product ${i}`;
-    const name = `${baseName} ${label}`;
-
-    const slug = slugify(`${baseName}-${i}-${Date.now()}`);
-
-    /* ---------- Create Product ---------- */
-
-    const product = await prisma.product.create({
-      data: {
-        name,
-        displayName: name,
-        slug,
-        description: `Seeded product ${i}`,
-        type: "FOOD",
-
-        healthBenefits: ["energy", "nutrition"],
-
-        isPublished: true,
-        isFeatured: Math.random() < 0.1,
-
-        categories: {
-          create: [
-            {
-              categoryId: randomFrom(categories).id,
+          categories: {
+            create: {
+              categoryId,
             },
-          ],
-        },
-      },
-    });
-
-    const imageCount = randomInt(3, 5);
-
-    for (let img = 0; img < imageCount; img++) {
-      const url = getUnsplashImage(`${product.id}-${img}`, "800x800");
-      const thumb = getUnsplashImage(`${product.id}-${img}`, "300x300");
-
-      await prisma.productAsset.create({
-        data: {
-          productId: product.id,
-          url,
-          thumbnail: thumb,
-          type: "IMAGE",
-          position: img,
-          isPrimary: img === 0,
-        },
-      });
-    }
-    /* ---------- Create Option (Size) ---------- */
-
-    const option = await prisma.option.create({
-      data: {
-        displayName: "Size",
-        slug: `size-${product.id}`,
-        productId: product.id,
-      },
-    });
-
-    const sizes = isMulti ? ["Small", "Medium", "Large"] : ["Standard"];
-
-    const optionValues = [];
-
-    for (let j = 0; j < sizes.length; j++) {
-      const val = await prisma.optionValue.create({
-        data: {
-          displayName: sizes[j],
-          slug: `${slug}-${sizes[j].toLowerCase()}`,
-          optionId: option.id,
-          isDefault: j === 0,
+          },
         },
       });
 
-      optionValues.push(val);
-    }
+      /* ---------------- Create Assets ---------------- */
 
-    /* ---------- Create Variants ---------- */
+      const images = PRODUCT_IMAGES.sort(() => 0.5 - Math.random()).slice(0, 3);
 
-    const variantCount = isMulti ? sizes.length : 1;
+      for (let idx = 0; idx < images.length; idx++) {
+        await prisma.productAsset.create({
+          data: {
+            productId: product.id,
+            url: images[idx],
+            thumbnail: images[idx],
+            position: idx,
+            isPrimary: idx === 0,
+          },
+        });
+      }
 
-    const createdVariants = [];
+      /* ---------------- Create Option (Weight) ---------------- */
 
-    for (let v = 0; v < variantCount; v++) {
-      const isDefault = v === 0;
-
-      const variant = await prisma.variant.create({
+      const option = await prisma.option.create({
         data: {
-          name: `${name} - ${sizes[v]}`,
-          sku: `SKU-${i}-${v}-${Date.now()}`,
-
           productId: product.id,
+          displayName: "Weight",
+          slug: `weight-${product.id}`,
+        },
+      });
 
-          price: randomInt(100, 500),
-          mrp: randomInt(600, 900),
+      const weights = [250, 500, 1000];
 
-          availableInStock: randomInt(10, 100),
-          stockLimit: 5,
+      const optionValues = [];
 
+      for (let j = 0; j < weights.length; j++) {
+        const val = await prisma.optionValue.create({
+          data: {
+            optionId: option.id,
+            displayName: `${weights[j]}g`,
+            slug: `weight-${weights[j]}-${product.id}`,
+            isDefault: j === 0,
+          },
+        });
+
+        optionValues.push(val);
+      }
+
+      /* ---------------- Create Default Variant ---------------- */
+
+      const defaultVariant = await prisma.variant.create({
+        data: {
+          productId: product.id,
+          name: `${name} - 250g`,
+          sku: generateSKU(),
+          price: basePrice,
+          mrp,
+          weight: 250,
+          weightUnit: "g",
+          availableInStock: randomPrice(20, 100),
+          isDefault: true,
           inStock: true,
-
-          isPublished: true,
-          isDefault,
         },
       });
 
       await prisma.variantOptionMap.create({
         data: {
-          variantId: variant.id,
-          valueId: optionValues[v].id,
+          variantId: defaultVariant.id,
+          valueId: optionValues[0].id,
         },
       });
 
-      createdVariants.push(variant);
-    }
+      /* ---------------- Create Extra Variants (Random) ---------------- */
 
-    /* ---------- Link Variants to Recipes ---------- */
+      const shouldCreateExtra = Math.random() > 0.4; // ~60% products
 
-    if (isRecipeLinked && recipes.length) {
-      const linkCount = randomInt(1, 2);
+      if (shouldCreateExtra) {
+        for (let k = 1; k < optionValues.length; k++) {
+          const weight = weights[k];
+          const price = basePrice + k * 40;
 
-      for (let r = 0; r < linkCount; r++) {
-        const recipe = randomFrom(recipes);
-        const variant = randomFrom(createdVariants);
+          const variant = await prisma.variant.create({
+            data: {
+              productId: product.id,
+              name: `${name} - ${weight}g`,
+              sku: generateSKU(),
+              price,
+              mrp: price + 60,
+              weight,
+              weightUnit: "g",
+              availableInStock: randomPrice(10, 80),
+              isDefault: false,
+              inStock: true,
+            },
+          });
 
-        await prisma.recipeIngredient.create({
-          data: {
-            recipeId: recipe.id,
-            variantId: variant.id,
-            quantity: randomInt(1, 5),
-          },
-        });
+          await prisma.variantOptionMap.create({
+            data: {
+              variantId: variant.id,
+              valueId: optionValues[k].id,
+            },
+          });
+        }
       }
-    }
 
-    if (i % 10 === 0) {
-      console.log(`✅ Created ${i} products`);
+      /* ---------------- Create FAQs ---------------- */
+
+      await prisma.productFAQ.createMany({
+        data: [
+          {
+            productId: product.id,
+            question: "Is this product organic?",
+            answer: "Yes, it is 100% organically sourced.",
+          },
+          {
+            productId: product.id,
+            question: "How should I store it?",
+            answer: "Store in a cool and dry place.",
+          },
+        ],
+      });
+
+      console.log(`✅ Created: ${name}`);
     }
   }
 
-  console.log("🌱 Seeding finished!");
+  console.log("\n🎉 Seeding completed successfully!");
 }
 
-/* ---------------- RUN ---------------- */
+/* -------------------- Run -------------------- */
 
-main()
+seed()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seeding failed:", e);
     process.exit(1);
   })
   .finally(async () => {

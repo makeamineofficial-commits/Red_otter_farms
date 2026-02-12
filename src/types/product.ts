@@ -10,7 +10,7 @@ export interface ProductPropsBase {
   type: string;
   assets: Asset[];
 
-  nutritionalInfo: Record<string, number>;
+  nutritionalInfo?: Record<string, number>;
   isFeatured: boolean;
   isPublished: boolean;
   faqs: { question: string; answer: string }[];
@@ -51,7 +51,7 @@ export interface ProductPreview {
   summary: string;
   presentInWishlist: boolean;
   slug: string;
-  nutritionalInfo: any;
+  nutritionalInfo?: any;
   healthBenefits: string[];
   assets: Asset[];
   variantId: string;
@@ -63,6 +63,7 @@ export interface ProductPreview {
   mrp: number;
   price: number;
 
+  inStock: boolean;
   stockLimit: number;
   availableInStock: number;
 }

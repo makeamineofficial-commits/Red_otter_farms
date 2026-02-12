@@ -46,6 +46,27 @@ const validateUser = async () => {
   };
 };
 
+export const validateUserReadOnly = async () => {
+  const cookieStore = await cookies();
+
+  const accessToken = cookieStore.get("access-token")?.value;
+  const refreshToken = cookieStore.get("refresh-token")?.value;
+
+  const accessPayload = await validateToken<UserToken>(accessToken);
+  const refreshPayload = await validateToken<UserToken>(refreshToken);
+
+  if (!accessPayload && !refreshPayload) {
+    return null;
+  }
+
+  return {
+    customerId: refreshPayload!.customerId,
+    phone: refreshPayload!.phone?.startsWith("+91")
+      ? refreshPayload?.phone
+      : "+91" + refreshPayload?.phone,
+  };
+};
+
 const isValidateUser = async () => {
   const cookieStore = await cookies();
 

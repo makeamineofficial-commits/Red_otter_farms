@@ -2,7 +2,8 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
 export default function Nutrition({ nutritionalInfo }: Product) {
-  if (Object.entries(nutritionalInfo).length === 0) return <></>;
+  if (!nutritionalInfo || Object.entries(nutritionalInfo).length === 0)
+    return <></>;
   return (
     <div className="flex gap-2 items-center flex-wrap">
       {Object.entries(nutritionalInfo).map(([key]) => (

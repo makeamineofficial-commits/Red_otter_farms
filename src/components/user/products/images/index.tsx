@@ -31,15 +31,25 @@ export default function Images({
   }, [data]);
 
   const { selectedVariant } = useProduct();
-  if (!selectedVariant) return <></>;
+
   return (
     <>
       <article className="w-full hidden sm:block">
         <div className="aspect-square bg-muted relative rounded-3xl overflow-hidden">
-          {selectedVariant?.stockLimit > selectedVariant?.availableInStock ? (
+          {selectedVariant &&
+          selectedVariant?.stockLimit > selectedVariant?.availableInStock ? (
             <>
               <div className="absolute top-6 -left-11.25 z-40 -rotate-45 bg-maroon py-1 px-10 text-white text-sm font-semibold shadow-md">
                 Low In Stock
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
+          {selectedVariant && !selectedVariant.inStock ? (
+            <>
+              <div className="absolute top-6 -left-11.25 z-40 -rotate-45 bg-maroon py-1 px-10 text-white text-sm font-semibold shadow-md">
+                Out Of Stock
               </div>
             </>
           ) : (
@@ -134,10 +144,20 @@ export default function Images({
       </article>
 
       <article className="w-full sm:hidden block relative space-y-5 overflow-hidden">
-        {selectedVariant?.stockLimit > selectedVariant?.availableInStock ? (
+        {selectedVariant &&
+        selectedVariant?.stockLimit > selectedVariant?.availableInStock ? (
           <>
             <div className="absolute top-6 -left-11.25 z-40 -rotate-45 bg-maroon py-1 px-10 text-white text-sm font-semibold shadow-md">
               Low In Stock
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
+        {selectedVariant && !selectedVariant.inStock ? (
+          <>
+            <div className="absolute top-6 -left-11.25 z-40 -rotate-45 bg-maroon py-1 px-10 text-white text-sm font-semibold shadow-md">
+              Out Of Stock
             </div>
           </>
         ) : (

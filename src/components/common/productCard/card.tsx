@@ -24,6 +24,7 @@ export function ProductCard(product: ProductPreview) {
     availableInStock,
     stockLimit,
     variants,
+    inStock,
   } = product;
   const { update, cart } = useCart();
   const [count, setCount] = useState(1);
@@ -56,16 +57,28 @@ export function ProductCard(product: ProductPreview) {
         ) : (
           <></>
         )}
+
+        {!inStock ? (
+          <>
+            <div className="absolute top-7 -left-9 z-50 -rotate-45 bg-maroon py-1 px-10 text-white text-xs font-semibold shadow-md">
+              Out Of Stock
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
         <Image
           src={assets[0].url}
           alt={displayName}
           fill
           className="object-cover"
         />
-        <Badge className="text-xs capitalize absolute z-40 bottom-3 right-3 bg-muted-foreground">
-          {Object.keys(nutritionalInfo)[0]}{" "}
-          {nutritionalInfo[Object.keys(nutritionalInfo)[0]]}
-        </Badge>
+        {nutritionalInfo && (
+          <Badge className="text-xs capitalize absolute z-40 bottom-3 right-3 bg-muted-foreground">
+            {Object.keys(nutritionalInfo)[0]}{" "}
+            {nutritionalInfo[Object.keys(nutritionalInfo)[0]]}
+          </Badge>
+        )}
 
         <div className="absolute z-40 top-3 right-3 flex flex-col gap-2">
           <Share href={`/products/${slug}`}>
@@ -102,15 +115,16 @@ export function ProductCard(product: ProductPreview) {
 
       {/* TAGS */}
       <div className="flex gap-2 flex-wrap   w-fit">
-        {[...healthBenefits]
-          .sort((a, b) => a.length - b.length)
-          .slice(0, 2)
-          .slice(0, 2)
-          .map((ele) => (
-            <Badge variant="outline" key={ele} className="text-xs capitalize">
-              {ele}
-            </Badge>
-          ))}
+        {healthBenefits &&
+          [...healthBenefits]
+            .sort((a, b) => a.length - b.length)
+            .slice(0, 2)
+            .slice(0, 2)
+            .map((ele) => (
+              <Badge variant="outline" key={ele} className="text-xs capitalize">
+                {ele}
+              </Badge>
+            ))}
         {healthBenefits.length > 2 && (
           <Badge variant="outline" className="text-xs capitalize">
             +{healthBenefits.length - 2} More
@@ -122,6 +136,7 @@ export function ProductCard(product: ProductPreview) {
       <div className="flex items-center justify-between gap-2 relative z-10 mt-auto">
         <div className="flex items-center border rounded-lg">
           <Button
+            disabled={!inStock}
             size="icon"
             variant="ghost"
             onClick={() => setCount((prev) => Math.max(1, prev - 1))}
@@ -130,6 +145,7 @@ export function ProductCard(product: ProductPreview) {
           </Button>
           <span className="px-2 text-sm">{count}</span>
           <Button
+            disabled={!inStock}
             size="icon"
             variant="ghost"
             onClick={() => setCount((prev) => prev + 1)}
@@ -139,6 +155,7 @@ export function ProductCard(product: ProductPreview) {
         </div>
         <div className="flex gap-2 items-center">
           <Button
+            disabled={!inStock}
             size="sm"
             className="bg-transparent! border rounded-lg! border-maroon! text-maroon!"
             onClick={() => {

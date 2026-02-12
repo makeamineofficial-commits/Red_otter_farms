@@ -1,144 +1,113 @@
-import { db as prisma, AssetType } from "@/lib/db";
+// seed-recipe-ingredients.ts
+// Run with: bun run seed-recipe-ingredients.ts
 
-/* ------------------ CONSTANTS ------------------ */
+import { db as prisma } from "@/lib/db";
+/* -------------------- Config -------------------- */
 
-const RECIPE_IMAGES = [
-  "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe",
-  "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-  "https://images.unsplash.com/photo-1498837167922-ddd27525d352",
-  "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
-  "https://images.unsplash.com/photo-1529042410759-befb1204b468",
-];
+const INGREDIENTS_PER_RECIPE = 5; // 4–5 variants per recipe
+const DRY_RUN = false; // set true to preview only
 
-const RECIPES = [
-  "Fresh Garden Salad",
-  "Creamy Cheese Soup",
-  "Fruit Power Bowl",
-  "Vegetable Delight Stir Fry",
-  "Cheesy Veg Bowl",
-  "Healthy Mixed Soup",
-  "Classic Flour Pancakes",
-  "Protein Rich Salad",
-  "Warm Comfort Soup",
-  "Daily Nutrition Bowl",
-];
+/* -------------------- Helpers -------------------- */
 
-const INGREDIENTS = [
-  "Salt",
-  "Olive oil",
-  "Black pepper",
-  "Garlic",
-  "Onion",
-  "Butter",
-  "Milk",
-  "Cheese",
-  "Fresh vegetables",
-  "Herbs",
-];
-
-const INSTRUCTIONS = [
-  "Wash all ingredients thoroughly",
-  "Heat oil in a pan",
-  "Add chopped ingredients",
-  "Cook on medium flame",
-  "Stir occasionally",
-  "Serve hot",
-];
-
-const CHEF_TIPS = [
-  "Always use fresh ingredients",
-  "Adjust salt as per taste",
-  "Do not overcook vegetables",
-  "Serve immediately for best flavor",
-];
-
-/* ------------------ HELPERS ------------------ */
-
-function pickRandom<T>(arr: T[], count: number): T[] {
-  return [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
+function shuffle<T>(array: T[]): T[] {
+  return array.sort(() => Math.random() - 0.5);
 }
 
-function randomBetween(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function randomQuantity() {
+  return Math.floor(Math.random() * 3) + 1; // 1–3
 }
 
-function generateNutrition() {
-  return {
-    calories: `${randomBetween(150, 350)}kcal`,
-    protein: `${randomBetween(5, 20)}g`,
-    fat: `${randomBetween(5, 18)}g`,
-    carbohydrates: `${randomBetween(10, 45)}g`,
-    sodium: `${randomBetween(80, 300)}mg`,
-  };
-}
+/* -------------------- Main -------------------- */
 
-/* ------------------ MAIN SCRIPT ------------------ */
+async function seedIngredients() {
+  console.log("🥗 Seeding recipe ingredients...");
 
-async function main() {
-  console.log("🍳 Seeding recipes...");
+  /* -------- Fetch Data -------- */
 
-  const products = await prisma.product.findMany({
-    select: { id: true, name: true },
+  const recipes = await prisma.recipe.findMany({
+    select: { id: true, slug: true },
   });
 
-  if (products.length === 0) {
-    throw new Error("No products found. Seed products first.");
+  const variants = await prisma.variant.findMany({
+    select: { id: true, name: true },
+    where: { isPublished: true },
+  });
+
+  if (!recipes.length) {
+    console.log("⚠️ No recipes found");
+    return;
   }
 
-  for (const title of RECIPES) {
-    const linkedProducts = pickRandom(products, randomBetween(3, 6));
+  if (!variants.length) {
+    console.log("⚠️ No variants found");
+    return;
+  }
 
-    const recipe = await prisma.recipe.create({
-      data: {
-        title,
-        slug: title.toLowerCase().replace(/\s+/g, "-"),
-        summary: `A delicious and healthy ${title.toLowerCase()}`,
-        tags: ["healthy", "homemade", "quick"],
-        ingredients: pickRandom(INGREDIENTS, 6),
-        instructions: pickRandom(INSTRUCTIONS, 5),
-        chefTips: pickRandom(CHEF_TIPS, 2),
-        nutritionalInfo: generateNutrition(),
-        cookingTime: `${randomBetween(10, 30)} mins`,
-        prepTime: `${randomBetween(5, 15)} mins`,
-        difficulty: ["Easy", "Medium"][Math.floor(Math.random() * 2)],
-        serving: `${randomBetween(1, 4)} people`,
+  console.log(`Found ${recipes.length} recipes`);
+  console.log(`Found ${variants.length} variants`);
+
+  let created = 0;
+  let skipped = 0;
+
+  /* -------- Process Recipes -------- */
+
+  for (const recipe of recipes) {
+    // Check existing ingredients
+    const existing = await prisma.recipeIngredient.findMany({
+      where: {
+        recipeId: recipe.id,
       },
+      select: { variantId: true },
     });
 
-    /* ---------- LINK PRODUCTS ---------- */
-    for (const product of linkedProducts) {
+    const usedVariantIds = new Set(existing.map((e) => e.variantId));
+
+    if (usedVariantIds.size >= INGREDIENTS_PER_RECIPE) {
+      skipped++;
+      continue;
+    }
+
+    // Filter unused variants
+    const available = variants.filter((v) => !usedVariantIds.has(v.id));
+
+    if (!available.length) continue;
+
+    // Pick random variants
+    const selected = shuffle(available).slice(
+      0,
+      INGREDIENTS_PER_RECIPE - usedVariantIds.size,
+    );
+
+    for (const variant of selected) {
+      if (DRY_RUN) {
+        console.log(`🔍 [DRY] ${recipe.slug} ← ${variant.name}`);
+        continue;
+      }
+
       await prisma.recipeIngredient.create({
         data: {
           recipeId: recipe.id,
-          variantId: product.id,
-          quantity: randomBetween(1, 3),
+          variantId: variant.id,
+          quantity: randomQuantity(),
         },
       });
+
+      created++;
     }
 
-    /* ---------- RECIPE ASSETS ---------- */
-    for (let i = 0; i < 5; i++) {
-      await prisma.recipeAsset.create({
-        data: {
-          recipeId: recipe.id,
-          url: RECIPE_IMAGES[i % RECIPE_IMAGES.length],
-          thumbnail: RECIPE_IMAGES[i % RECIPE_IMAGES.length],
-          position: i,
-          isPrimary: i === 0,
-          type: AssetType.IMAGE,
-        },
-      });
-    }
-
-    console.log(`✅ Recipe created: ${title}`);
+    console.log(`✅ Updated recipe: ${recipe.slug}`);
   }
 
-  console.log("🎉 Recipe seeding completed");
+  console.log("\n🎉 Done!");
+  console.log(`Created: ${created}`);
+  console.log(`Skipped: ${skipped}`);
 }
 
-main()
+/* -------------------- Run -------------------- */
+
+seedIngredients()
   .catch((err) => {
-    console.error("❌ Recipe seed failed", err);
+    console.error("❌ Error:", err);
     process.exit(1);
   })
   .finally(async () => {

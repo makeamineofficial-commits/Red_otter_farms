@@ -5,7 +5,7 @@ import { ProductPreview, SortBy } from "@/types/product";
 import { Prisma } from "../../../../generated/prisma/browser";
 import { PaginatedResponse } from "@/types/common";
 import { nullToUndefined } from "@/lib/utils";
-import { validateUser } from "@/actions/auth/user.action";
+import { validateUser, validateUserReadOnly } from "@/actions/auth/user.action";
 
 interface Filters {
   inStock?: boolean;
@@ -173,6 +173,7 @@ export const listProducts = async (
         assets: product.assets,
         presentInWishlist: false,
         sku: defaultVariant.sku,
+        inStock: defaultVariant.inStock,
         mrp: defaultVariant.mrp,
         price: defaultVariant.price,
         variants: product._count.variants,
@@ -184,7 +185,7 @@ export const listProducts = async (
 
   /* ---------------- WISHLIST (OPTIMIZED) ---------------- */
 
-  const user = await validateUser();
+  const user = await validateUserReadOnly();
 
   if (user?.phone && data.length) {
     const ids = data.map((p) => p.id);
