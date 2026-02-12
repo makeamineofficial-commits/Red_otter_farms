@@ -13,6 +13,7 @@ export interface UpdateProductProps extends ProductPropsBase {
     slug: string;
     values: { displayName: string; slug: string; isDefault: boolean }[];
   }[];
+  
 }
 export const updateProduct = async (product: UpdateProductProps) => {
   await validateAdmin();

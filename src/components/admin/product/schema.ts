@@ -48,6 +48,7 @@ export const productSchema = z.object({
   faqs: z.array(faqSchema),
   options: z.array(optionSchema).max(5, "Maximum 5 options allowed"),
   isPublished: z.boolean(),
+  isDryStore: z.boolean(),
   isFeatured: z.boolean(),
 });
 
@@ -96,5 +97,6 @@ export const updateProductSchema = z.object({
 
   options: z.array(updateOptionSchema).max(5, "Maximum 5 options allowed"),
   isPublished: z.boolean(),
+  isDryStore: z.boolean(),
   isFeatured: z.boolean(),
 });

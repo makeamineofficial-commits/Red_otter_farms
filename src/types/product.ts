@@ -13,6 +13,7 @@ export interface ProductPropsBase {
   nutritionalInfo?: Record<string, number>;
   isFeatured: boolean;
   isPublished: boolean;
+  isDryStore: boolean;
   faqs: { question: string; answer: string }[];
   minPrice: number;
   maxPrice: number;

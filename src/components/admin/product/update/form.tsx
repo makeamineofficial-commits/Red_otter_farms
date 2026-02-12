@@ -49,6 +49,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
       minPrice: product.minPrice / 100,
       maxPrice: product.maxPrice / 100,
       faqs: product.faqs ?? [],
+      isDryStore: product.isDryStore,
       // @ts-ignore
       nutritionalInfo: product.nutritionalInfo ?? { key: 0 },
     },
@@ -336,6 +337,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
             {[
               { label: "Is Published", key: "isPublished" },
               { label: "Is Featured", key: "isFeatured" },
+              { label: "Is Drystore Product", key: "isDryStore" },
             ].map((key) => (
               <FormField
                 key={key.key}

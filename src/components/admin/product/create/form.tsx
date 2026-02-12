@@ -47,6 +47,7 @@ export default function CreateProductForm() {
       minPrice: 0,
       faqs: [],
       isFeatured: false,
+      isDryStore: false,
       // @ts-ignore
       nutritionalInfo: { key: 0 },
     },
@@ -321,6 +322,7 @@ export default function CreateProductForm() {
               {[
                 { label: "Is Published", key: "isPublished" },
                 { label: "Is Featured", key: "isFeatured" },
+                { label: "Is Drystore Product", key: "isDryStore" },
               ].map((key) => (
                 <FormField
                   key={key.key}
