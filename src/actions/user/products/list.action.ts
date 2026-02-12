@@ -6,6 +6,7 @@ import { Prisma } from "../../../../generated/prisma/browser";
 import { PaginatedResponse } from "@/types/common";
 import { nullToUndefined } from "@/lib/utils";
 import { validateUser, validateUserReadOnly } from "@/actions/auth/user.action";
+import { isLocationNCR } from "../location/index.action";
 
 interface Filters {
   inStock?: boolean;
@@ -95,6 +96,12 @@ export const listProducts = async (
         : [{ createdAt: "desc" }];
 
   /* ---------------- QUERY ---------------- */
+
+  const ncr = await isLocationNCR();
+
+  if (!ncr) {
+    where.isDryStore = true;
+  }
 
   const [total, products] = await db.$transaction([
     db.product.count({ where }),

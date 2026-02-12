@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -53,6 +53,12 @@ function FilterSection({ children }: { children?: ReactNode }) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [price, setPrice] = useState<number[]>(DEFAULT_PRICE);
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const stock = searchParams.get("inStock");
+    setInStock(stock === "true");
+  }, [pathname]);
+
   const updateQuery = (params: {
     inStock?: string;
     maxPrice?: string;
@@ -97,7 +103,6 @@ function FilterSection({ children }: { children?: ReactNode }) {
   }, 300);
 
   const handleCategoryClick = (slug: string) => {
-    setInStock(true);
     setPrice(DEFAULT_PRICE);
     setSelectedCategories([slug]);
     router.push(`/categories/${slug}`);

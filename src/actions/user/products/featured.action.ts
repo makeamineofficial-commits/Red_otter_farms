@@ -3,14 +3,20 @@
 import { db } from "@/lib/db";
 import { Product, ProductPreview } from "@/types/product";
 import { nullToUndefined } from "@/lib/utils";
-
+import { isLocationNCR } from "../location/index.action";
 export const listFeaturedProducts = async (): Promise<ProductPreview[]> => {
-  console.log("called here");
+  const ncr = await isLocationNCR();
+
+  const where: any = {
+    isFeatured: true,
+    isPublished: true,
+  };
+
+  if (!ncr) {
+    where.isDryStore = true;
+  }
   const products = await db.product.findMany({
-    where: {
-      isFeatured: true,
-      isPublished: true,
-    },
+    where,
     select: {
       displayName: true,
       nutritionalInfo: true,

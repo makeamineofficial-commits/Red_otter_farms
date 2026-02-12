@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import Login from "../login";
 import Cart from "../cart";
 import { Handbag, Heart, Menu, Search } from "lucide-react";
+import LocationPicker from "../location";
 const pages = [
   { slug: "salads", href: "/about", label: "Founder's Note" },
   { slug: "none", href: "/recipes", label: "Recipes" },
@@ -16,49 +17,54 @@ export default function Header() {
   const [isOpen, setOpen] = useState(false);
   return (
     <>
-      <header className="bg-mint max-w-500 sticky z-50 w-full top-0 px-4 md:px-12 lg:px-18 py-4 ">
-        <div className="w-full  relative flex justify-between items-center  ">
-          <Link href="/">
-            <div className="min-w-21  lg:w-31.5 aspect-square relative">
-              <Image src="/logo-black.webp" alt="logo" fill></Image>
-            </div>
-          </Link>
-
-          <nav className=" hidden xl:flex gap-4 xl:gap-6  3xl:gap-10 items-center justify-between  3xl:absolute 3xl:top-1/2 3xl:left-1/2 3xl:-translate-x-1/2 3xl:-translate-y-1/2">
-            {pages.map((ele) => {
-              return (
-                <Link
-                  key={ele.slug}
-                  href={ele.href}
-                  className="uppercase text-nowrap text-[1.25rem]"
-                >
-                  {ele.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <nav className="flex gap-2 xl:gap-4  3xl:gap-7 items-center ">
-            <Link href="/categories?action=search">
-              <Search
-                className="stroke-1 stroke-red-500  hidden lg:block lg:size-9"
-                stroke="1"
-              />
-            </Link>
-            <Link href="/wishlist">
-              <Heart
-                className="stroke-1 stroke-red-500 hidden lg:block lg:size-9 "
-                stroke="0.01"
-              />
-            </Link>
-            <Login></Login>
-            <Cart></Cart>
-            <button onClick={() => setOpen(true)}>
-              <Menu className="stroke-1 stroke-red-500 block size-8 lg:hidden lg:size-9 "></Menu>
-            </button>
-          </nav>
+      <div className="sticky z-50 top-0">
+        <div className="bg-black p-1 px-2 flex items-center justify-end">
+          <LocationPicker></LocationPicker>
         </div>
-      </header>
+        <header className="bg-mint max-w-500  w-full  px-4 md:px-12 lg:px-18 py-4 ">
+          <div className="w-full  relative flex justify-between items-center  ">
+            <Link href="/">
+              <div className="min-w-21  lg:w-31.5 aspect-square relative">
+                <Image src="/logo-black.webp" alt="logo" fill></Image>
+              </div>
+            </Link>
+
+            <nav className=" hidden xl:flex gap-4 xl:gap-6  3xl:gap-10 items-center justify-between  3xl:absolute 3xl:top-1/2 3xl:left-1/2 3xl:-translate-x-1/2 3xl:-translate-y-1/2">
+              {pages.map((ele) => {
+                return (
+                  <Link
+                    key={ele.slug}
+                    href={ele.href}
+                    className="uppercase text-nowrap text-[1.25rem]"
+                  >
+                    {ele.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <nav className="flex gap-2 xl:gap-4  3xl:gap-7 items-center ">
+              <Link href="/categories?action=search">
+                <Search
+                  className="stroke-1 stroke-red-500  hidden lg:block lg:size-9"
+                  stroke="1"
+                />
+              </Link>
+              <Link href="/wishlist">
+                <Heart
+                  className="stroke-1 stroke-red-500 hidden lg:block lg:size-9 "
+                  stroke="0.01"
+                />
+              </Link>
+              <Login></Login>
+              <Cart></Cart>
+              <button onClick={() => setOpen(true)}>
+                <Menu className="stroke-1 stroke-red-500 block size-8 lg:hidden lg:size-9 "></Menu>
+              </button>
+            </nav>
+          </div>
+        </header>
+      </div>
 
       {isOpen && (
         <div

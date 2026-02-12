@@ -3,6 +3,7 @@ import React from "react";
 import { Product, Variant } from "@/types/product";
 import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
+import { isLocationNCR } from "../location/index.action";
 
 export default async function quickShop(): Promise<
   {
@@ -11,6 +12,9 @@ export default async function quickShop(): Promise<
     products: (Product & { variants: Variant[] })[];
   }[]
 > {
+  const isNCR = await isLocationNCR();
+
+  const locationFilter = isNCR ? {} : { isDryStore: true };
   const categories = await db.category.findMany({
     where: { quickShop: true, isPublished: true },
     include: {
@@ -18,6 +22,7 @@ export default async function quickShop(): Promise<
         where: {
           product: {
             isPublished: true,
+            ...locationFilter,
           },
         },
 

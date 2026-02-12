@@ -3,6 +3,7 @@
 import { validateUser } from "@/actions/auth/user.action";
 import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
+import { isLocationNCR } from "../location/index.action";
 
 export async function getSimilarProducts(slug: string) {
   const product = await db.product.findUnique({
@@ -15,15 +16,22 @@ export async function getSimilarProducts(slug: string) {
   if (!product || product.healthBenefits.length === 0) {
     return [];
   }
+  const ncr = await isLocationNCR();
+  const where: any = {
+    isPublished: true,
+    slug: { not: slug },
+    healthBenefits: {
+      hasSome: product.healthBenefits,
+    },
+  };
+
+  // Apply dry store filter only outside NCR
+  if (!ncr) {
+    where.isDryStore = true;
+  }
 
   const products = await db.product.findMany({
-    where: {
-      isPublished: true,
-      slug: { not: slug },
-      healthBenefits: {
-        hasSome: product.healthBenefits,
-      },
-    },
+    where,
     take: 4,
     orderBy: {
       createdAt: "desc",

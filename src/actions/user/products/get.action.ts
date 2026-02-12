@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { nullToUndefined } from "@/lib/utils";
 import { Product, Variant } from "@/types/product";
 import { validateUser, validateUserReadOnly } from "@/actions/auth/user.action";
-
+import { isLocationNCR } from "../location/index.action";
 /* -------------------- Helpers -------------------- */
 
 function getUniqueRecipes(recipes: { title: string; slug: string }[]) {
@@ -26,6 +26,7 @@ function getUniqueRecipes(recipes: { title: string; slug: string }[]) {
 
 const _getProductCached = async (
   slug: string,
+  isNCR: boolean,
 ): Promise<
   | (Product & {
       id: string;
@@ -34,8 +35,9 @@ const _getProductCached = async (
     })
   | null
 > => {
+  const locationFilter = isNCR ? {} : { isDryStore: true };
   const product = await db.product.findUnique({
-    where: { slug },
+    where: { slug, ...locationFilter },
     include: {
       categories: { include: { category: true } },
       faqs: {
@@ -103,11 +105,11 @@ const _getProductCached = async (
 /* -------------------- Cached Wrapper -------------------- */
 
 const getCachedProduct = unstable_cache(
-  async ({ slug }: { slug: string }) => {
-    return _getProductCached(slug);
+  async ({ slug, isNCR }: { slug: string; isNCR: boolean }) => {
+    return _getProductCached(slug, isNCR);
   },
   // @ts-ignore
-  (args) => [`product:${args.slug}`],
+  (args) => [`product:${args.slug}:ncr:${args.isNCR}`], // include NCR in key
   {
     revalidate: 60,
     tags: ["product"],
@@ -117,7 +119,9 @@ const getCachedProduct = unstable_cache(
 /* -------------------- Public API -------------------- */
 
 export const getProduct = async ({ slug }: { slug: string }) => {
-  const product = await getCachedProduct({ slug });
+  const isNCRLocation = await isLocationNCR();
+
+  const product = await getCachedProduct({ slug, isNCR: isNCRLocation });
 
   if (!product) {
     return { success: false, message: "Product not found" };

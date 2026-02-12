@@ -91,6 +91,7 @@ model Product {
 
   isPublished Boolean @default(true)
   isFeatured  Boolean @default(false)
+  isDryStore Boolean @default(false)
 
   lastUpdatedById String?
   lastUpdatedBy AdminUser?  @relation(fields: [lastUpdatedById],references: [id])
