@@ -25,6 +25,7 @@ export default function Header() {
         <button onClick={() => toggle()} className="block md:hidden">
           <Menu size={20}></Menu>
         </button>
+
         <div className="h-8 w-8 bg-muted-foreground/20 rounded-full"></div>
       </div>
     </header>

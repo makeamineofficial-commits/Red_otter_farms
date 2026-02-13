@@ -82,7 +82,7 @@ function SidebarComponent() {
 
   return (
     <>
-      <div className="h-full w-80 md:w-60 border-r bg-background">
+      <div className="h-full w-60 border-r bg-background">
         <div className="p-3 space-y-2">
           <h2 className=" text-[0.65rem] text-black/70 pl-3">ACCOUNT</h2>
           <div className="flex flex-col ">

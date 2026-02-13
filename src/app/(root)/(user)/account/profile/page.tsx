@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <>
       <UpdateProfile></UpdateProfile>
-      <Survey></Survey>
+      {/* <Survey></Survey> */}
     </>
   );
 }

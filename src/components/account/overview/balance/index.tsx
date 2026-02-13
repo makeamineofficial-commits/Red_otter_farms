@@ -2,10 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { useAccountStore } from "@/store/user/account.store";
 import { ArrowRight, Wallet, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function Balance() {
   const { isFetching, isLoading, data } = useAccountStore();
+  const { push } = useRouter();
   if (isFetching || isLoading || !data)
     return (
       <div className="border p-4 rounded-2xl w-full relative pointer-events-none animate-pulse duration-300">
@@ -49,7 +51,13 @@ export default function Balance() {
         </p>
       </div>
 
-      <Button variant={"outline"} className="rounded-md mt-4">
+      <Button
+        onClick={() => {
+          push("/categories");
+        }}
+        variant={"outline"}
+        className="rounded-md mt-4"
+      >
         <ArrowRight></ArrowRight>
         Shop with Wallet
       </Button>

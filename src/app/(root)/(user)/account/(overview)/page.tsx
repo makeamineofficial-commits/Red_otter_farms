@@ -2,7 +2,7 @@ import Balance from "@/components/account/overview/balance";
 import Delivery from "@/components/account/overview/delivery";
 import KPI from "@/components/account/overview/kpi";
 import Nutrition from "@/components/account/overview/nutrition";
-import Order from "@/components/account/overview/orders";
+import Order from "@/components/account/orders";
 import AccountBreadcrumb from "@/components/account/breadcrumb";
 export default function page() {
   return (
@@ -24,7 +24,14 @@ export default function page() {
       <KPI></KPI>
 
       <Nutrition></Nutrition>
-      <Order></Order>
+
+      <div className="border p-4 rounded-2xl w-full relative space-y-4">
+        <div className="flex items-center gap-2 text-[1.075rem] font-semibold">
+          <h2>Recent Orders</h2>
+        </div>
+
+        <Order></Order>
+      </div>
     </>
   );
 }

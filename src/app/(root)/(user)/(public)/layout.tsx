@@ -13,15 +13,13 @@ export default function UserLayout({
   return (
     <>
       <body className="relative max-w-500 mx-auto">
-        <CartProvider>
-          <Header></Header>
-          {children}
+        <Header></Header>
+        {children}
 
-          <Newsletter></Newsletter>
-          <Footer></Footer>
+        <Newsletter></Newsletter>
+        <Footer></Footer>
 
-          <Toaster></Toaster>
-        </CartProvider>
+        <Toaster></Toaster>
       </body>
     </>
   );
