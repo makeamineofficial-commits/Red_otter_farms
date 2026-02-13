@@ -37,6 +37,43 @@ export const editAddress = async (
       },
     });
 
+    if (data.tag !== "NONE") {
+      await db.addressTag.updateMany({
+        where: {
+          customerId,
+          tag: data.tag,
+        },
+        data: {
+          tag: "NONE",
+        },
+      });
+    }
+
+    const lookUp = await db.addressTag.findUnique({
+      where: {
+        customerId,
+        addressId: data.address_id,
+      },
+    });
+    if (lookUp) {
+      await db.addressTag.update({
+        where: {
+          customerId,
+          addressId: data.address_id,
+        },
+        data: {
+          tag: data.tag,
+        },
+      });
+    } else {
+      await db.addressTag.create({
+        data: {
+          tag: data.tag,
+          customerId,
+          addressId: data.address_id,
+        },
+      });
+    }
     return { success: true, message: "Address update successfully" };
   } catch (err) {
     console.log(err);

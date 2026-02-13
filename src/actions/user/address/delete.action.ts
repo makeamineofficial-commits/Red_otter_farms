@@ -10,7 +10,7 @@ export const deleteAddress = async (data: { address_id: string }) => {
         success: false,
         message: "Failed to authenticate user",
       };
-    const { phone, customerId } = user;
+    const { customerId } = user;
     await axios.delete(
       "https://automation.redotterfarms.com/webhook/e1dc62a4-5233-4a63-b460-8b3a120794ea",
       {
@@ -18,9 +18,13 @@ export const deleteAddress = async (data: { address_id: string }) => {
         params: { customer_id: customerId, address_id: data.address_id },
       },
     );
-    console.log(user);
 
     await db.addressLabel.deleteMany({
+      where: {
+        addressId: data.address_id,
+      },
+    });
+    await db.addressTag.deleteMany({
       where: {
         addressId: data.address_id,
       },

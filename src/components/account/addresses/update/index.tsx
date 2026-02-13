@@ -33,17 +33,23 @@ const LABELS = [
   { value: "WORK", label: "Work" },
   { value: "CUSTOM", label: "Other" },
 ];
+const TAGS = [
+  { value: "BILLING", label: "Billing" },
+  { value: "SHIPPING", label: "Shipping" },
+  { value: "NONE", label: "None" },
+];
 const addressSchema = z
   .object({
     address: z.string().min(10),
-    street2: z.string().min(10),
+    street: z.string().min(10),
     zip_code: z.string().regex(/^[0-9]{6}$/),
     city: z.string().min(2),
     state: z.string().min(2),
     country: z.string().min(2),
     labelType: z.enum(["HOME", "WORK", "CUSTOM"]),
+    tag: z.enum(["SHIPPING", "BILLING", "NONE"]),
     customLabel: z.string().optional(),
-    attention: z.string().optional(),
+    attention: z.string(),
   })
   .refine((data) => data.labelType !== "CUSTOM" || !!data.customLabel?.trim(), {
     path: ["customLabel"],
@@ -54,7 +60,7 @@ type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function UpdateAddressForm({
   address,
-  street2,
+  street,
   attention,
   zip,
   city,
@@ -62,16 +68,18 @@ export default function UpdateAddressForm({
   customLabel,
   label,
   address_id,
+  tag,
 }: Address) {
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
       address,
-      street2,
+      street: street,
       attention,
       zip_code: zip,
       city,
       state,
+      tag,
       labelType: label,
       customLabel: customLabel ?? undefined,
       country: "India",
@@ -124,7 +132,7 @@ export default function UpdateAddressForm({
 
                 <FormField
                   control={form.control}
-                  name="street2"
+                  name="street"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Street</FormLabel>
@@ -211,7 +219,40 @@ export default function UpdateAddressForm({
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="tag"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Set address as</FormLabel>
 
+                      <div className="flex gap-3 flex-wrap">
+                        {TAGS.map((item) => {
+                          const isActive = field.value === item.value;
+
+                          return (
+                            <Badge
+                              key={item.value}
+                              variant="outline"
+                              className={`cursor-pointer px-4 py-2 text-sm rounded-full transition
+                ${
+                  isActive
+                    ? "border-primary text-primary bg-primary/10"
+                    : "text-muted-foreground"
+                }
+              `}
+                              onClick={() => field.onChange(item.value)}
+                            >
+                              {item.label}
+                            </Badge>
+                          );
+                        })}
+                      </div>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="labelType"
@@ -274,7 +315,9 @@ export default function UpdateAddressForm({
                       Cancel
                     </Button>
                   </DialogClose>
-                  <Button type="submit">Save Address</Button>
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    Save Address
+                  </Button>
                 </div>
               </form>
             </Form>

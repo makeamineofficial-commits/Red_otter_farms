@@ -30,6 +30,25 @@ export const addAddress = async (data: AddressProps) => {
         customLabel: data.customLabel,
       },
     });
+    if (data.tag !== "NONE") {
+      await db.addressTag.updateMany({
+        where: {
+          customerId,
+          tag: data.tag,
+        },
+        data: {
+          tag: "NONE",
+        },
+      });
+    }
+
+    await db.addressTag.create({
+      data: {
+        addressId: address_id,
+        customerId,
+        tag: data.tag,
+      },
+    });
     return { success: true, message: "Address created successfully" };
   } catch (err: any) {
     console.log(err);

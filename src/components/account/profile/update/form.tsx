@@ -65,8 +65,14 @@ export default function ProfileForm() {
 
   useEffect(() => {
     if (!data) return;
-    form.setValue("firstName", data.first_name);
-    form.setValue("lastName", data.last_name);
+    form.setValue(
+      "firstName",
+      data.first_name && data.first_name !== "null" ? data.first_name : "",
+    );
+    form.setValue(
+      "lastName",
+      data.last_name && data.last_name !== "null" ? data.last_name : "",
+    );
     form.setValue("mobile", data.mobile.replace("+91", ""));
   }, [data, isLoading, isFetching]);
 
@@ -238,6 +244,7 @@ export default function ProfileForm() {
         />
 
         <Button
+          disabled={isFetching || isLoading || form.formState.isSubmitting}
           type="submit"
           className=" bg-maroon! hover:bg-maroon rounded-full"
         >

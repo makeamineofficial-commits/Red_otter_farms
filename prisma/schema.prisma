@@ -453,6 +453,22 @@ model AddressLabel{
   addressId String @unique
   label AddressLabelEnum @default(HOME)
   customLabel String?
+
+}
+
+enum AddressTagEnum{
+  BILLING
+  SHIPPING
+  NONE
+}
+
+model AddressTag{
+  id String @id @default(uuid())
+  addressId String @unique
+  tag AddressTagEnum
+  customerId String
+
+  @@unique([addressId,customerId])
 }
 
 

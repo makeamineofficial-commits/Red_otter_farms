@@ -4,9 +4,7 @@ import { cookies } from "next/headers";
 import { generateJWT } from "@/utils/jwt.util";
 import { redirect } from "next/navigation";
 import { validateToken } from "@/utils/jwt.util";
-import { db } from "@/lib/db";
 import { sendOTP, verifyOTP } from "@/utils/otp.util";
-import { success } from "zod";
 import axios from "axios";
 import { UserToken } from "@/types/auth";
 
@@ -92,13 +90,16 @@ async function logout() {
 
 const loginUser = async (data: { phone: string; type?: string }) => {
   try {
-    await sendOTP(data);
+    const phone = data.phone.startsWith("+91")
+      ? data.phone
+      : "+91" + data.phone;
+    await sendOTP({ phone });
     return {
       success: true,
       message: "OTP sent to your phone successfully",
     };
-  } catch (err) {
-    console.log(err);
+  } catch (err: any) {
+    console.error(err.message);
     return {
       success: false,
       message: "Failed to send OTP to your phone",
@@ -116,22 +117,40 @@ const verifyUser = async ({ otp }: { otp: string }) => {
     const { phone } = res;
     const userRes = await axios.post(
       "https://automation.redotterfarms.com/webhook/0b38de6f-5560-4396-8204-a1874e419a2d",
-      { phone: "+91" + phone },
+      { phone },
       {
         headers: { api_key: process.env.BACKEND_API_KEY as string },
       },
     );
 
-    const account = userRes.data;
+    const account = userRes.data[0];
+    let customerId = account?.customer_id ?? null;
+    if (!customerId) {
+      // creating account if not found
+      const account = await axios.post(
+        "https://automation.redotterfarms.com/webhook/b40a9035-c8c3-4267-bc9e-144b89c2ab55",
+        { mobile: phone },
+        {
+          headers: { api_key: process.env.BACKEND_API_KEY as string },
+        },
+      );
+      customerId = account.data.zoho_inv_customer_id;
+    }
+
     const accessToken = await generateJWT({
       type: "access",
       phone,
-      customerId: account[0].customer_id,
+      customerId,
     });
     const refreshToken = await generateJWT(
-      { type: "refresh", phone, customerId: account[0].customer_id },
+      {
+        type: "refresh",
+        phone,
+        customerId,
+      },
       "30d",
     );
+
     const cookieStore = await cookies();
     cookieStore.set("access-token", accessToken, {
       httpOnly: true,
@@ -152,7 +171,6 @@ const verifyUser = async ({ otp }: { otp: string }) => {
       message: "Your phone no has been verified",
     };
   } catch (err: any) {
-    console.log(err);
     return {
       success: false,
       message: err.message,

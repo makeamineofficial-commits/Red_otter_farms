@@ -1,46 +1,26 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-
 export default function AddressCardLoader() {
   return (
-    <div className="w-full h-auto p-4 border rounded-2xl relative animate-pulse opacity-50">
-      <div className="space-y-2 text-sm mt-4  ">
-        <p className="font-semibold">John Doe</p>
-        <div>
-          <p className="text-muted-foreground">
-            D-**/** J**** Flats, Sec **, Noida
-          </p>
-          <p className="text-muted-foreground">NOIDA, UTTAR PRADESH 201301</p>
-          <p className="text-muted-foreground">India</p>
-        </div>
+    <div className="w-full p-4 border rounded-2xl relative animate-pulse">
+      <div className="h-4 w-32 bg-muted rounded mb-3" />
 
-        <p className="">
-          Phone number:{" "}
-          <span className="text-muted-foreground">9650******</span>
-        </p>
+      <div className="space-y-2 mt-2">
+        <div className="h-3 w-full bg-muted rounded" />
+        <div className="h-3 w-5/6 bg-muted rounded" />
+        <div className="h-3 w-1/3 bg-muted rounded" />
       </div>
 
-      <div className="ml-auto w-fit mt-4 gap-1 flex justify-end">
-        <Badge variant={"outline"} className="">
-          Home
-        </Badge>
-        <Badge variant={"outline"} className="">
-          Work
-        </Badge>
+      <div className="h-3 w-48 bg-muted rounded mt-4" />
+
+      <div className="flex gap-2 justify-end mt-4">
+        <div className="h-5 w-14 bg-muted rounded-full" />
+        <div className="h-5 w-14 bg-muted rounded-full" />
       </div>
 
-      <div className="flex gap-2 absolute top-4 right-4">
-        <button>
-          <Pencil size={15} className="stroke-1 "></Pencil>
-        </button>
-
-        <button>
-          <Trash2 size={15} className="stroke-1 text-red-500"></Trash2>
-        </button>
+      <div className="absolute top-4 right-4 flex gap-2">
+        <div className="h-4 w-4 bg-muted rounded" />
+        <div className="h-4 w-4 bg-muted rounded" />
       </div>
     </div>
   );

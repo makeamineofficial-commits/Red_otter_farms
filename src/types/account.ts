@@ -23,7 +23,7 @@ export interface Address {
   address_id: string;
   attention: string;
   address: string;
-  street2: string;
+  street: string;
   city: string;
   state: string;
   state_code: string;
@@ -34,7 +34,7 @@ export interface Address {
   phone: string;
   fax: string;
   tax_info_id?: string;
-
+  tag: AddressTag;
   label: any | null;
   customLabel: string | null;
 }
@@ -49,16 +49,18 @@ export interface ListAddressReturnType {
   billing_address: Address;
   shipping_address: ShippingAddress;
   addresses: Address[];
-  customer_id: string;
 }
 
-type AddressLabel = "HOME" | "WORK" | "CUSTOM";
+export type AddressLabel = "HOME" | "WORK" | "CUSTOM";
+export type AddressTag = "BILLING" | "SHIPPING" | "NONE";
 export interface AddressProps {
-  street2: string;
+  street: string;
   city: string;
   state: string;
   country: string;
   zip_code: string;
+  attention: string;
   labelType: AddressLabel;
   customLabel?: string;
+  tag: AddressTag;
 }

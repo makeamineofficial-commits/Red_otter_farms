@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,7 +40,6 @@ const otpSchema = z.object({
 
 export default function LoginForm({ close }: { close: () => void }) {
   const { refetch } = useAccountStore();
-  const router = useRouter();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
@@ -80,8 +79,7 @@ export default function LoginForm({ close }: { close: () => void }) {
 
       toast.success("Login successful");
       await refetch();
-      if (action === "close") close();
-      else router.push("/account/profile");
+      close();
     });
   };
 

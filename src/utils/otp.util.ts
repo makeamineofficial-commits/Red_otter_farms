@@ -17,16 +17,10 @@ export async function sendOTP({
     });
     return otp;
   });
-  console.log("[OTP] OTP added", { otp });
+
   try {
     if (process.env.NODE_ENV === "production") {
       const url = `https://automation.redotterfarms.com/webhook/74bbc36f-88f5-4315-9530-986b3fe60a71?type=${type}`;
-
-      console.log("[OTP] Sending OTP webhook", {
-        url,
-        phone: "+91" + phone,
-      });
-
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -34,7 +28,7 @@ export async function sendOTP({
           api_key: process.env.BACKEND_API_KEY!,
         },
         body: JSON.stringify({
-          mobile: "+91" + phone,
+          mobile: phone,
           otp,
         }),
       });
