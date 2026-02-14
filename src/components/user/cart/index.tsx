@@ -6,6 +6,7 @@ import Products from "@/components/common/cartProduct";
 import { useCart } from "@/provider/cart.provider";
 import NutritionMeter from "./nutritionMeter";
 import Checkout from "./checkout";
+import Floater from "./floater";
 function _Cart() {
   const { isOpen, toggle, cart } = useCart();
   return (
@@ -64,6 +65,7 @@ function _Cart() {
 export default function Cart() {
   return (
     <Suspense fallback={<></>}>
+      <Floater></Floater>
       <_Cart />
     </Suspense>
   );

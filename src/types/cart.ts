@@ -14,6 +14,7 @@ export interface Item {
     sku: string;
     price: number;
     publicId: string;
+    options: string[];
   };
   product: {
     displayName: string;

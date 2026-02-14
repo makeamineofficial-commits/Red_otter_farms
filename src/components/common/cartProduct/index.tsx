@@ -5,6 +5,7 @@ import { CartItem } from "@/types/cart";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 function ProductCard(item: CartItem) {
   const { quantity, product } = item;
@@ -54,20 +55,25 @@ function ProductCard(item: CartItem) {
         <Trash2 size={15} className="text-destructive" />
       </button>
 
-      <div className="relative h-24 w-24 rounded-lg border overflow-hidden bg-muted">
-        {product.assets?.[0]?.url && (
-          <Image
-            fill
-            src={product.assets[0].url}
-            alt={product.displayName}
-            className="object-cover"
-          />
-        )}
+      <div className="relative">
+        <Badge className="absolute bottom-1 right-1 z-10">{item.variant.options.join("|")}</Badge>
+        <div className="relative h-24 w-24 rounded-lg border overflow-hidden bg-muted">
+          {product.assets?.[0]?.url && (
+            <Image
+              fill
+              src={product.assets[0].url}
+              alt={product.displayName}
+              className="object-cover"
+            />
+          )}
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col ">
         <Link href={`/products/${product.slug}`} className="hover:underline">
-          <span className="font-medium">{product.displayName.trim()}</span>
+          <span className="font-medium text-sm  w-[90%] overflow-clip ">
+            {product.displayName.trim()}
+          </span>
         </Link>
 
         {product.summary && (

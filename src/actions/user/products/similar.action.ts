@@ -71,6 +71,15 @@ export async function getSimilarProducts(slug: string) {
           inStock: true,
           stockLimit: true,
           availableInStock: true,
+          options: {
+            select: {
+              value: {
+                select: {
+                  displayName: true,
+                },
+              },
+            },
+          },
         },
       },
       _count: {
@@ -103,6 +112,7 @@ export async function getSimilarProducts(slug: string) {
       variants: product._count.variants,
       stockLimit: product.variants[0].stockLimit,
       availableInStock: product.variants[0].availableInStock,
+      variantOption: defaultVariant.options.map((ele) => ele.value.displayName),
     });
   });
 

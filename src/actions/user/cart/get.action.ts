@@ -23,6 +23,11 @@ export const getCart = async (): Promise<Cart | null> => {
               sku: true,
               price: true,
               publicId: true,
+              options: {
+                select: {
+                  value: { select: { displayName: true } },
+                },
+              },
               product: {
                 select: {
                   summary: true,
@@ -61,10 +66,13 @@ export const getCart = async (): Promise<Cart | null> => {
     status: cart.status,
     items:
       cart.items?.map(({ variant, quantity }) => {
-        const { product, ...details } = variant;
+        const { product, options, ...details } = variant;
         const { summary, ...productDetails } = product;
         return {
-          variant: details,
+          variant: {
+            options: options.map((ele) => ele.value.displayName),
+            ...details,
+          },
           product: { summary: summary ?? "", ...productDetails },
           quantity,
         };

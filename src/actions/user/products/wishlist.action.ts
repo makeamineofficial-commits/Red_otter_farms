@@ -65,6 +65,15 @@ export async function getWishlist(): Promise<{ products: ProductPreview[] }> {
             inStock: true,
             stockLimit: true,
             availableInStock: true,
+            options: {
+              select: {
+                value: {
+                  select: {
+                    displayName: true,
+                  },
+                },
+              },
+            },
           },
         },
         _count: {
@@ -97,6 +106,9 @@ export async function getWishlist(): Promise<{ products: ProductPreview[] }> {
         variants: product._count.variants,
         stockLimit: product.variants[0].stockLimit,
         availableInStock: product.variants[0].availableInStock,
+        variantOption: defaultVariant.options.map(
+          (ele) => ele.value.displayName,
+        ),
       });
     });
 

@@ -63,7 +63,7 @@ export interface ProductPreview {
   sku: string;
   mrp: number;
   price: number;
-
+  variantOption: string[];
   inStock: boolean;
   stockLimit: number;
   availableInStock: number;

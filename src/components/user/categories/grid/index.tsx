@@ -12,7 +12,7 @@ export function Grid() {
       <>
         <div className="w-full">
           <GridHeader></GridHeader>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4  gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4  gap-6">
             {[1, 2, 3, 4, 5].map((ele, i) => (
               <ProductCardLoader key={i} />
             ))}
@@ -23,7 +23,7 @@ export function Grid() {
   return (
     <div className="w-full">
       <GridHeader></GridHeader>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4  gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4  gap-6">
         {data.data.map((ele, i) => (
           <ProductCard key={i} {...ele} />
         ))}

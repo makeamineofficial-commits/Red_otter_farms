@@ -12,12 +12,14 @@ import Link from "next/link";
 import { convertToCartItem, formatPrice } from "@/lib/utils";
 import { Share } from "../share";
 import Wishlist from "./wishlist";
+import { motion, AnimatePresence } from "framer-motion";
 export function ProductCard(product: ProductPreview) {
   const {
     displayName,
     price,
     mrp,
     assets,
+    variantOption,
     nutritionalInfo,
     slug,
     healthBenefits,
@@ -26,8 +28,9 @@ export function ProductCard(product: ProductPreview) {
     variants,
     inStock,
   } = product;
-  const { update, cart } = useCart();
-  const [count, setCount] = useState(1);
+  const { update, cart, remove } = useCart();
+  const [count, setCount] = useState(0);
+
   useEffect(() => {
     if (!cart) return;
 
@@ -80,7 +83,7 @@ export function ProductCard(product: ProductPreview) {
           </Badge>
         )}
 
-        <div className="absolute z-40 top-3 right-3 flex flex-col gap-2">
+        <div className="absolute z-40 top-2 right-2 md:top-3  md:right-3 flex flex-col gap-2">
           <Share href={`/products/${slug}`}>
             <div className="bg-white h-8 w-8 flex items-center justify-center shadow-sm rounded-full">
               <Share2 className="size-5 stroke-1  transition-colors "></Share2>
@@ -93,12 +96,15 @@ export function ProductCard(product: ProductPreview) {
 
       {/* TITLE + PRICE */}
       <div className="space-y-1">
-        <div className="flex items-center justify-between w-full">
-          <p className=" font-medium line-clamp-1 text-lg">{displayName}</p>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full">
+          <p className=" font-medium line-clamp-1 text-base capitalize md:text-lg">
+            {displayName.toLowerCase()}
+          </p>
           <div className="flex gap-1 items-center">
+            <Badge className="bg-maroon">{variantOption.join("|")}</Badge>
             {variants > 1 && (
               <Badge variant="outline" className="text-xs capitalize">
-                +{variants} Options
+                +{variants - 1}
               </Badge>
             )}
           </div>
@@ -133,7 +139,7 @@ export function ProductCard(product: ProductPreview) {
       </div>
 
       {/* QUANTITY + CART */}
-      <div className="flex items-center justify-between gap-2 relative z-10 mt-auto">
+      <div className="items-center justify-between gap-2 relative z-10 mt-auto hidden md:flex">
         <div className="flex items-center border rounded-lg">
           <Button
             disabled={!inStock}
@@ -143,7 +149,7 @@ export function ProductCard(product: ProductPreview) {
           >
             <Minus className="size-4" />
           </Button>
-          <span className="px-2 text-sm">{count}</span>
+          <span className="px-2 text-sm">{Math.max(1, count)}</span>
           <Button
             disabled={!inStock}
             size="icon"
@@ -161,13 +167,92 @@ export function ProductCard(product: ProductPreview) {
             onClick={() => {
               update({
                 item: convertToCartItem(product),
-                quantity: count,
+                quantity: Math.max(count, 1),
               });
             }}
           >
             Add to Cart
           </Button>
         </div>
+      </div>
+
+      <div className="items-center justify-end gap-2 relative z-10 mt-auto h-10  flex md:hidden">
+        <AnimatePresence mode="wait">
+          {count > 0 ? (
+            /* Quantity Controls */
+            <motion.div
+              key="counter"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center border border-maroon rounded-lg"
+            >
+              <Button
+                disabled={!inStock}
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setCount((prev) => Math.max(0, prev - 1));
+                  if (count === 1) {
+                    remove({ variantId: product.variantId });
+                  } else {
+                    update({
+                      toggle: false,
+                      item: convertToCartItem(product),
+                      quantity: Math.max(1, count - 1),
+                    });
+                  }
+                }}
+              >
+                <Minus className="size-2" />
+              </Button>
+
+              <span className="px-2 text-sm">{count}</span>
+
+              <Button
+                disabled={!inStock}
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setCount((prev) => prev + 1);
+                  update({
+                    toggle: false,
+                    item: convertToCartItem(product),
+                    quantity: count + 1,
+                  });
+                }}
+              >
+                <Plus className="size-2" />
+              </Button>
+            </motion.div>
+          ) : (
+            /* Add Button */
+            <motion.div
+              key="add"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button
+                disabled={!inStock}
+                size="sm"
+                className="bg-transparent border text-sm! border-maroon text-maroon rounded-lg px-4"
+                onClick={() => {
+                  setCount(1);
+                  update({
+                    toggle: false,
+                    item: convertToCartItem(product),
+                    quantity: 1,
+                  });
+                }}
+              >
+                Add
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

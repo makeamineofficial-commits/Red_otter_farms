@@ -148,6 +148,13 @@ export const listProducts = async (
             inStock: true,
             stockLimit: true,
             availableInStock: true,
+            options: {
+              select: {
+                value: {
+                  select: { displayName: true },
+                },
+              },
+            },
           },
         },
 
@@ -184,8 +191,11 @@ export const listProducts = async (
         mrp: defaultVariant.mrp,
         price: defaultVariant.price,
         variants: product._count.variants,
-        stockLimit: product.variants[0].stockLimit,
-        availableInStock: product.variants[0].availableInStock,
+        stockLimit: defaultVariant.stockLimit,
+        availableInStock: defaultVariant.availableInStock,
+        variantOption: defaultVariant.options.map(
+          (ele) => ele.value.displayName,
+        ),
       });
     })
     .filter(Boolean) as (ProductPreview & { id: string })[];
