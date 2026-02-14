@@ -21,8 +21,8 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   >({
     queryKey: ["wishlist"],
     queryFn: async () => {
-      const data = await getWishlist();
-      return data.products;
+      const res = await fetch("/api/v1/user/wishlist");
+      return await res.json();
     },
 
     staleTime: 1000 * 60 * 5,

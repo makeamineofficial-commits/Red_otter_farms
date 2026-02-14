@@ -37,14 +37,31 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   }, [searchParams, category]);
 
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    PaginatedResponse<RecipePreview> | undefined
+    PaginatedResponse<RecipePreview>
   >({
-    queryKey: ["recipes", filter],
-    queryFn: async () => {
-      const res = await listRecipes(filter);
 
-      return res;
+    queryKey: ["recipes", category, filter],
+
+    queryFn: async () => {
+      const params = new URLSearchParams();
+
+      params.set("page", String(filter.page));
+      params.set("limit", String(filter.limit));
+
+      if (filter.q) params.set("q", filter.q);
+      if (filter.category) params.set("category", filter.category);
+
+      const url = `/api/v1/user/recipes?${params.toString()}`;
+
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch recipes");
+      }
+
+      return await res.json();
     },
+
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

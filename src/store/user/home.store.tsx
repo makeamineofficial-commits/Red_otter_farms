@@ -22,10 +22,9 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   >({
     queryKey: ["home"],
     queryFn: async () => {
-      const { testimonials } = await listTestimonials();
-      const products = await listFeaturedProducts();
-      console.log({ testimonials, products });
-      return { testimonials, products };
+      console.log("rendered");
+      const res = await fetch("/api/v1/user/home");
+      return await res.json();
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,

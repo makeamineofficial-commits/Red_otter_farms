@@ -1,4 +1,3 @@
-"use server";
 import { validateUser } from "@/actions/auth/user.action";
 import axios from "axios";
 import { db } from "@/lib/db";
@@ -6,6 +5,7 @@ import { ProductPreview } from "@/types/product";
 export async function getOrders() {
   try {
     const user = await validateUser();
+
     if (!user)
       return {
         success: false,
@@ -24,7 +24,6 @@ export async function getOrders() {
         },
       },
     );
-  
 
     if (!res.data || !Array.isArray(res.data)) {
       return {

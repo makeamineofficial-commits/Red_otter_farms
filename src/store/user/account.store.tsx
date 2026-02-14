@@ -22,8 +22,8 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   >({
     queryKey: ["account"],
     queryFn: async () => {
-      const data = await getAccount();
-      return data.account;
+      const res = await fetch("/api/v1/user/account");
+      return await res.json();
     },
 
     staleTime: 1000 * 60 * 5,

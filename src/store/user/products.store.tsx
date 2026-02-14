@@ -40,11 +40,34 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
     PaginatedResponse<ProductPreview> | undefined
   >({
+    
     queryKey: ["products", JSON.stringify(filter)],
     queryFn: async () => {
-      const res = await listProducts(filter);
-      return res;
+      const params = new URLSearchParams();
+
+      params.set("page", String(filter.page));
+      params.set("limit", String(filter.limit));
+      params.set("category", slug?.toString() ?? "");
+      if (filter.q) params.set("q", filter.q);
+      if (filter.inStock) params.set("inStock", "true");
+      if (filter.maxPrice) params.set("maxPrice", String(filter.maxPrice));
+      if (filter.sortBy) params.set("sortBy", filter.sortBy);
+
+      filter.benefits.forEach((b) => {
+        params.append("benefit", b);
+      });
+
+      const url = `/api/v1/user/products/?${params.toString()}`;
+      console.log(url);
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch products");
+      }
+
+      return await res.json();
     },
+
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

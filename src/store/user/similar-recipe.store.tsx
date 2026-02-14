@@ -23,10 +23,16 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   >({
     queryKey: ["similar-recipe", slug],
     queryFn: async () => {
-      if (!slug) return;
-      const data = await similarRecipes(slug?.toString());
-      return data;
+      const params = new URLSearchParams();
+      params.set("slug", slug?.toString() ?? "");
+      const url = `/api/v1/user/recipes/similar?${params.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Failed to fetch recipes");
+      }
+      return await res.json();
     },
+
     enabled: !!slug,
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,

@@ -17,7 +17,7 @@ export default function Header() {
   const [isOpen, setOpen] = useState(false);
   return (
     <>
-      <div className="sticky z-50 top-0">
+      <div className="sticky z-90 top-0">
         <div className="bg-black p-1 px-2 flex items-center justify-end">
           <LocationPicker></LocationPicker>
         </div>

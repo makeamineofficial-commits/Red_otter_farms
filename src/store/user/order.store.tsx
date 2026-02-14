@@ -20,8 +20,8 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   >({
     queryKey: ["order-history"],
     queryFn: async () => {
-      const data = await getOrders();
-      return data.orders;
+      const res = await fetch("/api/v1/user/orders");
+      return await res.json();
     },
 
     staleTime: 1000 * 60 * 5,

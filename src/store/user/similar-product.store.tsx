@@ -22,8 +22,14 @@ export const Store = ({ children }: { children: React.ReactNode }) => {
     queryKey: ["similar-products", slug],
     enabled: !!slug,
     queryFn: async () => {
-      if (!slug) return [];
-      return getSimilarProducts(slug.toString());
+      const params = new URLSearchParams();
+      params.set("slug", slug?.toString() ?? "");
+      const url = `/api/v1/user/products/similar?${params.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Failed to fetch recipes");
+      }
+      return await res.json();
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,

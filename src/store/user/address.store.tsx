@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ListAddressReturnType } from "@/types/account";
-import { listAddress } from "@/actions/user/address/list.action";
 
 interface StoreInterface {
   isFetching: boolean;
@@ -20,8 +19,8 @@ function StoreContent({ children }: { children: React.ReactNode }) {
   >({
     queryKey: ["addresses"],
     queryFn: async () => {
-      const data = await listAddress();
-      return data.data;
+      const res = await fetch("/api/v1/user/address");
+      return await res.json();
     },
 
     staleTime: 1000 * 60 * 5,

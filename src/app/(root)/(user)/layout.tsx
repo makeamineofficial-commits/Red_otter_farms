@@ -4,10 +4,10 @@ import { CartProvider } from "@/provider/cart.provider";
 import { OrderStore } from "@/store/user/order.store";
 export default function layout({ children }: { children: ReactNode }) {
   return (
-    <AccountStore>
-      <OrderStore>
+    <>
+      <AccountStore>
         <CartProvider>{children}</CartProvider>
-      </OrderStore>
-    </AccountStore>
+      </AccountStore>
+    </>
   );
 }
