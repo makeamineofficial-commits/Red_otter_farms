@@ -3,5 +3,5 @@ import { getWishlist } from "@/actions/user/wishlist/get.action";
 export async function GET(req: NextRequest) {
   const res = await getWishlist();
 
-  return NextResponse.json(res);
+  return NextResponse.json(res.products?.map((ele) => ele.product) ?? []);
 }

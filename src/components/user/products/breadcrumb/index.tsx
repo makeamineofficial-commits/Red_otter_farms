@@ -29,7 +29,9 @@ export default function ProductBreadcrumb({ product }: { product: Product }) {
         </BreadcrumbItem>
 
         <BreadcrumbSeparator />
-        <BreadcrumbItem className="text-maroon">{product.name}</BreadcrumbItem>
+        <BreadcrumbItem className="text-maroon capitalize">
+          {product.name.toLowerCase()}
+        </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
   );

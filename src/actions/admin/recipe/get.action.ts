@@ -21,6 +21,15 @@ export const getRecipe = async ({
           quantity: true,
           variant: {
             select: {
+              options: {
+                select: {
+                  value: {
+                    select: {
+                      displayName: true,
+                    },
+                  },
+                },
+              },
               sku: true,
               publicId: true,
               price: true,
@@ -51,13 +60,17 @@ export const getRecipe = async ({
     listedIngredients: recipe.listedIngredients.map((ele) => {
       const { product, ...variant } = ele.variant;
       const { summary, ...detail } = product;
+      const { options, ...rest } = variant;
       return {
         quantity: ele.quantity,
         product: {
           summary: summary ?? "",
           ...detail,
         },
-        variant,
+        variant: {
+          options: options.map((ele) => ele.value.displayName),
+          ...rest,
+        },
       };
     }),
   });

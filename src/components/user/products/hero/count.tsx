@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { Product, Variant } from "@/types/product";
 import { useCart } from "@/provider/cart.provider";
@@ -35,6 +35,25 @@ export default function Count({
   if (!data) return <></>;
 
   if (!selectedVariant) return <></>;
+
+  const variantOption = useMemo(() => {
+    if (!selectedVariant || !data?.options) return [];
+
+    return selectedVariant.options.map((variantOpt) => {
+      const optionGroup = data.options.find(
+        (opt) => opt.slug === variantOpt.option,
+      );
+
+      if (!optionGroup) return variantOpt.optionValue;
+
+      const optionValue = optionGroup.values.find(
+        (val) => val.slug === variantOpt.optionValue,
+      );
+
+      return optionValue?.displayName || variantOpt.optionValue;
+    });
+  }, [selectedVariant, data]);
+
   return (
     <div className="flex w-full flex-col justify-between sm:flex-row gap-3">
       <div className=" flex items-center border-2  h-fit w-fit rounded-2xl">
@@ -68,6 +87,7 @@ export default function Count({
           update({
             item: convertToCartItem({
               ...data,
+              variantOption,
               productId: data.publicId,
               variantId: selectedVariant.publicId,
               variants: data.variants.length,

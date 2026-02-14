@@ -47,7 +47,7 @@ function ProductCard(item: CartItem) {
   }, [quantity]);
 
   return (
-    <div className="border-b last:border-b-0 pb-2 flex gap-3 items-end relative">
+    <div className="border-b last:border-b-0 pb-2 flex gap-3 items-end relative ">
       <button
         className="absolute top-2 right-2"
         onClick={() => remove({ variantId: item.variant.publicId })}
@@ -56,7 +56,9 @@ function ProductCard(item: CartItem) {
       </button>
 
       <div className="relative">
-        <Badge className="absolute bottom-1 right-1 z-10">{item.variant.options.join("|")}</Badge>
+        <Badge className="absolute bottom-1 right-1 z-10">
+          {item.variant.options.join("|")}
+        </Badge>
         <div className="relative h-24 w-24 rounded-lg border overflow-hidden bg-muted">
           {product.assets?.[0]?.url && (
             <Image
@@ -71,8 +73,8 @@ function ProductCard(item: CartItem) {
 
       <div className="flex-1 flex flex-col ">
         <Link href={`/products/${product.slug}`} className="hover:underline">
-          <span className="font-medium text-sm  w-[90%] overflow-clip ">
-            {product.displayName.trim()}
+          <span className="font-medium text-sm  w-[90%] overflow-clip capitalize">
+            {product.displayName.trim().toLowerCase()}
           </span>
         </Link>
 

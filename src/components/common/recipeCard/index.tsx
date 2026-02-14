@@ -4,15 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 import { Clock, Users } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
 import { Recipe } from "@/types/recipe";
-import Autoplay from "embla-carousel-autoplay";
 import Link from "next/link";
 
 export function RecipeCard({
@@ -24,18 +17,6 @@ export function RecipeCard({
   serving,
   assets,
 }: Recipe) {
-  const [api, setApi] = useState<any>(null);
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    if (!api) return;
-
-    setCurrent(api.selectedScrollSnap());
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
-
   return (
     <div className="overflow-hidden relative bg-white rounded-2xl border hover:shadow-md transition-all">
       <Link
@@ -53,10 +34,10 @@ export function RecipeCard({
 
       {/* CONTENT */}
       <div className="flex flex-col gap-4 p-4">
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold line-clamp-1">{title}</h3>
+        <div className="space-y-1">
+          <h3 className="text-xl font-semibold line-clamp-1">{title}</h3>
 
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <p className="text-md text-muted-foreground line-clamp-2">
             {summary}
           </p>
 

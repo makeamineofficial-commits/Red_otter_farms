@@ -49,7 +49,14 @@ export default function CreateProductForm() {
       isFeatured: false,
       isDryStore: false,
       // @ts-ignore
-      nutritionalInfo: { key: 0 },
+      nutritionalInfo: {
+        carbs: "0g",
+        fiber: "0g",
+        sodium: "0mg",
+        protein: "0g",
+        calories: "0kcal",
+        potassium: "0mg",
+      },
     },
   });
   const router = useRouter();

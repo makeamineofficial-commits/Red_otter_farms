@@ -40,6 +40,15 @@ export const listRecipe = async (
                 sku: true,
                 publicId: true,
                 price: true,
+                options: {
+                  select: {
+                    value: {
+                      select: {
+                        displayName: true,
+                      },
+                    },
+                  },
+                },
                 product: {
                   select: {
                     slug: true,
@@ -72,13 +81,17 @@ export const listRecipe = async (
       listedIngredients: recipe.listedIngredients.map((ele) => {
         const { product, ...variant } = ele.variant;
         const { summary, ...detail } = product;
+        const { options, ...rest } = variant;
         return {
           quantity: ele.quantity,
           product: {
             summary: summary ?? "",
             ...detail,
           },
-          variant,
+          variant: {
+            options: options.map((ele) => ele.value.displayName),
+            ...rest,
+          },
         };
       }),
     });

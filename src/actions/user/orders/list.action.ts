@@ -49,6 +49,9 @@ export async function getOrders() {
         price: true,
         inStock: true,
         stockLimit: true,
+        options: {
+          select: { value: { select: { displayName: true } } },
+        },
         availableInStock: true,
         product: {
           select: {
@@ -78,17 +81,18 @@ export async function getOrders() {
 
     const productMap: Map<string, ProductPreview> = new Map();
 
-    for (let { product, ...variant } of products) {
+    for (let { product, options, ...details } of products) {
       const formatedProduct: ProductPreview = {
         ...product,
-        ...variant,
+        ...details,
+        variantOption: options.map((ele) => ele.value.displayName),
         summary: product.summary ?? "",
-        variantId: variant.publicId,
+        variantId: details.publicId,
         presentInWishlist: false,
         productId: product.publicId,
         variants: 1,
       };
-      productMap.set(variant.sku, formatedProduct);
+      productMap.set(details.sku, formatedProduct);
     }
 
     const orders: (SalesOrder & { products: ProductPreview[] })[] =

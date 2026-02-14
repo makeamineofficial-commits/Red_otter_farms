@@ -16,10 +16,10 @@ export default function Ingredients({
   const handleClick = async () => {
     try {
       await updateMany({
-        items: listedIngredients.map((ele) => {
+        items: listedIngredients.map(({ variant, ...rest }) => {
           return {
-            item: ele,
-            quantity: ele.quantity,
+            item: { variant: { ...variant }, ...rest },
+            quantity: rest.quantity,
           };
         }),
       });

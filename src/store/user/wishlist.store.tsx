@@ -1,9 +1,7 @@
 "use client";
 import React, { createContext, useContext, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getOrders } from "@/actions/user/orders/list.action";
 import { ProductPreview } from "@/types/product";
-import { getWishlist } from "@/actions/user/products/wishlist.action";
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;

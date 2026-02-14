@@ -25,6 +25,15 @@ const _getRecipeCached = async (
               sku: true,
               price: true,
               publicId: true,
+              options: {
+                select: {
+                  value: {
+                    select: {
+                      displayName: true,
+                    },
+                  },
+                },
+              },
               product: {
                 select: {
                   summary: true,
@@ -69,10 +78,13 @@ const _getRecipeCached = async (
     summary: recipe.summary,
     listedIngredients:
       recipe.listedIngredients?.map(({ variant, quantity }) => {
-        const { product, ...details } = variant;
+        const { product, options, ...details } = variant;
         const { summary, ...productDetails } = product;
         return {
-          variant: details,
+          variant: {
+            options: options.map((ele) => ele.value.displayName),
+            ...details,
+          },
           product: { summary: summary ?? "", ...productDetails },
           quantity,
         };

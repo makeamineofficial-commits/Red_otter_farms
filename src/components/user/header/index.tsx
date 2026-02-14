@@ -50,7 +50,7 @@ export default function Header() {
                   stroke="1"
                 />
               </Link>
-              <Link href="/wishlist">
+              <Link href="/account/wishlist">
                 <Heart
                   className="stroke-1 stroke-red-500 hidden lg:block lg:size-9 "
                   stroke="0.01"
@@ -101,7 +101,7 @@ export default function Header() {
                 stroke="1"
               />
             </Link>
-            <Link href="/wishlist">
+            <Link href="/account/wishlist">
               <Heart
                 className="stroke-1 stroke-red-500 block lg:size-9 "
                 stroke="0.01"

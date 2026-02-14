@@ -50,10 +50,13 @@ function _Cart() {
           </button>
         </div>
 
-        <div className="p-4">
+        <div
+          className="p-4 flex-1 overflow-auto no-scrollbar "
+          onScroll={(e) => e.stopPropagation()}
+        >
           <Products></Products>
         </div>
-        <div className="fixed bottom-0 left-0 right-0 z-50 shadow-xl">
+        <div className=" z-50 shadow-xl">
           <NutritionMeter></NutritionMeter>
           <Checkout></Checkout>
         </div>

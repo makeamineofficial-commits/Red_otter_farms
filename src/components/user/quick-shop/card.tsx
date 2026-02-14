@@ -142,6 +142,9 @@ export function ProductCard(product: Product & { variants: Variant[] }) {
               update({
                 item: {
                   variant: {
+                    options: selectedVariant.options.map(
+                      (ele) => ele.optionValue,
+                    ),
                     sku: selectedVariant.sku,
                     price: selectedVariant.price,
                     publicId: selectedVariant.publicId,
