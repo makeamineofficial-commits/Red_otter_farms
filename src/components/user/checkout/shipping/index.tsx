@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger2,
 } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -21,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCheckout } from "@/provider/checkout.provider";
 
 export default function Shipping() {
-  const { shipping, setShipping } = useCheckout();
+  const { shipping, setShipping, setSameAsBilling } = useCheckout();
 
   const handleChange = (name: string, value: string) => {
     setShipping((prev: any) => ({
@@ -33,11 +34,11 @@ export default function Shipping() {
   return (
     <Accordion
       type="single"
-      defaultValue="shipping"
+      defaultValue="shipping?"
       collapsible
-      className="w-full border rounded-lg p-6"
+      className="w-full border rounded-lg p-2 sm:p-4 md:p-6"
     >
-      <AccordionItem value="shipping" className="border-none">
+      <AccordionItem value="shipping?" className="border-none">
         <AccordionTrigger2 className="px-4! py-3! h-auto! justify-start!">
           <div
             className="
@@ -56,7 +57,7 @@ export default function Shipping() {
               <Label className="text-muted-foreground">First Name</Label>
               <Input
                 className="h-12!"
-                value={shipping.firstName || ""}
+                value={shipping?.firstName || ""}
                 onChange={(e) => handleChange("firstName", e.target.value)}
               />
             </div>
@@ -65,7 +66,7 @@ export default function Shipping() {
               <Label className="text-muted-foreground">Last Name</Label>
               <Input
                 className="h-12!"
-                value={shipping.lastName || ""}
+                value={shipping?.lastName || ""}
                 onChange={(e) => handleChange("lastName", e.target.value)}
               />
             </div>
@@ -81,7 +82,7 @@ export default function Shipping() {
                 className="h-12!"
                 placeholder="Enter mobile number"
                 name="mobile"
-                value={shipping.phone || ""}
+                value={shipping?.phone || ""}
                 onChange={(e) => handleChange("phone", e.target.value)}
               />
             </div>
@@ -91,7 +92,7 @@ export default function Shipping() {
             <Label className="text-muted-foreground">Street Address *</Label>
             <Input
               className="h-12!"
-              value={shipping.address || ""}
+              value={shipping?.address || ""}
               onChange={(e) => handleChange("address", e.target.value)}
             />
           </div>
@@ -100,7 +101,7 @@ export default function Shipping() {
             <Label className="text-muted-foreground">Town / City *</Label>
             <Input
               className="h-12!"
-              value={shipping.city || ""}
+              value={shipping?.city || ""}
               onChange={(e) => handleChange("city", e.target.value)}
             />
           </div>
@@ -108,7 +109,7 @@ export default function Shipping() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">State *</Label>
             <Select
-              value={shipping.state}
+              value={shipping?.state}
               onValueChange={(value) => handleChange("state", value)}
             >
               <SelectTrigger className="w-full h-12!">
@@ -127,7 +128,7 @@ export default function Shipping() {
             <Label className="text-muted-foreground">Postcode / ZIP *</Label>
             <Input
               className="h-12!"
-              value={shipping.zip || ""}
+              value={shipping?.zip || ""}
               onChange={(e) => handleChange("zip", e.target.value)}
             />
           </div>
@@ -143,11 +144,21 @@ export default function Shipping() {
             </Label>
             <Textarea
               rows={10}
-              className="h-10"
+              className="h-18"
               placeholder="Notes about your order, e.g. special notes for delivery."
-              value={shipping.notes || ""}
+              value={shipping?.notes || ""}
               onChange={(e) => handleChange("notes", e.target.value)}
             />
+          </div>
+
+          <div className="space-y-1 flex gap-2 items-center">
+            <Checkbox
+              onCheckedChange={(e) => {
+                console.log(e.valueOf());
+                setSameAsBilling(e.valueOf() as boolean);
+              }}
+            ></Checkbox>
+            <Label className="text-muted-foreground">Same as Billing</Label>
           </div>
         </AccordionContent>
       </AccordionItem>

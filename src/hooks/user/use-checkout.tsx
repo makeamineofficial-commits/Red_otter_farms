@@ -17,6 +17,8 @@ export const useCheckoutHandler = () => {
   const [orderId, setOrderId] = useState<string | null>(null);
   const { cart } = useCart();
   const validateBilling = (billing: BillingDetails) => {
+    if (!billing) return false;
+
     const requiredFields: (keyof BillingDetails)[] = [
       "phone",
       "firstName",
@@ -61,6 +63,11 @@ export const useCheckoutHandler = () => {
   };
 
   const _checkout = async () => {
+    if (!billing || !shipping)
+      return {
+        sucess: false,
+        message: "Billing & Shipping details are missing",
+      };
     const billingError = validateBilling(billing);
     if (billingError) return { success: false, message: billingError };
 

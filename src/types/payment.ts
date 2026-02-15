@@ -27,4 +27,5 @@ export interface ShippingDetails {
 export enum PaymentMethod {
   RAZORPAY = "RAZORPAY",
   OTTER = "OTTER",
+  SPLIT = "SPLIT",
 }

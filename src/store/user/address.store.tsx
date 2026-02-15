@@ -20,7 +20,7 @@ function StoreContent({ children }: { children: React.ReactNode }) {
     queryKey: ["addresses"],
     queryFn: async () => {
       const res = await fetch("/api/v1/user/address");
-      return await res.json();
+      return (await res.json()).data;
     },
 
     staleTime: 1000 * 60 * 5,

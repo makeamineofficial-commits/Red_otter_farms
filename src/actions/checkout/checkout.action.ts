@@ -18,8 +18,9 @@ import { getShippingRate } from "./shipping.action";
 import { PaymentMethod } from "@/types/payment";
 import { db } from "@/lib/db";
 import { cookies } from "next/headers";
-import { validateUser } from "../auth/user.action";
+import { createAccount, validateUser } from "../auth/user.action";
 import { handleOrder } from "../orders/order.action";
+import axios from "axios";
 
 export async function getCheckout({
   paymentMethod,
@@ -42,6 +43,11 @@ export async function getCheckout({
   }
 
   await syncAddress({ shipping, billing });
+
+  if (billing.createAccount) {
+    await createAccount(billing);
+  }
+
   try {
     if (paymentMethod === PaymentMethod.RAZORPAY) {
       const res = await getRazorpayCheckout({

@@ -4,9 +4,5 @@ export default function layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <AddressStore>{children}</AddressStore>
-    </>
-  );
+  return <>{children}</>;
 }

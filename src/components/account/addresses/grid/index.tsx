@@ -21,7 +21,7 @@ export default function AddressGrid() {
         </>
       ) : (
         <>
-          {data?.addresses.map((ele) => (
+          {data?.addresses?.map((ele) => (
             <AddressCard key={ele.address_id} {...ele}></AddressCard>
           ))}
         </>

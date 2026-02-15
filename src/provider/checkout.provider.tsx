@@ -20,38 +20,14 @@ import {
 } from "@/types/payment";
 import { getCartTotal } from "@/actions/user/cart/util";
 import { Cart } from "@/types/cart";
-
-const DEFAULT_BILLING: BillingDetails = {
-  zip: "110057",
-  city: "New Delhi",
-  phone: "8800960547",
-  firstName: "Damanjeet",
-  lastName: "Singh",
-  email: "damanjeetsingh434@gmail.com",
-  address: "20, Paschimi Marg (2nd floor), Block D, Vasant Vihar",
-  state: "DL",
-  country: "IN",
-  createAccount: false,
-};
-
-const DEFAULT_SHIPPING: ShippingDetails = {
-  phone: "8800960547",
-  firstName: "Damanjeet",
-  lastName: "Singh",
-  address: "20, Paschimi Marg (2nd floor), Block D, Vasant Vihar",
-  zip: "110057",
-  city: "New Delhi",
-  state: "DL",
-  country: "IN",
-  notes: "",
-  courier: "",
-};
+import { useAccountStore } from "@/store/user/account.store";
+import { useAddressStore } from "@/store/user/address.store";
 
 type ContextType = {
-  shipping: ShippingDetails;
-  setShipping: Dispatch<SetStateAction<ShippingDetails>>;
-  billing: BillingDetails;
-  setBilling: Dispatch<SetStateAction<BillingDetails>>;
+  shipping?: ShippingDetails;
+  setShipping: Dispatch<SetStateAction<ShippingDetails | undefined>>;
+  billing?: BillingDetails;
+  setBilling: Dispatch<SetStateAction<BillingDetails | undefined>>;
   isFetching: boolean;
   total: number;
   shippingRate: number;
@@ -59,13 +35,83 @@ type ContextType = {
   showEstimate: boolean;
   paymentMethod: PaymentMethod;
   setPaymentMethod: Dispatch<SetStateAction<PaymentMethod>>;
+  setCreateAccount: Dispatch<SetStateAction<boolean>>;
+  setSameAsBilling: Dispatch<SetStateAction<boolean>>;
 };
 
 const CheckoutContext = createContext<ContextType | undefined>(undefined);
 
 export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
-  const [billing, setBilling] = useState<BillingDetails>(DEFAULT_BILLING);
-  const [shipping, setShipping] = useState<ShippingDetails>(DEFAULT_SHIPPING);
+  const { data: user } = useAccountStore();
+  const { data: address } = useAddressStore();
+  const [createAccount, setCreateAccount] = useState(false);
+  const [sameAsBilling, setSameAsBilling] = useState(false);
+
+  const [billing, setBilling] = useState<BillingDetails | undefined>();
+  const [shipping, setShipping] = useState<ShippingDetails | undefined>();
+  useEffect(() => {
+    console.log("here", user, address);
+    // if (!user) return;
+    const shippingAddress = address?.addresses?.find(
+      (ele) => ele.tag === "SHIPPING",
+    );
+    const billingAddress = address?.addresses?.find(
+      (ele) => ele.tag === "BILLING",
+    );
+    const DEFAULT_ADDRESS = {
+      address: "123 Test Street",
+      city: "New Delhi",
+      zip: "110001",
+      state_code: "DL",
+      country_code: "IN",
+      attention: "",
+    };
+    const finalShipping = shippingAddress ?? DEFAULT_ADDRESS;
+    const finalBilling = billingAddress ?? DEFAULT_ADDRESS;
+
+    setShipping({
+      phone: user?.phone ?? "9999999999",
+      firstName: user?.first_name ?? "Test",
+      lastName: user?.last_name ?? "User",
+      address: finalShipping.address ?? "",
+      zip: finalShipping.zip ?? "",
+      city: finalShipping.city ?? "",
+      state: finalShipping.state_code ?? "",
+      country: finalShipping.country_code ?? "",
+      notes: finalShipping.attention,
+      courier: "",
+    });
+
+    setBilling({
+      zip: finalBilling.zip ?? "",
+      city: finalBilling.city ?? "",
+      phone: user?.phone ?? "0000000000",
+      firstName: user?.first_name ?? "Test2",
+      lastName: user?.last_name ?? "User2",
+      email: "test123@example.com",
+      address: finalBilling.address ?? "",
+      state: finalBilling.state_code ?? "",
+      country: finalBilling.country_code ?? "",
+      createAccount,
+    });
+  }, [user, address, createAccount]);
+
+  useEffect(() => {
+    if (!sameAsBilling || !billing) return;
+    setShipping((prev) => ({
+      phone: billing.phone ?? "",
+      firstName: user?.first_name ?? "",
+      lastName: user?.last_name ?? "",
+      address: billing.address ?? "",
+      zip: billing.zip ?? "",
+      city: billing.city ?? "",
+      state: billing.state ?? "",
+      country: billing.country ?? "",
+      notes: prev?.notes,
+      courier: prev?.courier,
+    }));
+  }, [sameAsBilling, billing, user]);
+
   const [shippingRate, setShippingRate] = useState<number>(9900);
   const [subtotal, setSubTotal] = useState<number>(0);
   const [isFetching, setFetching] = useState<boolean>(false);
@@ -103,13 +149,14 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    if (!shipping) return;
     const pincode = shipping.zip?.trim();
     if (!pincode) return;
     if (!/^\d{6}$/.test(pincode)) return;
     const isNCR = isNCRPincode(pincode);
     setShowEstimate(!isNCR);
     resolveShippingRate(pincode);
-  }, [shipping.zip, cart]);
+  }, [shipping?.zip, cart]);
 
   useEffect(() => {
     if (!cart) return;
@@ -132,7 +179,8 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
         total,
         subtotal,
         showEstimate,
-
+        setCreateAccount,
+        setSameAsBilling,
         paymentMethod,
         setPaymentMethod,
       }}

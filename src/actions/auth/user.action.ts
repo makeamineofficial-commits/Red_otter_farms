@@ -178,4 +178,49 @@ const verifyUser = async ({ otp }: { otp: string }) => {
   }
 };
 
-export { logout, isValidateUser, validateUser, loginUser, verifyUser };
+const createAccount = async ({
+  phone,
+  firstName,
+  lastName,
+  email,
+}: {
+  phone: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+}) => {
+  const userRes = await axios.post(
+    "https://automation.redotterfarms.com/webhook/0b38de6f-5560-4396-8204-a1874e419a2d",
+    { phone },
+    {
+      headers: { api_key: process.env.BACKEND_API_KEY as string },
+    },
+  );
+
+  const account = userRes.data[0];
+  let customerId = account?.customer_id ?? null;
+
+  if (!customerId) {
+    await axios.post(
+      "https://automation.redotterfarms.com/webhook/b40a9035-c8c3-4267-bc9e-144b89c2ab55",
+      {
+        mobile: phone.startsWith("+91") ? phone : "+91" + phone,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+      },
+      {
+        headers: { api_key: process.env.BACKEND_API_KEY as string },
+      },
+    );
+  }
+};
+
+export {
+  logout,
+  isValidateUser,
+  validateUser,
+  loginUser,
+  verifyUser,
+  createAccount,
+};

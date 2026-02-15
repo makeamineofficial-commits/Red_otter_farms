@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger2,
 } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -18,11 +19,11 @@ import {
 } from "@/components/ui/select";
 
 import { useCheckout } from "@/provider/checkout.provider";
+import { useAccountStore } from "@/store/user/account.store";
 
 export default function Billing() {
-  const { billing, setBilling } = useCheckout();
-
-  const handleChange = (name: string, value: string) => {
+  const { billing, setBilling, setCreateAccount } = useCheckout();
+  const handleChange = (name: string, value: string | boolean) => {
     setBilling((prev: any) => ({
       ...prev,
       [name]: value,
@@ -32,11 +33,11 @@ export default function Billing() {
   return (
     <Accordion
       type="single"
-      defaultValue="billing"
+      defaultValue="billing?"
       collapsible
-      className="w-full border rounded-lg p-6"
+      className="w-full border rounded-lg p-2 sm:p-4 md:p-6"
     >
-      <AccordionItem value="billing" className="border-none">
+      <AccordionItem value="billing?" className="border-none">
         <AccordionTrigger2 className="px-4! py-3! h-auto! justify-start!">
           <div
             className="
@@ -49,7 +50,7 @@ export default function Billing() {
           <h2 className="text-xl! font-semibold!">Billing Information</h2>
         </AccordionTrigger2>
 
-        <AccordionContent className="px-4! py-6! space-y-5 ">
+        <AccordionContent className=" px-4! py-2! sm:py-6! space-y-5 ">
           {/* Mobile */}
           <div className="space-y-1">
             <Label className="text-muted-foreground">Mobile Number *</Label>
@@ -59,7 +60,7 @@ export default function Billing() {
                 className="h-12!"
                 placeholder="Enter mobile number"
                 name="mobile"
-                value={billing.phone || ""}
+                value={billing?.phone || ""}
                 onChange={(e) => handleChange("phone", e.target.value)}
               />
             </div>
@@ -71,7 +72,7 @@ export default function Billing() {
               <Label className="text-muted-foreground">First Name *</Label>
               <Input
                 className="h-12!"
-                value={billing.firstName || ""}
+                value={billing?.firstName || ""}
                 onChange={(e) => handleChange("firstName", e.target.value)}
               />
             </div>
@@ -80,7 +81,7 @@ export default function Billing() {
               <Label className="text-muted-foreground">Last Name *</Label>
               <Input
                 className="h-12!"
-                value={billing.lastName || ""}
+                value={billing?.lastName || ""}
                 onChange={(e) => handleChange("lastName", e.target.value)}
               />
             </div>
@@ -92,7 +93,7 @@ export default function Billing() {
             <Input
               className="h-12!"
               type="email"
-              value={billing.email || ""}
+              value={billing?.email || ""}
               onChange={(e) => handleChange("email", e.target.value)}
             />
           </div>
@@ -102,7 +103,7 @@ export default function Billing() {
             <Label className="text-muted-foreground">Street Address *</Label>
             <Input
               className="h-12!"
-              value={billing.address || ""}
+              value={billing?.address || ""}
               onChange={(e) => handleChange("address", e.target.value)}
             />
           </div>
@@ -112,7 +113,7 @@ export default function Billing() {
             <Label className="text-muted-foreground">Town / City *</Label>
             <Input
               className="h-12!"
-              value={billing.city || ""}
+              value={billing?.city || ""}
               onChange={(e) => handleChange("city", e.target.value)}
             />
           </div>
@@ -121,7 +122,7 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">State *</Label>
             <Select
-              value={billing.state}
+              value={billing?.state}
               onValueChange={(value) => handleChange("state", value)}
             >
               <SelectTrigger className="w-full h-12!">
@@ -138,7 +139,7 @@ export default function Billing() {
             <Label className="text-muted-foreground">Postcode / ZIP *</Label>
             <Input
               className="h-12!"
-              value={billing.zip || ""}
+              value={billing?.zip || ""}
               onChange={(e) => handleChange("zip", e.target.value)}
             />
           </div>
@@ -147,6 +148,15 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Country</Label>
             <Input className="h-12!" value="IN" readOnly />
+          </div>
+
+          <div className="space-y-1 flex gap-2 items-center">
+            <Checkbox
+              onCheckedChange={(e) => {
+                setCreateAccount(e.valueOf() as boolean);
+              }}
+            ></Checkbox>
+            <Label className="text-muted-foreground">Create Account</Label>
           </div>
         </AccordionContent>
       </AccordionItem>
