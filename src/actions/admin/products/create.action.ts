@@ -83,6 +83,21 @@ export const createProduct = async (product: ProductProps) => {
           }),
         });
       }
+
+      const healthBenefits = product.healthBenefits;
+      const existing = (
+        await tx.healthBenefit.findMany({ select: { label: true } })
+      ).map((ele) => ele.label);
+      const newHealthBenefits = healthBenefits.filter(
+        (ele) => !existing.includes(ele),
+      );
+
+      await tx.healthBenefit.createMany({
+        data: newHealthBenefits.map((ele) => {
+          return { label: ele };
+        }),
+      });
+
       return product;
     });
 

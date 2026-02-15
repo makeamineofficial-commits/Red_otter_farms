@@ -59,7 +59,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
   };
 
   const { mutateAsync, isPending } = useUpdateProduct();
-  const { data, isLoading, isFetching } = useAdminStore();
+  const { data, isLoading, isFetching, refetch } = useAdminStore();
   const onSubmit = async (values: FormValues) => {
     await mutateAsync({
       publicId: product.publicId,
@@ -70,6 +70,7 @@ export default function UpdateProductForm({ product }: { product: Product }) {
       >,
       ...values,
     });
+    await refetch();
   };
 
   return (
@@ -206,7 +207,10 @@ export default function UpdateProductForm({ product }: { product: Product }) {
               <FormItem>
                 <FormLabel>Health Benefits</FormLabel>
                 <FormControl>
-                  <TagInput {...field} />
+                  <TagInput
+                    {...field}
+                    options={data?.healthBenefits.map((ele) => ele.label) ?? []}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

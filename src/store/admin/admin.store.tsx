@@ -3,6 +3,7 @@ import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllVariants } from "@/actions/admin/variants/getAll.action";
 import { getAllCategory } from "@/actions/admin/category/getAll.action";
+import { getHealthBenefits } from "@/actions/admin/products/getHealthBenefit";
 
 interface ContextDataReturnType {
   categories: { publicId: string; name: string }[];
@@ -11,6 +12,7 @@ interface ContextDataReturnType {
     name: string;
     options: string[];
   }[];
+  healthBenefits: { label: string }[];
 }
 
 interface StoreInterface {
@@ -18,21 +20,22 @@ interface StoreInterface {
   isError: boolean;
   isLoading: boolean;
   data: ContextDataReturnType | undefined;
-
+  refetch: Function;
   error: Error | null;
 }
 
 const StoreContext = createContext<StoreInterface | null>(null);
 
 function StoreContent({ children }: { children: React.ReactNode }) {
-  const { isFetching, isError, isLoading, data, error } = useQuery<
+  const { isFetching, isError, isLoading, data, error, refetch } = useQuery<
     ContextDataReturnType | undefined
   >({
     queryKey: ["admin"],
     queryFn: async () => {
       const categories = await getAllCategory();
+      const healthBenefits = await getHealthBenefits();
       const variants = await getAllVariants();
-      return { categories, variants };
+      return { categories, variants, healthBenefits };
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
@@ -41,7 +44,7 @@ function StoreContent({ children }: { children: React.ReactNode }) {
 
   return (
     <StoreContext.Provider
-      value={{ isLoading, isError, isFetching, data, error }}
+      value={{ isLoading, isError, isFetching, data, error, refetch }}
     >
       {children}
     </StoreContext.Provider>

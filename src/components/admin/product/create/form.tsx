@@ -61,7 +61,7 @@ export default function CreateProductForm() {
   });
   const router = useRouter();
   const { mutateAsync, isPending } = useCreateProduct();
-  const { data, isLoading, isFetching } = useAdminStore();
+  const { data, isLoading, isFetching, refetch } = useAdminStore();
   const onSubmit = async (values: FormValues) => {
     const res = await mutateAsync({
       // @ts-ignore
@@ -71,6 +71,7 @@ export default function CreateProductForm() {
       >,
       ...values,
     });
+    await refetch();
     if (res.product) {
       router.push(
         `/admin/dashboard/product/${res.product?.publicId}/variant/create?new=true`,
@@ -197,7 +198,12 @@ export default function CreateProductForm() {
                 <FormItem>
                   <FormLabel>Health Benefits</FormLabel>
                   <FormControl>
-                    <TagInput {...field} />
+                    <TagInput
+                      {...field}
+                      options={
+                        data?.healthBenefits.map((ele) => ele.label) ?? []
+                      }
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

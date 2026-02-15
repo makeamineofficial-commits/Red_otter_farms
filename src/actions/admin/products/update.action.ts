@@ -13,7 +13,6 @@ export interface UpdateProductProps extends ProductPropsBase {
     slug: string;
     values: { displayName: string; slug: string; isDefault: boolean }[];
   }[];
-  
 }
 export const updateProduct = async (product: UpdateProductProps) => {
   await validateAdmin();
@@ -103,6 +102,20 @@ export const updateProduct = async (product: UpdateProductProps) => {
           }),
         });
         await syncOptions(tx, updatedProduct.id, _options);
+
+        const healthBenefits = product.healthBenefits;
+        const existing = (
+          await tx.healthBenefit.findMany({ select: { label: true } })
+        ).map((ele) => ele.label);
+        const newHealthBenefits = healthBenefits.filter(
+          (ele) => !existing.includes(ele),
+        );
+
+        await tx.healthBenefit.createMany({
+          data: newHealthBenefits.map((ele) => {
+            return { label: ele };
+          }),
+        });
         return updatedProduct;
       },
     );
