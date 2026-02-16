@@ -15,6 +15,8 @@ import Link from "next/link";
 import { Minus, Plus } from "lucide-react";
 import { convertToCartItem } from "@/lib/utils";
 import { CartItem, Item } from "@/types/cart";
+import { Badge } from "@/components/ui/badge";
+
 export function ProductCard(product: ProductPreview & { isLast: boolean }) {
   const {
     displayName,
@@ -27,7 +29,7 @@ export function ProductCard(product: ProductPreview & { isLast: boolean }) {
     stockLimit,
     availableInStock,
   } = product;
-  const { update, cart } = useCart();
+  const { update, cart, discount } = useCart();
   const [count, setCount] = useState(1);
   useEffect(() => {
     if (!cart) return;
@@ -78,7 +80,20 @@ export function ProductCard(product: ProductPreview & { isLast: boolean }) {
         <h3 className="font-semibold uppercase text-sm">{displayName}</h3>
         <p className="text-sm opacity-70">{summary}</p>
         <div className="flex items-center justify-between ">
-          <span className="font-semibold">₹{formatPrice(price)}</span>
+          <span>
+            <span className="font-semibold">
+              ₹{formatPrice(price * discount)}
+            </span>
+            {discount < 1 ? (
+              <>
+                <Badge className="ml-2 bg-forest!">
+                  Extra {100 - discount * 100}% Off
+                </Badge>
+              </>
+            ) : (
+              <></>
+            )}
+          </span>
 
           <div className="z-40 flex gap-2 sm:mt-0 mt-4">
             <div className="flex items-center border border-muted-foreground rounded-lg">

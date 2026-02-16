@@ -3,10 +3,6 @@ export interface Account {
   first_name: string;
   last_name: string;
 
-  billing_address: Address;
-  shipping_address: ShippingAddress;
-  addresses: Address[];
-
   phone: string;
   mobile: string;
 

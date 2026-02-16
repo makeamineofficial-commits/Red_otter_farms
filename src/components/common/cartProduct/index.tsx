@@ -1,5 +1,5 @@
 import { useCart } from "@/provider/cart.provider";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { CartItem } from "@/types/cart";
 import { Minus, Plus, Trash2 } from "lucide-react";
@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 function ProductCard(item: CartItem) {
   const { quantity, product } = item;
   const { update, isUpdating, remove } = useCart();
-
   const [localQty, setLocalQty] = useState(item.quantity);
 
   // Debounced server update

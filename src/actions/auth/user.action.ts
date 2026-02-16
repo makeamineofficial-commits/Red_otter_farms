@@ -7,6 +7,7 @@ import { validateToken } from "@/utils/jwt.util";
 import { sendOTP, verifyOTP } from "@/utils/otp.util";
 import axios from "axios";
 import { UserToken } from "@/types/auth";
+import { Account } from "@/types/account";
 
 const validateUser = async () => {
   const cookieStore = await cookies();
@@ -115,15 +116,7 @@ const verifyUser = async ({ otp }: { otp: string }) => {
       return { success: false, message: res.message };
     }
     const { phone } = res;
-    const userRes = await axios.post(
-      "https://automation.redotterfarms.com/webhook/0b38de6f-5560-4396-8204-a1874e419a2d",
-      { phone },
-      {
-        headers: { api_key: process.env.BACKEND_API_KEY as string },
-      },
-    );
-
-    const account = userRes.data[0];
+    const account = await getUser(phone);
     let customerId = account?.customer_id ?? null;
     if (!customerId) {
       // creating account if not found
@@ -189,15 +182,7 @@ const createAccount = async ({
   lastName: string;
   email?: string;
 }) => {
-  const userRes = await axios.post(
-    "https://automation.redotterfarms.com/webhook/0b38de6f-5560-4396-8204-a1874e419a2d",
-    { phone },
-    {
-      headers: { api_key: process.env.BACKEND_API_KEY as string },
-    },
-  );
-
-  const account = userRes.data[0];
+  const account = await getUser(phone);
   let customerId = account?.customer_id ?? null;
 
   if (!customerId) {
@@ -216,6 +201,35 @@ const createAccount = async ({
   }
 };
 
+const getUser = async (_phone: string): Promise<Account> => {
+  const phone = _phone.startsWith("+91") ? _phone : "+91" + _phone;
+  if (process.env.NODE_ENV === "production") {
+    const userRes = await axios.post(
+      "https://automation.redotterfarms.com/webhook/0b38de6f-5560-4396-8204-a1874e419a2d",
+      { phone },
+      {
+        headers: { api_key: process.env.BACKEND_API_KEY as string },
+      },
+    );
+
+    const account = userRes.data[0];
+    return account;
+  }
+  return {
+    customer_id: "96965000000247226",
+    first_name: "John",
+    last_name: "Doe",
+    phone,
+    mobile: "9XXXXXXXXX",
+    otter_wallet: 250.0,
+    total_saving: 1340.5,
+    loyality_status: "privy",
+    otter_pass: true,
+    nutrition_meter: false,
+    otter_n: true,
+  };
+};
+
 export {
   logout,
   isValidateUser,
@@ -223,4 +237,5 @@ export {
   loginUser,
   verifyUser,
   createAccount,
+  getUser,
 };

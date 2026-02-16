@@ -33,9 +33,8 @@ export async function POST(req: NextRequest) {
     //   return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     // }
 
-    const { purpose, paymentId, customerId } = await handleRazorpayWebhook(
-      JSON.parse(rawBody),
-    );
+    const { purpose, paymentId, customerId, isPartial } =
+      await handleRazorpayWebhook(JSON.parse(rawBody));
 
     if (purpose === PaymentPurpose.ORDER) {
       const payment = await db.payment.findUnique({
@@ -45,9 +44,21 @@ export async function POST(req: NextRequest) {
         console.error("[Webhook] Payment not found");
         return NextResponse.json({ success: true }, { status: 200 });
       }
-      const cart = await db.cart.findFirst({
+      const order = await db.order.findFirst({
         where: {
           paymentId: payment.publicId,
+        },
+      });
+      if (!order) {
+        console.log("[Webhook] Order not found");
+        return NextResponse.json({ success: true }, { status: 200 });
+      }
+
+      const cart = await db.cart.findFirst({
+        where: {
+          order: {
+            id: order.id,
+          },
         },
       });
       if (!cart) {
@@ -57,12 +68,12 @@ export async function POST(req: NextRequest) {
       await handleOrder({
         customerId,
         cartSessionId: cart.sessionId,
-        paymentMethod: PaymentMethod.RAZORPAY,
+        paymentMethod: isPartial ? PaymentMethod.SPLIT : PaymentMethod.RAZORPAY,
       });
     }
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {
-    console.error("Razorpay webhook error:", error);
+    console.error("Razorpay webhook error:", error.message);
 
     return NextResponse.json(
       {

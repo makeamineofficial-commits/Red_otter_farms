@@ -1,6 +1,5 @@
 "use server";
 
-import { db, OrderStatus } from "@/lib/db";
 import { isNCRPincode } from "@/lib/utils";
 
 import {
@@ -17,6 +16,13 @@ import {
   PaymentMethod,
   ShippingDetails,
 } from "@/types/payment";
+import {
+  createDrystoreSplitOrder,
+  createNormalSplitOrder,
+} from "./splitOrder.action";
+import { getCartById } from "../user/cart/get.action";
+import { getOrder } from "./utils";
+import { Order } from "@/types/order";
 export const handleOrder = async ({
   cartSessionId,
   paymentMethod,
@@ -26,114 +32,68 @@ export const handleOrder = async ({
   paymentMethod: PaymentMethod;
   customerId?: string;
 }) => {
-  const cart = await db.$transaction(async (tx) => {
-    const cart = await tx.cart.findUnique({
-      where: {
-        sessionId: cartSessionId,
-      },
-      include: {
-        items: {
-          select: {
-            quantity: true,
-            variant: {
-              select: {
-                sku: true,
-                price: true,
-                publicId: true,
-                options: {
-                  select: { value: { select: { displayName: true } } },
-                },
-                product: {
-                  select: {
-                    summary: true,
-                    displayName: true,
-                    nutritionalInfo: true,
-                    slug: true,
-                    assets: {
-                      where: {
-                        isPrimary: true,
-                      },
-                      take: 1,
-                      select: {
-                        url: true,
-                        thumbnail: true,
-                        type: true,
-                        position: true,
-                        isPrimary: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (cart) {
-      const existingOrder = await tx.order.findUnique({
-        where: { cartId: cart.id },
-      });
-
-      if (!existingOrder) {
-        await tx.order.create({
-          data: {
-            cartId: cart.id,
-            userIdentifier: cart.userIdentifier!,
-            status: OrderStatus.PROCESSING,
-          },
-        });
-      } else {
-        await tx.order.update({
-          where: { cartId: cart.id },
-          data: { status: OrderStatus.PROCESSING },
-        });
-      }
-    }
-    return cart;
-  });
-
-  if (!cart || !cart.shipping) {
-    console.log(cart);
-    console.error("here -> Cart not found");
+  const cart = await getCartById({ sessionId: cartSessionId });
+  if (!cart) {
     throw new Error("Cart not found");
   }
+  const { order } = await getOrder({ orderId: cart.orderId!! });
+  if (!order) {
+    throw new Error("Order not found");
+  }
 
-  const revisedCart = {
-    id: cart.id,
-    userIdentifier: cart.userIdentifier,
-    shipping: (cart.shipping as unknown as ShippingDetails) ?? undefined,
-    billing: (cart.billing as unknown as BillingDetails) ?? undefined,
+  const revisedOrder: Order = {
+    id: order.publicId,
+    userIdentifier: order.userIdentifier,
+    shipping: (order.shipping as unknown as ShippingDetails) ?? undefined,
+    billing: (order.billing as unknown as BillingDetails) ?? undefined,
     sessionId: cart.sessionId,
-    paymentId: cart.paymentId ?? undefined,
-    status: cart.status,
+    paymentId: order.paymentId ?? undefined,
+    status: order.status,
+    subTotal: order.subTotal / 100,
+    netTotal: order.netTotal / 100,
+    discount: order.discount / 100,
+    total: order.total / 100,
+    shippingFee: order.shippingFee / 100,
     items:
-      cart.items?.map(({ variant, quantity }) => {
-        const { product, options, ...details } = variant;
-        const { summary, ...productDetails } = product;
+      cart.items?.map(({ variant, product, quantity }) => {
         return {
-          variant: {
-            options: options.map((ele) => ele.value.displayName),
-            ...details,
-          },
-          product: { summary: summary ?? "", ...productDetails },
+          variant,
+          product,
           quantity,
         };
       }) ?? [],
   };
 
-  // @ts-ignore
-  if (isNCRPincode(cart.shipping.zip)) {
-    paymentMethod === PaymentMethod.RAZORPAY
-      ? await createNormalRazorpayOrder({
-          ...revisedCart,
-          customerId: customerId ?? null,
-        })
-      : await createNormalWalletOrder(revisedCart);
+  const normalOrder = isNCRPincode(revisedOrder.shipping.zip);
+  if (paymentMethod === PaymentMethod.RAZORPAY) {
+    // @ts-ignore
+    if (normalOrder) {
+      await createNormalRazorpayOrder({
+        ...revisedOrder,
+        customerId: customerId ?? null,
+      });
+    } else {
+      await createDrystoreRazorpayOrder(revisedOrder);
+    }
+  } else if (paymentMethod === PaymentMethod.OTTER) {
+    // @ts-ignore
+    if (normalOrder) {
+      await createNormalWalletOrder({
+        ...revisedOrder,
+        customerId: customerId ?? null,
+      });
+    } else {
+      await createDrystoreWalletOrder(revisedOrder);
+    }
   } else {
-    paymentMethod === PaymentMethod.RAZORPAY
-      ? await createDrystoreRazorpayOrder(revisedCart)
-      : await createDrystoreWalletOrder(revisedCart);
+    // @ts-ignore
+    if (normalOrder) {
+      await createNormalSplitOrder({
+        ...revisedOrder,
+        customerId: customerId ?? null,
+      });
+    } else {
+      await createDrystoreSplitOrder(revisedOrder);
+    }
   }
 };

@@ -18,8 +18,7 @@ import {
   ShippingDetails,
   PaymentMethod,
 } from "@/types/payment";
-import { getCartTotal } from "@/actions/user/cart/util";
-import { Cart } from "@/types/cart";
+
 import { useAccountStore } from "@/store/user/account.store";
 import { useAddressStore } from "@/store/user/address.store";
 
@@ -29,14 +28,14 @@ type ContextType = {
   billing?: BillingDetails;
   setBilling: Dispatch<SetStateAction<BillingDetails | undefined>>;
   isFetching: boolean;
-  total: number;
   shippingRate: number;
-  subtotal: number;
   showEstimate: boolean;
   paymentMethod: PaymentMethod;
   setPaymentMethod: Dispatch<SetStateAction<PaymentMethod>>;
   setCreateAccount: Dispatch<SetStateAction<boolean>>;
   setSameAsBilling: Dispatch<SetStateAction<boolean>>;
+  isCheckingOut: boolean;
+  setCheckingOut: Dispatch<SetStateAction<boolean>>;
 };
 
 const CheckoutContext = createContext<ContextType | undefined>(undefined);
@@ -46,11 +45,11 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
   const { data: address } = useAddressStore();
   const [createAccount, setCreateAccount] = useState(false);
   const [sameAsBilling, setSameAsBilling] = useState(false);
-
+  const [isCheckingOut, setCheckingOut] = useState(false);
   const [billing, setBilling] = useState<BillingDetails | undefined>();
   const [shipping, setShipping] = useState<ShippingDetails | undefined>();
+
   useEffect(() => {
-    console.log("here", user, address);
     // if (!user) return;
     const shippingAddress = address?.addresses?.find(
       (ele) => ele.tag === "SHIPPING",
@@ -68,9 +67,10 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     };
     const finalShipping = shippingAddress ?? DEFAULT_ADDRESS;
     const finalBilling = billingAddress ?? DEFAULT_ADDRESS;
+    const phone = user?.phone.replace("+91", "");
 
     setShipping({
-      phone: user?.phone ?? "9999999999",
+      phone: phone ?? "9999999999",
       firstName: user?.first_name ?? "Test",
       lastName: user?.last_name ?? "User",
       address: finalShipping.address ?? "",
@@ -85,7 +85,7 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     setBilling({
       zip: finalBilling.zip ?? "",
       city: finalBilling.city ?? "",
-      phone: user?.phone ?? "0000000000",
+      phone: phone ?? "9999999999",
       firstName: user?.first_name ?? "Test2",
       lastName: user?.last_name ?? "User2",
       email: "test123@example.com",
@@ -113,7 +113,6 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
   }, [sameAsBilling, billing, user]);
 
   const [shippingRate, setShippingRate] = useState<number>(9900);
-  const [subtotal, setSubTotal] = useState<number>(0);
   const [isFetching, setFetching] = useState<boolean>(false);
   const [showEstimate, setShowEstimate] = useState<boolean>(false);
   const [paymentMethod, setPaymentMethod] = useState(PaymentMethod.RAZORPAY);
@@ -135,21 +134,12 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const resolveSubTotal = async (cart: Cart) => {
-    try {
-      setFetching(true);
-      const res = await getCartTotal(cart);
-      setSubTotal(res);
-      return res;
-    } catch (err) {
-      return 0;
-    } finally {
-      setFetching(false);
-    }
-  };
-
   useEffect(() => {
     if (!shipping) return;
+    if (user && user.otter_pass) {
+      setShippingRate(0);
+      return;
+    }
     const pincode = shipping.zip?.trim();
     if (!pincode) return;
     if (!/^\d{6}$/.test(pincode)) return;
@@ -157,15 +147,6 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     setShowEstimate(!isNCR);
     resolveShippingRate(pincode);
   }, [shipping?.zip, cart]);
-
-  useEffect(() => {
-    if (!cart) return;
-    resolveSubTotal(cart);
-  }, [cart]);
-
-  const total = useMemo(() => {
-    return subtotal + shippingRate;
-  }, [subtotal, shippingRate]);
 
   return (
     <CheckoutContext.Provider
@@ -176,8 +157,8 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
         setBilling,
         shippingRate,
         isFetching,
-        total,
-        subtotal,
+        isCheckingOut,
+        setCheckingOut,
         showEstimate,
         setCreateAccount,
         setSameAsBilling,

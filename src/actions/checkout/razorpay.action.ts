@@ -1,6 +1,9 @@
 "use server";
 
 import { db, PaymentPurpose, PaymentStatus } from "@/lib/db";
+import { createPayment, getPaymentById } from "./payment.action";
+import { getOrder, updateOrderPayment } from "../orders/utils";
+import { validateUser } from "../auth/user.action";
 
 function getRazorpayProvider(payment: any): string | null {
   switch (payment.method) {
@@ -109,6 +112,7 @@ export async function handleRazorpayWebhook(payload: any) {
       });
 
       return {
+        isPartial: payment.isPartial,
         purpose,
         paymentId: payment.id,
         ok: true,
@@ -120,5 +124,109 @@ export async function handleRazorpayWebhook(payload: any) {
   } catch (err) {
     console.error("Razorpay Webhook Error:", err);
     throw err;
+  }
+}
+
+export async function getRazorpayCheckout({
+  amount,
+  isPartial,
+  orderId,
+}: {
+  amount: number;
+  isPartial: boolean;
+  orderId: string;
+}): Promise<{
+  success: boolean;
+  message: any;
+  razorPayOrderId?: string;
+}> {
+  try {
+    const { order } = await getOrder({ orderId });
+    const user = await validateUser();
+    if (!order) return { success: false, message: "Order not found" };
+    if (!order.paymentId) {
+      const payment = await createPayment({
+        amount,
+        purpose: PaymentPurpose.ORDER,
+        isPartial,
+        referenceId: order.publicId,
+        customerId: user && user.customerId ? user.customerId : null,
+      });
+
+      if (!payment.success || !payment.paymentId || !payment.orderId) {
+        return {
+          success: false,
+          message: payment.message ?? "Failed to create payment",
+        };
+      }
+      await updateOrderPayment({
+        paymentId: payment.paymentId,
+        orderId: order.publicId,
+      });
+      return {
+        success: true,
+        razorPayOrderId: payment.orderId,
+        message: "Payment created for cart",
+      };
+    }
+
+    const payment = await getPaymentById({
+      id: order.paymentId,
+    });
+
+    if (
+      payment &&
+      [
+        PaymentStatus.IN_PROGRESS,
+        PaymentStatus.PROCESSING,
+        // @ts-ignore
+      ].includes(payment.status)
+    ) {
+      return {
+        success: false,
+        message: "Ongoing payment for this checkout",
+      };
+    }
+    const shouldRecreate =
+      !payment || payment.amount !== amount || !payment.razorpayOrderId;
+
+    if (shouldRecreate) {
+      const newPayment = await createPayment({
+        amount,
+        purpose: PaymentPurpose.ORDER,
+        isPartial: false,
+        referenceId: order.publicId,
+        customerId: user && user.customerId ? user.customerId : null,
+      });
+
+      if (!newPayment.success || !newPayment.paymentId || !newPayment.orderId) {
+        return {
+          success: false,
+          message: "Failed to create payment",
+        };
+      }
+      await updateOrderPayment({
+        paymentId: newPayment.paymentId,
+        orderId: order.publicId,
+      });
+
+      return {
+        success: true,
+        razorPayOrderId: newPayment.orderId,
+        message: "Payment created for cart",
+      };
+    }
+
+    return {
+      success: true,
+      razorPayOrderId:
+        payment.razorpayOrderId === null ? undefined : payment.razorpayOrderId,
+      message: "Continuing existing payment",
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err?.message ?? "Failed to checkout",
+    };
   }
 }

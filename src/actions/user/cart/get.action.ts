@@ -2,7 +2,6 @@
 import { db } from "@/lib/db";
 import { getCartId } from "./util";
 import { Cart } from "@/types/cart";
-import { BillingDetails, ShippingDetails } from "@/types/payment";
 
 export const getCart = async (): Promise<Cart | null> => {
   const sessionId = await getCartId();
@@ -10,11 +9,13 @@ export const getCart = async (): Promise<Cart | null> => {
   const cart = await db.cart.findUnique({
     where: { sessionId },
     select: {
-      shipping: true,
-      billing: true,
       sessionId: true,
       status: true,
-      paymentId: true,
+      order: {
+        select: {
+          publicId: true,
+        },
+      },
       items: {
         select: {
           quantity: true,
@@ -59,11 +60,87 @@ export const getCart = async (): Promise<Cart | null> => {
   if (!cart) return null;
 
   return {
-    shipping: (cart.shipping as unknown as ShippingDetails) ?? undefined,
-    billing: (cart.billing as unknown as BillingDetails) ?? undefined,
     sessionId: cart.sessionId,
-    paymentId: cart.paymentId ?? undefined,
     status: cart.status,
+    orderId: cart.order?.publicId,
+    items:
+      cart.items?.map(({ variant, quantity }) => {
+        const { product, options, ...details } = variant;
+        const { summary, ...productDetails } = product;
+        return {
+          variant: {
+            options: options.map((ele) => ele.value.displayName),
+            ...details,
+          },
+          product: { summary: summary ?? "", ...productDetails },
+          quantity,
+        };
+      }) ?? [],
+  };
+};
+
+export const getCartById = async ({
+  sessionId,
+}: {
+  sessionId: string;
+}): Promise<Cart | null> => {
+  const cart = await db.cart.findUnique({
+    where: { sessionId },
+    select: {
+      sessionId: true,
+      status: true,
+      order: {
+        select: {
+          publicId: true,
+        },
+      },
+      items: {
+        select: {
+          quantity: true,
+          variant: {
+            select: {
+              sku: true,
+              price: true,
+              publicId: true,
+              options: {
+                select: {
+                  value: { select: { displayName: true } },
+                },
+              },
+              product: {
+                select: {
+                  summary: true,
+                  displayName: true,
+                  nutritionalInfo: true,
+                  slug: true,
+                  assets: {
+                    where: {
+                      isPrimary: true,
+                    },
+                    take: 1,
+                    select: {
+                      url: true,
+                      thumbnail: true,
+                      type: true,
+                      position: true,
+                      isPrimary: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!cart) return null;
+
+  return {
+    sessionId: cart.sessionId,
+    status: cart.status,
+    orderId: cart.order?.publicId,
     items:
       cart.items?.map(({ variant, quantity }) => {
         const { product, options, ...details } = variant;

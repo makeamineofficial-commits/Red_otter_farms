@@ -1,7 +1,6 @@
 "use server";
-import { validateUser } from "@/actions/auth/user.action";
+import { getUser, validateUser } from "@/actions/auth/user.action";
 import { Account } from "@/types/account";
-import axios from "axios";
 export async function getAccount() {
   try {
     const user = await validateUser();
@@ -11,20 +10,16 @@ export async function getAccount() {
         message: "Failed to authenticate user",
       };
     const { phone } = user;
-
-    const res = await axios.post(
-      "https://automation.redotterfarms.com/webhook/0b38de6f-5560-4396-8204-a1874e419a2d",
-      { phone },
-      {
-        headers: { api_key: process.env.BACKEND_API_KEY as string },
-      },
-    );
-
-    const account = res.data;
+    if (!phone)
+      return {
+        success: false,
+        message: "User not logged in",
+      };
+    const account = await getUser(phone);
     return {
       success: true,
       message: "User details found",
-      account: account[0] as Account,
+      account: account as Account,
     };
   } catch (err) {
     return {

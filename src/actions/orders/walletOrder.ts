@@ -1,10 +1,8 @@
 "use server";
 
-import { CartExtended } from "@/types/cart";
 import {
   finalizeOrder,
   saveOrderToFile,
-  calculateTotal,
   sendNormalOrder,
   sendDryStoreOrder,
 } from "./utils";
@@ -17,101 +15,85 @@ import {
 
 import { afterCheckout } from "../checkout/checkout.action";
 import { PaymentStatus } from "@/lib/db";
-import { validateUser } from "../auth/user.action";
+import { Order } from "@/types/order";
 
-export async function createNormalWalletOrder(cart: CartExtended) {
-  const user = await validateUser();
+export async function createNormalWalletOrder(
+  orderDetails: Order & { customerId: string | null },
+) {
   await afterCheckout();
-  const total = await calculateTotal(cart);
 
   const order = {
-    id: cart.sessionId,
+    id: orderDetails.id,
 
     order_date: new Date().toISOString().slice(0, 10),
 
-    customer_id: user && user.customerId ? user.customerId : null,
+    customer_id: orderDetails.customerId,
 
-    mobile: (cart.billing.phone as string).startsWith("+91")
-      ? cart.billing.phone
-      : "+91" + cart.billing.phone,
+    mobile: orderDetails.billing.phone.startsWith("+91")
+      ? orderDetails.billing.phone
+      : "+91" + orderDetails.billing.phone,
 
     payment_status: "PAID",
 
-    billing_address: buildNormalAddress(cart.billing),
+    billing_address: buildNormalAddress(orderDetails.billing),
 
-    shipping_address: buildNormalAddress(cart.shipping),
+    shipping_address: buildNormalAddress(orderDetails.shipping),
 
     order_items: {
-      items: buildNormalItems(cart),
+      items: buildNormalItems(orderDetails),
     },
     payment_object: {
-      cart_value: total,
-      otterwallet: total,
+      cart_value: orderDetails.subTotal,
+      otterwallet: orderDetails.total,
 
       rof_campaign: {
         coupon: "",
       },
 
-      split_payment: total,
-      delivery_charge: 0,
-      discount_amount: 0,
+      split_payment: false,
+      delivery_charge: orderDetails.shippingFee,
+      discount_amount: orderDetails.discount,
       customer_payment: {
         useRazorpay: false,
         useOtterWallet: true,
-        total_payment_due: total,
+        total_payment_due: orderDetails.total,
         razorpay_payment_amount: 0,
-        otterwallet_payment_amount: total,
+        otterwallet_payment_amount: orderDetails.total,
       },
 
-      total_order_value: total,
+      total_order_value: orderDetails.total,
     },
 
     source: "Website - NCR",
 
-    place_of_supply: cart.shipping.state,
+    place_of_supply: orderDetails.shipping.state,
   };
-  await sendNormalOrder(order);
-  await finalizeOrder(cart.id, cart.userIdentifier!, PaymentStatus.VERIFIED);
-  await saveOrderToFile(`order_${cart.sessionId}`, order);
+  if (process.env.NODE_ENV === "production") await sendNormalOrder(order);
+  await finalizeOrder(orderDetails.sessionId, PaymentStatus.VERIFIED);
+  await saveOrderToFile(`order_${orderDetails.sessionId}_normal_wallet`, order);
   return order;
 }
 
-export async function createDrystoreWalletOrder(cart: CartExtended) {
-  const total = await calculateTotal(cart);
-
+export async function createDrystoreWalletOrder(orderDetails: Order) {
+  await afterCheckout();
   const order = {
-    id: Number(cart.sessionId),
-
-    number: cart.sessionId,
-
-    status: "processing",
-
+    id: orderDetails.id,
+    number: orderDetails.sessionId,
+    status: "paid",
     currency: "INR",
-
     version: "9.9.5",
-
     date_created_utc: new Date().toISOString(),
-
     date_paid_utc: new Date().toISOString(),
-
-    total: total.total.toFixed(2),
-
-    shipping_total: total.shipping.toFixed(2),
-
+    total: orderDetails.total,
+    shipping_total: orderDetails.shippingFee,
     payment_method: "wallet",
-
     payment_method_title: "Otter Wallet",
-
     created_via: "checkout",
-
-    billing: buildDrystoreAddress(cart.billing),
-
-    shipping: buildDrystoreAddress(cart.shipping),
-
-    line_items: buildDrystoreItems(cart),
-
+    billing: buildDrystoreAddress(orderDetails.billing),
+    shipping: buildDrystoreAddress(orderDetails.shipping),
+    line_items: buildDrystoreItems(orderDetails),
     shipping_lines:
-      total.shipping === 0
+      orderDetails.shippingFee === 0
         ? [
             {
               method_title: "Free Shipping",
@@ -121,14 +103,17 @@ export async function createDrystoreWalletOrder(cart: CartExtended) {
         : [
             {
               method_title: "ShipRocket",
-              total: total.shipping.toFixed(2),
+              total: orderDetails.shippingFee.toFixed(2),
             },
           ],
 
     fee_lines: [],
   };
-  await sendDryStoreOrder(order);
-  await finalizeOrder(cart.id, cart.userIdentifier!, PaymentStatus.VERIFIED);
-  await saveOrderToFile(`order_${cart.sessionId}`, order);
+  if (process.env.NODE_ENV === "production") await sendDryStoreOrder(order);
+  await finalizeOrder(orderDetails.sessionId, PaymentStatus.VERIFIED);
+  await saveOrderToFile(
+    `order_${orderDetails.sessionId}_drystore_wallet`,
+    order,
+  );
   return order;
 }

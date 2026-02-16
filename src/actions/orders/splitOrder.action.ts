@@ -16,10 +16,10 @@ import {
 import { razorpay } from "@/lib/razorpay";
 
 import { validateUser } from "../auth/user.action";
-import { db, PaymentStatus } from "@/lib/db";
+import { db } from "@/lib/db";
 import { Order } from "@/types/order";
 
-export async function createNormalRazorpayOrder(
+export async function createNormalSplitOrder(
   orderDetails: Order & { customerId: string | null },
 ) {
   if (!orderDetails.paymentId) throw new Error("Missing paymentId");
@@ -38,7 +38,7 @@ export async function createNormalRazorpayOrder(
 
   const finalStatus = mapRazorpayStatus(payment.status);
 
-  const total = Number(payment.amount) / 100;
+  const paidViaRazorpay = Number(payment.amount) / 100;
 
   const order = {
     id: orderDetails.id,
@@ -63,21 +63,21 @@ export async function createNormalRazorpayOrder(
 
     payment_object: {
       cart_value: orderDetails.subTotal,
-      otterwallet: 0,
+      otterwallet: orderDetails.total - paidViaRazorpay,
       rof_campaign: {
         coupon: "",
       },
-      split_payment: false,
+      split_payment: true,
       delivery_charge: orderDetails.shippingFee,
       discount_amount: orderDetails.discount,
       customer_payment: {
         useRazorpay: true,
-        useOtterWallet: false,
-        total_payment_due: total,
-        razorpay_payment_amount: total,
-        otterwallet_payment_amount: 0,
+        useOtterWallet: true,
+        total_payment_due: orderDetails.total,
+        razorpay_payment_amount: paidViaRazorpay,
+        otterwallet_payment_amount: orderDetails.total - paidViaRazorpay,
       },
-      total_order_value: total,
+      total_order_value: orderDetails.total,
     },
     razorpay_payment: {
       amount: Number(payment.amount) / 100,
@@ -101,19 +101,19 @@ export async function createNormalRazorpayOrder(
 
     place_of_supply: orderDetails.shipping.state,
   };
-
-  if (finalStatus === "VERIFIED") console.log("[RAZORPAY NORMAL] Order sent");
+  if (finalStatus === "VERIFIED")
+    console.log("[SPLIT NORMAL] Order sent", orderDetails.sessionId);
   if (process.env.NODE_ENV === "production" && finalStatus === "VERIFIED")
     await sendNormalOrder(order);
   await finalizeOrder(orderDetails.sessionId, finalStatus);
   await saveOrderToFile(
-    `order_${orderDetails.sessionId}_normal_razorpay`,
+    `order_${orderDetails.sessionId}_split_razorpay`,
     order,
   );
   return order;
 }
 
-export async function createDrystoreRazorpayOrder(orderDetails: Order) {
+export async function createDrystoreSplitOrder(orderDetails: Order) {
   if (!orderDetails.paymentId) throw new Error("Missing paymentId");
 
   const paymentInstance = await db.payment.findUnique({
@@ -128,8 +128,6 @@ export async function createDrystoreRazorpayOrder(orderDetails: Order) {
 
   const finalStatus = mapRazorpayStatus(payment.status);
 
-  const total = Number(payment.amount) / 100;
-
   const order = {
     id: orderDetails.id,
     number: orderDetails.sessionId,
@@ -138,10 +136,10 @@ export async function createDrystoreRazorpayOrder(orderDetails: Order) {
     version: "9.9.5",
     date_created_utc: new Date().toISOString(),
     date_paid_utc: new Date().toISOString(),
-    total: total,
+    total: orderDetails.total,
     shipping_total: orderDetails.shippingFee,
-    payment_method: "razorpay",
-    payment_method_title: "Razorpay",
+    payment_method: "split",
+    payment_method_title: "Split",
     created_via: "checkout",
     razorpay_order_id: payment.order_id,
     transaction_id: payment.id,
@@ -165,12 +163,13 @@ export async function createDrystoreRazorpayOrder(orderDetails: Order) {
 
     fee_lines: [],
   };
-  if (finalStatus === "VERIFIED") console.log("[RAZORPAY NORMAL] Order sent");
+  if (finalStatus === "VERIFIED")
+    console.log("[SPLIT DRYSTORE] Order sent", orderDetails.sessionId);
   if (process.env.NODE_ENV === "production" && finalStatus === "VERIFIED")
     await sendDryStoreOrder(order);
   await finalizeOrder(orderDetails.sessionId, finalStatus);
   await saveOrderToFile(
-    `order_${orderDetails.sessionId}_drystore_razorpay`,
+    `order_${orderDetails.sessionId}_drystore_split`,
     order,
   );
   return order;

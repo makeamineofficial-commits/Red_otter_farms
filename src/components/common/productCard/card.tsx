@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { convertToCartItem, formatPrice } from "@/lib/utils";
 import { Share } from "../share";
 import Wishlist from "./wishlist";
 import { motion, AnimatePresence } from "framer-motion";
+
 export function ProductCard(product: ProductPreview) {
   const {
     displayName,
@@ -28,7 +29,7 @@ export function ProductCard(product: ProductPreview) {
     variants,
     inStock,
   } = product;
-  const { update, cart, remove } = useCart();
+  const { update, cart, remove, discount } = useCart();
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -109,12 +110,22 @@ export function ProductCard(product: ProductPreview) {
             )}
           </div>
         </div>
+
         <p className="text-sm font-semibold">
-          ₹{formatPrice(price)}
+          ₹{formatPrice(price * discount)}
           {mrp && (
             <span className="text-xs text-muted-foreground line-through ml-1">
               ₹{formatPrice(mrp)}
             </span>
+          )}
+          {discount < 1 ? (
+            <>
+              <Badge className="ml-2" variant={"outline"}>
+                Extra {100 - discount * 100}% Off
+              </Badge>
+            </>
+          ) : (
+            <></>
           )}
         </p>
       </div>

@@ -2,21 +2,26 @@
 
 import { CartStatus, OrderStatus, PaymentStatus } from "@/lib/db";
 import { db } from "@/lib/db";
-import { Cart } from "@/types/cart";
 import axios from "axios";
 import fs from "fs/promises";
 import path from "path";
-import { getShippingRate } from "../checkout/shipping.action";
-import { getCartTotal } from "../user/cart/util";
 
 export async function finalizeOrder(
   cartId: string,
-  userId: string,
   finalStatus: PaymentStatus,
 ) {
   await db.$transaction(async (tx) => {
+    const cart = await tx.cart.findUnique({
+      where: {
+        sessionId: cartId,
+      },
+    });
+
+    if (!cart) {
+      throw new Error("Cart not found");
+    }
     const existing = await tx.order.findUnique({
-      where: { cartId },
+      where: { cartId: cart.id },
     });
 
     const orderStatus =
@@ -24,25 +29,16 @@ export async function finalizeOrder(
         ? OrderStatus.PLACED
         : OrderStatus.FAILED;
 
-    if (!existing) {
-      await tx.order.create({
-        data: {
-          cartId,
-          userIdentifier: userId,
-          status: orderStatus,
-        },
-      });
-    } else {
-      await tx.order.update({
-        where: { id: existing.id },
-        data: { status: orderStatus },
+    await tx.order.update({
+      where: { id: existing!!.id },
+      data: { status: orderStatus },
+    });
+    if (orderStatus === "PLACED") {
+      await tx.cart.update({
+        where: { sessionId: cartId },
+        data: { status: CartStatus.CONVERTED },
       });
     }
-
-    await tx.cart.update({
-      where: { id: cartId },
-      data: { status: CartStatus.CONVERTED },
-    });
   });
 }
 
@@ -72,21 +68,6 @@ export async function saveOrderToFile(prefix: string, orderData: unknown) {
 
     throw new Error("Could not save order file");
   }
-}
-
-export async function calculateTotal(
-  cart: Cart,
-): Promise<{ subTotal: number; total: number; shipping: number }> {
-  const shipping = await getShippingRate({
-    deliveryPincode: cart.shipping.zip,
-  });
-  const subTotal = await getCartTotal(cart);
-
-  return {
-    subTotal: subTotal / 100,
-    total: subTotal + shipping.rate / 100,
-    shipping: shipping.rate / 100,
-  };
 }
 
 export async function sendNormalOrder(payload: any) {
@@ -120,3 +101,42 @@ export async function sendDryStoreOrder(payload: any) {
     return { success: false, message: "Failed to send drystore order" };
   }
 }
+
+export async function getOrder({ orderId }: { orderId: string }) {
+  const order = await db.order.findUnique({
+    where: {
+      publicId: orderId,
+    },
+  });
+  if (!order) return { success: false };
+
+  return { order, sucess: true };
+}
+
+export const updateOrderPayment = async ({
+  paymentId,
+  orderId,
+}: {
+  paymentId: string;
+  orderId: string;
+}): Promise<{ success: boolean }> => {
+  const order = await db.order.findUnique({
+    where: { publicId: orderId },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!order) return { success: false };
+
+  await db.order.update({
+    where: { publicId: orderId },
+    data: {
+      paymentId,
+    },
+  });
+
+  return {
+    success: true,
+  };
+};

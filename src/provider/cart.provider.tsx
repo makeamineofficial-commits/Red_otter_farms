@@ -6,10 +6,13 @@ import {
   useState,
   ReactNode,
   useEffect,
+  useMemo,
 } from "react";
 import { getCart } from "@/actions/user/cart/get.action";
 import { updateCart } from "@/actions/user/cart/update.action";
 import { Cart, Item } from "@/types/cart";
+import { useAccountStore } from "@/store/user/account.store";
+import { loyaltyDiscount } from "@/types/product";
 
 type ContextType = {
   isOpen: boolean;
@@ -24,7 +27,7 @@ type ContextType = {
     items: { item: Item; quantity: number }[];
     toggle?: boolean;
   }) => Promise<void>;
-
+  discount: number;
   cart: Cart | null;
   isUpdating: boolean;
   isLoading: boolean;
@@ -38,7 +41,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<Cart | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [isUpdating, setUpdating] = useState(false);
-
+  const { data: user, isLoading: userLoading, isFetching } = useAccountStore();
   const refetch = async () => {
     try {
       setLoading(true);
@@ -184,9 +187,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const discount = useMemo(() => {
+    if (!user) return 1;
+    const status = user.loyality_status?.toLowerCase().trim() ?? "none";
+    return loyaltyDiscount[status] ?? 1;
+  }, [user, isFetching, userLoading]);
+
   return (
     <Context.Provider
       value={{
+        discount,
         isOpen,
         toggle,
         update,

@@ -12,10 +12,11 @@ import { useRouter } from "next/navigation";
 
 export const useCheckoutHandler = () => {
   const { replace } = useRouter();
-  const [isCheckingOut, setCheckingOut] = useState(false);
+
   const { billing, shipping, paymentMethod } = useCheckout();
   const [orderId, setOrderId] = useState<string | null>(null);
   const { cart } = useCart();
+  const { isCheckingOut, setCheckingOut } = useCheckout();
   const validateBilling = (billing: BillingDetails) => {
     if (!billing) return false;
 
@@ -27,7 +28,6 @@ export const useCheckoutHandler = () => {
       "city",
       "state",
       "zip",
-      "country",
     ];
     for (const field of requiredFields) {
       if (
@@ -50,7 +50,6 @@ export const useCheckoutHandler = () => {
       "city",
       "state",
       "zip",
-      "country",
     ];
     for (const field of requiredFields) {
       if (!shipping[field] || shipping[field].trim() === "") {
@@ -81,10 +80,8 @@ export const useCheckoutHandler = () => {
       setCheckingOut(true);
       const res = await getCheckout({
         paymentMethod,
-        // @ts-ignore
-        shipping,
-        // @ts-ignore
         billing,
+        shipping,
       });
 
       if (!res.success) {
@@ -94,15 +91,21 @@ export const useCheckoutHandler = () => {
         };
       }
 
-      if (paymentMethod === PaymentMethod.RAZORPAY && res.orderId) {
-        setOrderId(res.orderId);
+      if (
+        (res.paymentMethod === PaymentMethod.RAZORPAY ||
+          res.paymentMethod === PaymentMethod.SPLIT) &&
+        res.razorPayOrderId
+      ) {
+    
+        setOrderId(res.razorPayOrderId);
         return {
           success: true,
           message: "Order Created Successfully",
         };
       }
-      if (paymentMethod === PaymentMethod.OTTER) {
-        replace("/order-placed");
+      if (res.paymentMethod === PaymentMethod.OTTER) {
+     
+        window.location.replace("/checkout/placed");
         return {
           success: true,
           message: "Order Created Successfully",
@@ -131,5 +134,5 @@ export const useCheckoutHandler = () => {
     }
   };
 
-  return { checkout, orderId, isCheckingOut, setOrderId };
+  return { checkout, orderId, setOrderId };
 };

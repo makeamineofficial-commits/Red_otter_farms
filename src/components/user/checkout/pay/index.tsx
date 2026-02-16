@@ -6,7 +6,7 @@ import { useCheckoutHandler } from "@/hooks/user/use-checkout";
 import { useCart } from "@/provider/cart.provider";
 import { useCheckout } from "@/provider/checkout.provider";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -15,11 +15,12 @@ declare global {
 }
 
 export default function Pay() {
-  const { isFetching, total } = useCheckout();
+  const { isFetching, isCheckingOut } = useCheckout();
+  const paymentSuccessRef = useRef(false);
 
   const { cart, isLoading, isUpdating } = useCart();
 
-  const { checkout, isCheckingOut, orderId, setOrderId } = useCheckoutHandler();
+  const { checkout, orderId, setOrderId } = useCheckoutHandler();
   const { replace } = useRouter();
   const isDisabled =
     isLoading ||
@@ -56,25 +57,24 @@ export default function Pay() {
 
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
-      amount: total,
       currency: "INR",
       name: "Otter Store",
       description: "Order Payment",
       order_id: orderId,
 
       handler: async function (response: any) {
+        paymentSuccessRef.current = true;
+        setOrderId(null);
         await afterCheckout();
-        replace("/order-placed");
+        window.location.replace(`/checkout/placed`); // hard reload
       },
-
       theme: {
         color: "#15803d",
       },
 
       modal: {
-        ondismiss: function () {
+        ondismiss: async function () {
           setOrderId(null);
-          console.log("Payment Closed");
         },
       },
     };

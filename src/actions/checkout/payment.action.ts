@@ -119,7 +119,9 @@ export const createPayment = async ({
   purpose,
   referenceId,
   customerId,
+  isPartial,
 }: {
+  isPartial: boolean;
   purpose: PaymentPurpose;
   amount: number;
   referenceId: string;
@@ -163,7 +165,7 @@ export const createPayment = async ({
       data: {
         referenceId,
         purpose,
-
+        isPartial,
         amount,
       },
     });
@@ -176,6 +178,7 @@ export const createPayment = async ({
         purpose,
         paymentId: payment.publicId,
         customerId,
+        isPartial: Number(isPartial),
       },
       currency: "INR",
     });

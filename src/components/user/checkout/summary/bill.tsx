@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 function BillSkeleton() {
   return (
@@ -37,13 +38,14 @@ function BillSkeleton() {
 }
 
 export default function Bill() {
-  const { cart, isLoading, isUpdating } = useCart();
+  const { cart, isLoading, isUpdating, discount } = useCart();
   const { shippingRate, showEstimate, isFetching } = useCheckout();
 
   const subtotal = useMemo(() => {
     return (
       cart?.items.reduce(
-        (sum, product) => sum + product.variant.price * product.quantity,
+        (sum, product) =>
+          sum + product.variant.price * discount * product.quantity,
         0,
       ) ?? 0
     );
@@ -68,11 +70,16 @@ export default function Bill() {
           <span>₹{formatPrice(subtotal)}</span>
         </div>
         <div className="flex items-center justify-between text-muted-foreground">
-          <span>Delivery Fee</span>
+          <div>
+            <span>Delivery Fee</span>
+            {shippingRate === 0 && (
+              <Badge className="ml-2 bg-maroon">Otter Pass Active</Badge>
+            )}
+          </div>
 
           <span className="flex items-center gap-1">
             ₹{formatPrice(shippingRate)}
-            {showEstimate && (
+            {shippingRate > 0 && showEstimate && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -81,7 +88,7 @@ export default function Bill() {
                     </span>
                   </TooltipTrigger>
 
-                  <TooltipContent className="max-w-xs text-xs leading-relaxed">
+                  <TooltipContent className="max-w-75 text-xs leading-relaxed">
                     The pincode you’ve entered requires external shipping, so
                     delivery charges may vary slightly at final payment based on
                     courier availability.

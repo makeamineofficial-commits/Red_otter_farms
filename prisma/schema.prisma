@@ -229,12 +229,7 @@ model Cart{
   status CartStatus @default(ACTIVE)
   items CartItem[]
 
-  shipping Json?
-  billing Json?
-  paymentId String?
-
   order Order? @relation("cart_to_order")
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -258,27 +253,39 @@ model CartItem{
 
 enum OrderStatus {
   CREATED
-
   PROCESSING 
-
   FAILED            
   PLACED  
-
   REFUNDED
-
   CANCELLED
+}
+enum PaymentMethod {
+  RAZORPAY
+  OTTER
+  SPLIT
 }
 
 model Order{
   id String @id @default(uuid())
   publicId String @unique @default(dbgenerated("concat('order_', gen_random_uuid())"))
-  
   userIdentifier String  
+
+  paymentMethod  PaymentMethod
 
   cartId String  @unique
   cart Cart  @relation("cart_to_order",fields: [cartId],references: [id] ,onDelete: Cascade)
 
+  shipping Json?
+  billing Json?
+  paymentId String?
+  
   status OrderStatus  @default(CREATED)
+
+  subTotal Int
+  discount Int @default(0)
+  netTotal Int
+  shippingFee Int
+  total Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -288,12 +295,8 @@ model Order{
 enum PaymentStatus {
   CREATED
   PENDING     
-
-
   IN_PROGRESS 
   PROCESSING 
-
-
   FAILED            
   VERIFIED   
   REFUNDED
@@ -305,6 +308,8 @@ enum PaymentStatus {
 
 enum PaymentPurpose {
     ORDER   
+    OTTER_PASS
+    NUTRITION_METER
 }
 
 
@@ -320,6 +325,8 @@ model Payment {
   currency String @default("INR")
 
   status PaymentStatus @default(CREATED)
+
+  isPartial Boolean @default(false)
 
   razorpayOrderId String?
   razorpayPaymentId String? 

@@ -11,6 +11,8 @@ import { useProduct } from "@/provider/product.provider";
 import ProductFAQs from "./faq";
 import { Product, Variant } from "@/types/product";
 import VariantSelector from "./variants";
+import { useCart } from "@/provider/cart.provider";
+import { Badge } from "@/components/ui/badge";
 
 export default function Hero({
   product,
@@ -21,7 +23,7 @@ export default function Hero({
   };
 }) {
   const { selectedVariant } = useProduct();
-
+  const { discount } = useCart();
   const { type, displayName, description, options, variants } = product;
 
   const hasMultipleVariants = variants.length > 1;
@@ -35,7 +37,7 @@ export default function Hero({
       <Nutrition {...product} />
 
       <div className="space-y-1.5">
-        <h1 className="text-[2.375rem] leading-[120%] font-semibold">
+        <h1 className="text-[2.375rem] capitalize leading-[120%] font-semibold">
           {displayName}
         </h1>
 
@@ -54,7 +56,10 @@ export default function Hero({
               {selectedVariant?.price !== selectedVariant?.mrp ? (
                 <>
                   <p className="text-[1.875rem] font-bold leading-none">
-                    ₹{formatPrice(selectedVariant?.price ?? 0)}
+                    ₹
+                    {formatPrice(
+                      Number(selectedVariant?.price || "0") * discount,
+                    )}
                   </p>
 
                   <p className="text-muted-foreground line-through">
@@ -63,9 +68,21 @@ export default function Hero({
                 </>
               ) : (
                 <p className="text-[1.875rem] font-bold">
-                  ₹{formatPrice(selectedVariant?.price ?? 0)}
+                  ₹
+                  {formatPrice(
+                    Number(selectedVariant?.price || "0") * discount,
+                  )}
                 </p>
               )}
+            {discount < 1 ? (
+              <>
+                <Badge className="ml-2 bg-forest!">
+                  Extra {100 - discount * 100}% Off
+                </Badge>
+              </>
+            ) : (
+              <></>
+            )}
             </div>
           </div>
           <Count product={product} />

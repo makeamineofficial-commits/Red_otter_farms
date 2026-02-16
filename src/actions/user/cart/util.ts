@@ -6,7 +6,8 @@ import { cookies } from "next/headers";
 import { CartStatus } from "../../../../generated/prisma/enums";
 import { getCart } from "./get.action";
 import { Cart } from "@/types/cart";
-
+import { getAccount } from "../account/get.action";
+import { loyaltyDiscount } from "@/types/product";
 export async function getCartId() {
   const cookieStore = await cookies();
   const sessionCartId = cookieStore.get("cart")?.value;
@@ -51,9 +52,18 @@ export async function getCartId() {
 }
 
 export async function getCartTotal(cart: Cart) {
-  const total = cart.items.reduce((prev, cur) => {
+  const user = await getAccount();
+  const status = user.account?.loyality_status?.toLowerCase() ?? "none";
+
+  const discount = loyaltyDiscount[status] ?? 1;
+
+  const subTotal = cart.items.reduce((prev, cur) => {
     return prev + cur.quantity * cur.variant.price;
   }, 0);
 
-  return total;
+  const netTotal = cart.items.reduce((prev, cur) => {
+    return prev + cur.quantity * cur.variant.price * discount;
+  }, 0);
+
+  return { discount: subTotal - netTotal, netTotal, subTotal };
 }

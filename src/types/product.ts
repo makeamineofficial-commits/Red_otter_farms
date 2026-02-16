@@ -126,3 +126,10 @@ export interface VariantOption {
   option: string;
   optionValue: string;
 }
+
+export const loyaltyDiscount: Record<string, number> = {
+  access: 0.95,
+  privy: 0.9,
+  signature: 0.85,
+  none: 1,
+};

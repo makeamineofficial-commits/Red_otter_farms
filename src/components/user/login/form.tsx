@@ -78,7 +78,7 @@ export default function LoginForm({ close }: { close: () => void }) {
       }
 
       toast.success("Login successful");
-      await refetch();
+      window.location.reload();
       close();
     });
   };
