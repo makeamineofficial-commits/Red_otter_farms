@@ -96,7 +96,6 @@ export const useCheckoutHandler = () => {
           res.paymentMethod === PaymentMethod.SPLIT) &&
         res.razorPayOrderId
       ) {
-    
         setOrderId(res.razorPayOrderId);
         return {
           success: true,
@@ -104,8 +103,7 @@ export const useCheckoutHandler = () => {
         };
       }
       if (res.paymentMethod === PaymentMethod.OTTER) {
-     
-        window.location.replace("/checkout/placed");
+        window.location.replace(`/checkout/placed/${res.orderId}`);
         return {
           success: true,
           message: "Order Created Successfully",

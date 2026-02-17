@@ -274,35 +274,38 @@ function FilterSection({ children }: { children?: ReactNode }) {
 export default function Filter() {
   const [open, setOpen] = useState(false);
   return (
-    <aside>
-      <nav className="hidden lg:block border rounded-2xl">
-        <FilterSection />
-      </nav>
-
-      <div className=" items-center gap-2  flex lg:hidden">
-        <Sliders
-          className="rotate-90"
-          size={20}
-          onClick={() => setOpen((prev) => !prev)}
-        />
-      </div>
-
-      <div
-        onClick={() => setOpen(false)}
-        className={`bg-black/30 fixed top-0 left-0 h-screen z-90 w-screen ${open ? "block lg:hidden" : "hidden"}`}
-      ></div>
-      <nav
-        className={`fixed top-0 left-0  bg-white shadow-xl h-screen block lg:hidden z-100 overflow-x-hidden overflow-y-auto no-scrollbar transition-all duration-200 ${open ? "max-w-96" : "max-w-0"} `}
-      >
-        <div className="p-4">
-          <FilterSection>
-            <X
-              className="absolute top-5 right-4"
-              onClick={() => setOpen((prev) => !prev)}
-            ></X>
-          </FilterSection>
+    <>
+      <aside className="hidden lg:block border rounded-2xl sticky top-50 max-h-500">
+        <nav>
+          <FilterSection />
+        </nav>
+      </aside>
+      <aside className=" flex lg:hidden">
+        <div className=" items-center gap-2 ">
+          <Sliders
+            className="rotate-90"
+            size={20}
+            onClick={() => setOpen((prev) => !prev)}
+          />
         </div>
-      </nav>
-    </aside>
+
+        <div
+          onClick={() => setOpen(false)}
+          className={`bg-black/30 fixed top-0 left-0 h-screen z-90 w-screen ${open ? "block lg:hidden" : "hidden"}`}
+        ></div>
+        <nav
+          className={`fixed top-0 left-0  bg-white shadow-xl h-screen block lg:hidden z-100 overflow-x-hidden overflow-y-auto no-scrollbar transition-all duration-200 ${open ? "max-w-96" : "max-w-0"} `}
+        >
+          <div className="p-4">
+            <FilterSection>
+              <X
+                className="absolute top-5 right-4"
+                onClick={() => setOpen((prev) => !prev)}
+              ></X>
+            </FilterSection>
+          </div>
+        </nav>
+      </aside>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 "use server";
 
 import { db, PaymentPurpose, PaymentStatus } from "@/lib/db";
-import { createPayment, getPaymentById } from "./payment.action";
+import { createPayment, getPaymentById } from "../payment/payment.action";
 import { getOrder, updateOrderPayment } from "../orders/utils";
 import { validateUser } from "../auth/user.action";
 
@@ -28,21 +28,36 @@ export async function handleRazorpayWebhook(payload: any) {
   try {
     const event = payload.event;
     const paymentEntity = payload?.payload?.payment?.entity;
+
     if (!paymentEntity) {
       throw new Error("Invalid Razorpay payload");
     }
 
     const razorpayPaymentId = paymentEntity.id;
     const razorpayOrderId = paymentEntity.order_id;
-    const amountPaid = paymentEntity.amount;
+
+    const amountPaid = paymentEntity.amount; // in paise
     const status = paymentEntity.status;
     const method = paymentEntity.method;
+
+    // ✅ Charges (in paise)
+    const bankFee = paymentEntity.fee ?? 0;
+    const tax = paymentEntity.tax ?? 0;
+
+    const netAmount = amountPaid - bankFee;
 
     const provider = getRazorpayProvider(paymentEntity);
 
     const dbPaymentId = paymentEntity?.notes?.paymentId;
     const purpose: PaymentPurpose = paymentEntity?.notes.purpose;
     const customerId = paymentEntity?.notes.customerId;
+
+    const customerEmail = paymentEntity.email ?? null;
+    const customerPhone = paymentEntity.contact ?? null;
+    const customerVpa = paymentEntity.vpa ?? null;
+    const customerBank = paymentEntity.bank ?? null;
+    const customerCardId = paymentEntity.card_id ?? null;
+    const customerWallet = paymentEntity.wallet ?? null;
 
     if (!dbPaymentId) {
       throw new Error("Missing internal paymentId in notes");
@@ -58,7 +73,7 @@ export async function handleRazorpayWebhook(payload: any) {
 
     const alreadyProcessed = await db.payment.findFirst({
       where: {
-        razorpayPaymentId: razorpayPaymentId,
+        razorpayPaymentId,
       },
     });
 
@@ -70,13 +85,11 @@ export async function handleRazorpayWebhook(payload: any) {
       throw new Error("Payment already verified");
     }
 
-    await db.$transaction(async (tx) => {
-      await tx.payment.update({
-        where: { id: payment.id },
-        data: {
-          status: PaymentStatus.PROCESSING,
-        },
-      });
+    await db.payment.update({
+      where: { id: payment.id },
+      data: {
+        status: PaymentStatus.PROCESSING,
+      },
     });
 
     let finalStatus: PaymentStatus = PaymentStatus.PROCESSING;
@@ -96,7 +109,6 @@ export async function handleRazorpayWebhook(payload: any) {
     }
 
     return await db.$transaction(async (tx) => {
-      // Update Payment
       await tx.payment.update({
         where: { id: payment.id },
         data: {
@@ -105,7 +117,16 @@ export async function handleRazorpayWebhook(payload: any) {
           razorpayOrderId,
           razorpayEvent: event,
           provider,
-          method: method,
+          method,
+          customerEmail,
+          customerPhone,
+          customerVpa,
+          customerBank,
+          customerCardId,
+          customerWallet,
+          bankFee: status === "captured" ? bankFee : 0,
+          tax: status === "captured" ? tax : 0,
+          netAmount: status === "captured" ? netAmount : 0,
           paidAt: finalStatus === PaymentStatus.VERIFIED ? new Date() : null,
           rawWebhook: payload,
         },

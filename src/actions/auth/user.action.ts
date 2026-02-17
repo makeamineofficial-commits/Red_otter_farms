@@ -201,7 +201,7 @@ const createAccount = async ({
   }
 };
 
-const getUser = async (_phone: string): Promise<Account> => {
+const getUser = async (_phone: string): Promise<Account | undefined> => {
   const phone = _phone.startsWith("+91") ? _phone : "+91" + _phone;
   if (process.env.NODE_ENV === "production") {
     const userRes = await axios.post(
@@ -211,7 +211,7 @@ const getUser = async (_phone: string): Promise<Account> => {
         headers: { api_key: process.env.BACKEND_API_KEY as string },
       },
     );
-
+    if (!Array.isArray(userRes.data)) return undefined;
     const account = userRes.data[0];
     return account;
   }

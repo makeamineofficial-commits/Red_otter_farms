@@ -21,7 +21,6 @@ export default function Pay() {
   const { cart, isLoading, isUpdating } = useCart();
 
   const { checkout, orderId, setOrderId } = useCheckoutHandler();
-  const { replace } = useRouter();
   const isDisabled =
     isLoading ||
     isUpdating ||
@@ -65,8 +64,8 @@ export default function Pay() {
       handler: async function (response: any) {
         paymentSuccessRef.current = true;
         setOrderId(null);
-        await afterCheckout();
-        window.location.replace(`/checkout/placed`); // hard reload
+        const res = await afterCheckout();
+        window.location.replace(`/checkout/placed/${res?.orderId}`);
       },
       theme: {
         color: "#15803d",

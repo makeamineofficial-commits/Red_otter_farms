@@ -8,9 +8,16 @@ export default function Footer() {
         <ul className="text-[1.375rem] flex flex-col">
           <Link href="#">OtterN</Link>
           <Link href="#">Convenience & Delivery</Link>
-          <Link href="#">Contact Us</Link>
-          <Link href="#">Instagram</Link>
-          <Link href="#">Facebook</Link>
+          <Link
+            href="https://wa.me/919354808527"
+            target="_blank"
+            rel="noopener noreferrer"
+            className=""
+          >
+            Contact Us
+          </Link>
+          <Link href="https://www.instagram.com/redotterfarms/">Instagram</Link>
+          <Link href="https://www.facebook.com/redotterfarms">Facebook</Link>
           <Link href="#">X</Link>
         </ul>
       </div>
@@ -26,14 +33,21 @@ export default function Footer() {
       <div className=" w-full p-4 md:p-12 lg:p-18 flex flex-col gap-5 lg:gap-11 col-span-2 md:col-span-1">
         <h2 className="text-[1.175rem] uppercase">Support</h2>
         <ul className="text-[1.375rem]  flex flex-col">
-          <Link href="#">My Account</Link>
+          <Link href="/account">My Account</Link>
           <Link href="#">Manage Subscription</Link>
           <Link href="#">Help & Support</Link>
           <Link href="#">Affiliate Program</Link>
-          <Link href="#">Contact</Link>
-          <Link href="#">Terms & Conditions</Link>
-          <Link href="#">Privacy Policy</Link>
-          <Link href="#">Return Policy</Link>
+          <Link
+            href="https://wa.me/919354808527"
+            target="_blank"
+            rel="noopener noreferrer"
+            className=""
+          >
+            Contact
+          </Link>
+          <Link href="/terms-conditions">Terms & Conditions</Link>
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/refund">Return & Refund Policy</Link>
         </ul>
       </div>
     </footer>

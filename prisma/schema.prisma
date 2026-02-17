@@ -310,6 +310,7 @@ enum PaymentPurpose {
     ORDER   
     OTTER_PASS
     NUTRITION_METER
+    WALLET
 }
 
 
@@ -317,11 +318,11 @@ model Payment {
   id String @id @default(uuid())
   publicId String @unique @default(dbgenerated("concat('payment_', gen_random_uuid())"))
 
-  referenceId String 
-
+  referenceId String
   purpose PaymentPurpose
 
-  amount Int
+  amount Int             
+  netAmount Int @default(0) 
   currency String @default("INR")
 
   status PaymentStatus @default(CREATED)
@@ -329,8 +330,12 @@ model Payment {
   isPartial Boolean @default(false)
 
   razorpayOrderId String?
-  razorpayPaymentId String? 
+  razorpayPaymentId String?
   razorpayEvent String?
+
+  bankFee Int @default(0)    
+  tax Int @default(0)         
+  gatewayFee Int @default(0)  
 
   method String?
   provider String?
@@ -341,6 +346,17 @@ model Payment {
   refundId String?
   refundAmount Int?
   refundedAt DateTime?
+
+  isSettled Boolean @default(false)
+  settledAt DateTime?
+
+  customerEmail   String?
+  customerPhone   String?
+  customerVpa     String?
+  customerBank    String?
+  customerCardId  String?
+  customerWallet  String?
+
 
   rawWebhook Json?
 
@@ -528,4 +544,24 @@ model HealthBenefit{
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum PurchaseStatus{
+  CREATED
+  IN_PROGRESS
+  COMPLETE
+  FAILED
+}
+
+model Purchase{
+  id String @id @default(uuid())
+  publicId String @unique @default(dbgenerated("concat('testimonial_', gen_random_uuid())"))
+  amount Int
+  purpose PaymentPurpose
+  status PurchaseStatus @default(CREATED)
+  paymentId String?
+  userIdentifier String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
 }

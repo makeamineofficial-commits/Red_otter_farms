@@ -5,33 +5,38 @@ import { handleRazorpayWebhook } from "@/actions/checkout/razorpay.action";
 import { db, PaymentPurpose } from "@/lib/db";
 import { handleOrder } from "@/actions/orders/order.action";
 import { PaymentMethod } from "@/types/payment";
+import { buySubscription } from "@/actions/purchase/nutrition.action";
+import { buyOtterPass } from "@/actions/purchase/otterpass.action";
+import { addToFund } from "@/actions/purchase/wallet.action";
+
+
 
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
 
-    // const signature = req.headers.get("x-razorpay-signature");
+    const signature = req.headers.get("x-razorpay-signature");
 
-    // if (!signature) {
-    //   console.error("Missing Razorpay signature");
-    //   return NextResponse.json({ error: "Missing signature" }, { status: 400 });
-    // }
-    // const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!signature) {
+      console.error("Missing Razorpay signature");
+      return NextResponse.json({ error: "Missing signature" }, { status: 400 });
+    }
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
-    // if (!secret) {
-    //   throw new Error("RAZORPAY_KEY_SECRET not configured");
-    // }
+    if (!secret) {
+      throw new Error("RAZORPAY_KEY_SECRET not configured");
+    }
 
-    // const expectedSignature = crypto
-    //   .createHmac("sha256", secret)
-    //   .update(rawBody)
-    //   .digest("hex");
+    const expectedSignature = crypto
+      .createHmac("sha256", secret)
+      .update(rawBody)
+      .digest("hex");
 
-    // if (expectedSignature !== signature) {
-    //   console.error("Invalid Razorpay webhook signature");
+    if (expectedSignature !== signature) {
+      console.error("Invalid Razorpay webhook signature");
 
-    //   return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-    // }
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
 
     const { purpose, paymentId, customerId, isPartial } =
       await handleRazorpayWebhook(JSON.parse(rawBody));
@@ -70,6 +75,12 @@ export async function POST(req: NextRequest) {
         cartSessionId: cart.sessionId,
         paymentMethod: isPartial ? PaymentMethod.SPLIT : PaymentMethod.RAZORPAY,
       });
+    } else if (purpose === PaymentPurpose.WALLET) {
+      await addToFund({ paymentId });
+    } else if (purpose === PaymentPurpose.NUTRITION_METER) {
+      await buySubscription({ paymentId });
+    } else if (purpose === PaymentPurpose.OTTER_PASS) {
+      await buyOtterPass({ paymentId });
     }
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {

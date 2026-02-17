@@ -25,6 +25,7 @@ export async function getCheckout({
 }): Promise<{
   success: boolean;
   message: any;
+  orderId?: string;
   razorPayOrderId?: string;
   paymentMethod: PaymentMethod;
 }> {
@@ -45,6 +46,9 @@ export async function getCheckout({
       message: "Failed to sync cart and order",
       paymentMethod,
     };
+  const cookieStore = await cookies();
+  cookieStore.set("checkout_cart_id", cart.sessionId as string);
+  cookieStore.set("checkout_order_id", orderId as string);
 
   if (billing.createAccount && process.env.NODE_ENV === "production") {
     await createAccount(billing);
@@ -57,8 +61,9 @@ export async function getCheckout({
         isPartial: false,
         orderId,
       });
-      console.log("here");
+
       return {
+        orderId,
         paymentMethod,
         ...res,
       };
@@ -77,6 +82,7 @@ export async function getCheckout({
         });
         return {
           paymentMethod: PaymentMethod.SPLIT,
+          orderId,
           ...res,
         };
       } else {
@@ -86,8 +92,9 @@ export async function getCheckout({
           customerId: user.account?.customer_id,
         });
       }
-      console.log("Selected Payment Method", paymentMethod);
+
       return {
+        orderId,
         paymentMethod,
         success: true,
         message: "Order created via red otter wallet",
@@ -104,48 +111,97 @@ export async function getCheckout({
 }
 export async function afterCheckout() {
   try {
-    const cart = await getCart();
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get("checkout_cart_id")?.value;
+    const orderId = cookieStore.get("checkout_order_id")?.value;
 
-    if (!cart?.orderId) return null;
+    if (!sessionId || !orderId) throw new Error("CartID or OrderID not found");
 
     const { order } = await getOrder({
-      orderId: cart.orderId,
+      orderId,
     });
-    if (!order) throw new Error("Order not found");
 
-    if (cart.status === CartStatus.CHECKEDOUT) {
-      return { orderId: order.publicId };
+    if (!order) {
+      console.error("❌ Order not found for:", orderId);
+      throw new Error("Order not found");
     }
 
+    console.log("✅ Order found:", {
+      id: order.id,
+      publicId: order.publicId,
+      status: order.status,
+      paymentId: order.paymentId,
+    });
+
+    console.log("🔄 Starting DB transaction...");
+
     await db.$transaction(async (tx) => {
-      await tx.cart.update({
-        where: { sessionId: cart.sessionId },
-        data: { status: CartStatus.CHECKEDOUT },
+      console.log("✏️ Updating cart status...");
+
+      const exist = await tx.cart.findUnique({
+        where: {
+          sessionId: sessionId,
+          status: {
+            notIn: [CartStatus.CONVERTED],
+          },
+        },
       });
+      if (exist) {
+        await tx.cart.update({
+          where: {
+            sessionId: sessionId,
+            status: {
+              notIn: [CartStatus.CONVERTED],
+            },
+          },
+          data: { status: CartStatus.CHECKEDOUT },
+        });
+      }
 
       if (order.paymentId) {
+        console.log("💳 Fetching payment:", order.paymentId);
+
         const payment = await tx.payment.findUnique({
           where: { publicId: order.paymentId },
         });
-        if (payment) {
+
+        if (!payment) {
+          console.warn("⚠️ Payment not found");
+        } else {
+          console.log("✏️ Updating payment status...");
+
           await tx.payment.update({
             where: { id: payment.id },
             data: { status: PaymentStatus.IN_PROGRESS },
           });
+
+          console.log("✅ Payment updated");
         }
+      } else {
+        console.log("ℹ️ No paymentId on order");
       }
+
+      console.log("✏️ Updating order status...");
+
       await tx.order.update({
         where: { id: order.id },
         data: { status: OrderStatus.PROCESSING },
       });
+
+      console.log("✅ Order updated");
     });
 
-    const cookieStore = await cookies();
-    cookieStore.delete("cart");
+    console.log("🧹 Clearing cart cookie");
 
-    return { orderId: order.publicId };
+    cookieStore.delete("cart");
+    cookieStore.delete("checkout_cart_id");
+    cookieStore.delete("checkout_order_id");
+    console.log("🎉 Checkout completed for:", orderId);
+
+    return { orderId: orderId };
   } catch (err) {
-    console.error("afterCheckout error:", err);
+    console.error("🔥 afterCheckout error:", err);
+
     return null;
   }
 }

@@ -95,5 +95,7 @@ export const handleOrder = async ({
     } else {
       await createDrystoreSplitOrder(revisedOrder);
     }
+
+    return { orderId: order.publicId };
   }
 };

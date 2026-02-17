@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+import { Button } from "@/components/ui/button";
 import { Minus, Plus, Share2 } from "lucide-react";
 import { Product, ProductPreview } from "@/types/product";
 import { useCart } from "@/provider/cart.provider";

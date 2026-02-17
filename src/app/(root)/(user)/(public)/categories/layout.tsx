@@ -10,7 +10,7 @@ export default function layout({ children }: { children: ReactNode }) {
         <main className=" px-4 md:px-12 lg:px-18 pb-5 mt-5">
           <Banner></Banner>
 
-          <article className="flex my-5 gap-2 lg:gap-10 lg:flex-row flex-col lg:items-start items-end">
+          <article className="flex my-5  gap-2 lg:gap-10 lg:flex-row flex-col lg:items-start items-end ">
             <Filter></Filter>
 
             <div className="w-full">
