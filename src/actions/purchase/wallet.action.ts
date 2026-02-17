@@ -1,16 +1,17 @@
 "use server";
 
 import axios from "axios";
-import { db, PaymentPurpose } from "@/lib/db";
+import { db, PaymentPurpose, PaymentStatus, PurchaseStatus } from "@/lib/db";
 import { getUser, validateUser } from "../auth/user.action";
 import { createPayment } from "../payment/payment.action";
 import { saveOrderToFile } from "../orders/utils";
+import { success } from "zod";
 
 export async function addToFund(data: { paymentId: string }) {
   try {
     const payment = await db.payment.findUnique({
       where: {
-        publicId: data.paymentId,
+        id: data.paymentId,
       },
     });
     if (!payment) throw new Error("Payment not found");
@@ -22,6 +23,7 @@ export async function addToFund(data: { paymentId: string }) {
     if (!purchase) {
       throw new Error("Purchase not found");
     }
+
     const user = await getUser(purchase?.userIdentifier);
     if (!user) throw new Error("User not found");
 
@@ -34,9 +36,24 @@ export async function addToFund(data: { paymentId: string }) {
       payment_contact: payment.customerPhone,
       payment_for: "Otter Wallet TopUp",
       payment_charges: payment.bankFee / 100,
+      payment_status:
+        payment.status === PaymentStatus.VERIFIED ? "paid" : "failed",
     };
 
-    if (process.env.NODE_ENV === "production") {
+    await db.purchase.update({
+      where: { publicId: payment.referenceId },
+      data: {
+        status:
+          payment.status === PaymentStatus.VERIFIED
+            ? PurchaseStatus.COMPLETE
+            : PurchaseStatus.FAILED,
+      },
+    });
+
+    if (
+      payment.status === PaymentStatus.VERIFIED &&
+      process.env.NODE_ENV === "production"
+    ) {
       await axios.post(
         "https://automation.redotterfarms.com/webhook/b9b0d695-600f-4078-bf19-074513c8e1ba",
         { ...payload, payment_for: "Otter Wallet TopUp" },
@@ -45,7 +62,7 @@ export async function addToFund(data: { paymentId: string }) {
         },
       );
     }
-    await saveOrderToFile("wallet_topup", payload);
+    await saveOrderToFile(`wallet_topup_${purchase.publicId}`, payload);
     return { success: true, message: "Wallet TopUp successfully" };
   } catch (err) {
     console.log(err);

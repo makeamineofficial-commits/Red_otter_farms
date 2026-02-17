@@ -555,7 +555,7 @@ enum PurchaseStatus{
 
 model Purchase{
   id String @id @default(uuid())
-  publicId String @unique @default(dbgenerated("concat('testimonial_', gen_random_uuid())"))
+  publicId String @unique @default(dbgenerated("concat('purchase_', gen_random_uuid())"))
   amount Int
   purpose PaymentPurpose
   status PurchaseStatus @default(CREATED)

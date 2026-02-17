@@ -1,7 +1,7 @@
 "use server";
 
 import axios from "axios";
-import { db, PaymentPurpose } from "@/lib/db";
+import { db, PaymentPurpose, PaymentStatus } from "@/lib/db";
 import { getUser, validateUser } from "../auth/user.action";
 import { createPayment } from "../payment/payment.action";
 import { saveOrderToFile } from "../orders/utils";
@@ -14,7 +14,10 @@ export async function buyOtterPass(data: { paymentId: string }) {
       },
     });
     if (!payment) throw new Error("Payment not found");
-
+    if (payment.status !== PaymentStatus.VERIFIED) {
+      console.warn("[OTTER PASS] Payment Failed");
+      return { success: false, message: "Failed to activate subscription" };
+    }
     const purchase = await db.purchase.findUnique({
       where: { publicId: payment.referenceId },
     });
