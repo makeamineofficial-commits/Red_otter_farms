@@ -3,14 +3,15 @@
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Testimonial } from "@/types/testimonial";
-import { listTestimonials } from "@/actions/user/testimonial/list.action";
-import { listFeaturedProducts } from "@/actions/user/products/featured.action";
 import { ProductPreview } from "@/types/product";
+import { Reel } from "@/types/home";
 interface StoreInterface {
   isFetching: boolean;
   isError: boolean;
   isLoading: boolean;
-  data: { testimonials: Testimonial[]; products: ProductPreview[] } | undefined;
+  data:
+    | { testimonials: Testimonial[]; products: ProductPreview[]; reels: Reel[] }
+    | undefined;
   error: Error | null;
 }
 
@@ -18,7 +19,8 @@ const StoreContext = createContext<StoreInterface | null>(null);
 
 function StoreContent({ children }: { children: React.ReactNode }) {
   const { isFetching, isError, isLoading, data, error } = useQuery<
-    { testimonials: Testimonial[]; products: ProductPreview[] } | undefined
+    | { testimonials: Testimonial[]; products: ProductPreview[]; reels: Reel[] }
+    | undefined
   >({
     queryKey: ["home"],
     queryFn: async () => {

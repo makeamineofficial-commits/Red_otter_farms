@@ -1,9 +1,6 @@
 "use client";
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-
-import { useParams } from "next/navigation";
-import { getAccount } from "@/actions/user/account/get.action";
 import { Account } from "@/types/account";
 interface StoreInterface {
   isFetching: boolean;
@@ -23,7 +20,8 @@ function StoreContent({ children }: { children: React.ReactNode }) {
     queryKey: ["account"],
     queryFn: async () => {
       const res = await fetch("/api/v1/user/account");
-      return await res.json();
+      const data = await res.json();
+      return data.account;
     },
 
     staleTime: 1000 * 60 * 5,

@@ -228,9 +228,20 @@
 .animate-marquee {
   display: flex;
   gap: 1rem;
-  animation: marquee 20s linear infinite;
+  animation: marquee 10s linear infinite;
 }
 
+@media (max-width: 768px) {
+  .animate-marquee {
+    animation-duration: 7s;
+  }
+}
+
+@media (max-width: 480px) {
+  .animate-marquee {
+    animation-duration: 5s;
+  }
+}
 body {
   color: rgba(0, 0, 0, 0.7);
 }
