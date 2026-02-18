@@ -79,8 +79,11 @@ const _getProductCached = async (
     nutritionalInfo: product.nutritionalInfo as any,
     summary: product.summary ?? "",
     description: product.description ?? "",
-    categories: product.categories.map((c) => c.category),
-    variants: product.variants.map((ele) => {
+    categories: product.categories.map((c) => {
+      const { id, ...details } = c.category;
+      return details;
+    }),
+    variants: product.variants.map(({ id, listedIngredients, ...ele }) => {
       return {
         ...ele,
         options: ele.options.map((ele) => {
