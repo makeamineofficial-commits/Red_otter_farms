@@ -1,5 +1,5 @@
 import React from "react";
-
+import { FeedbackForm } from "@/components/user/feedback";
 export default function page() {
-  return <div className="pt-45 px-18">Feedback</div>;
+  return <FeedbackForm />;
 }

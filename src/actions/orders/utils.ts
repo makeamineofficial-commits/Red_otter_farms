@@ -43,6 +43,8 @@ export async function finalizeOrder(
 }
 
 export async function saveOrderToFile(prefix: string, orderData: unknown) {
+  const ALLOWED = process.env.SAVE_FILES === "true";
+  if (!ALLOWED) return;
   try {
     // Base directory
     const baseDir = path.join(process.cwd(), "public", "assets");
