@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { Send, MessageCircle, Mail, FileText, CheckCircle } from "lucide-react";
 import { z } from "zod";
-
+import { feedback } from "@/actions/user/feedback/send.action";
 const feedbackSchema = z.object({
   email: z.string().email("Please enter a valid email"),
   subject: z.string().min(3, "Subject must be at least 3 characters"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
+  body: z.string().min(10, "Message must be at least 10 characters"),
 });
 
 type FeedbackFormData = z.infer<typeof feedbackSchema>;
@@ -16,7 +16,7 @@ export function FeedbackForm() {
   const [formData, setFormData] = useState<FeedbackFormData>({
     email: "",
     subject: "",
-    message: "",
+    body: "",
   });
 
   const [errors, setErrors] = useState<
@@ -25,26 +25,26 @@ export function FeedbackForm() {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const result = feedbackSchema.safeParse(formData);
 
     if (!result.success) {
       const fieldErrors: Partial<Record<keyof FeedbackFormData, string>> = {};
-      // @ts-ignore
-      result.error.errors.forEach((err) => {
+      result.error.issues.forEach((err) => {
         const field = err.path[0] as keyof FeedbackFormData;
-        fieldErrors[field] = err.message;
-      });
 
+        if (field) {
+          fieldErrors[field] = err.message;
+        }
+      });
       setErrors(fieldErrors);
       return;
     }
 
-    // Clear errors
     setErrors({});
-
+    await feedback(result.data);
     console.log("Feedback submitted:", result.data);
 
     setIsSubmitted(true);
@@ -52,7 +52,7 @@ export function FeedbackForm() {
     // Reset after 3 seconds
     setTimeout(() => {
       setIsSubmitted(false);
-      setFormData({ email: "", subject: "", message: "" });
+      setFormData({ email: "", subject: "", body: "" });
     }, 3000);
   };
 
@@ -66,14 +66,17 @@ export function FeedbackForm() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-forest text-white py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="font-dream-orphans text-6xl md:text-7xl tracking-[4px] mb-4">
-            We're Listening
-          </h1>
-          <p className=" text-[#edefea] text-lg max-w-2xl mx-auto">
-            Your feedback helps us grow better food and build a better
-            experience
+      <div className="bg-forest text-white py-20 px-4 flex items-center justify-center flex-col">
+        <div className="text-center">
+          <div className="  text-xs uppercase tracking-[4px] mb-2">
+            Share Your Thoughts
+          </div>
+          <h2 className="font-dream-orphans text-5xl tracking-[3px] mb-4">
+            Send Us Feedback
+          </h2>
+          <p className="  text-lg">
+            Questions, suggestions, or just want to say hi? We'd love to hear
+            from you.
           </p>
         </div>
       </div>
@@ -96,19 +99,6 @@ export function FeedbackForm() {
         ) : (
           /* Form */
           <div>
-            <div className="text-center mb-12">
-              <div className=" text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
-                Share Your Thoughts
-              </div>
-              <h2 className="font-dream-orphans text-forest text-5xl tracking-[3px] mb-4">
-                Send Us Feedback
-              </h2>
-              <p className=" text-[#1b1a21] text-lg">
-                Questions, suggestions, or just want to say hi? We'd love to
-                hear from you.
-              </p>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Email */}
               <div>
@@ -158,19 +148,19 @@ export function FeedbackForm() {
                 </label>
 
                 <textarea
-                  value={formData.message}
-                  onChange={(e) => updateFormData("message", e.target.value)}
+                  value={formData.body}
+                  onChange={(e) => updateFormData("body", e.target.value)}
                   rows={8}
                   className="w-full border-2 border-forest rounded-lg px-6 py-4 text-lg focus:border-[#d7262d] resize-none"
                   placeholder="Tell us what's on your mind..."
                 />
 
                 <p className="text-sm mt-2 text-[#1b1a21]/60">
-                  {formData.message.length} characters
+                  {formData.body.length} characters
                 </p>
 
-                {errors.message && (
-                  <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+                {errors.body && (
+                  <p className="text-red-500 text-sm mt-1">{errors.body}</p>
                 )}
               </div>
 
