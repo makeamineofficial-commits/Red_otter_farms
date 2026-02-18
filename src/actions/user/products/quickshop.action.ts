@@ -8,6 +8,7 @@ import { isLocationNCR } from "../location/index.action";
 export default async function quickShop(): Promise<
   {
     displayName: string;
+    description: string;
     slug: string;
     products: (Product & { variants: Variant[] })[];
   }[]
@@ -62,10 +63,11 @@ export default async function quickShop(): Promise<
   });
 
   return categories.map((ele) => {
-    const { displayName, slug, products } = ele;
+    const { description, displayName, slug, products } = ele;
     return {
       displayName,
       slug,
+      description: description ?? "",
       products: products.map(({ product }) => {
         return nullToUndefined({
           ...product,

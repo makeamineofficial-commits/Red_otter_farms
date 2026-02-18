@@ -31,7 +31,7 @@ export async function getShippingRate({
     const user = await validateUser();
     if (user && user.phone) {
       const profile = await getUser(user.phone);
-      if (profile.otter_pass)
+      if (profile && profile.otter_pass)
         return { success: true, rate: 0, courier: "Free Shipping" };
     }
 

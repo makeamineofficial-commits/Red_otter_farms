@@ -3,13 +3,20 @@ import QuickShopCard from "@/components/user/quick-shop/card";
 export default async function page() {
   const categpries = await quickShop();
   return (
-    <section className="flex flex-col gap-4 px-4 md:px-12 lg:px-18 pb-5 max-w-400 w-full m-auto space-y-10 mt-5">
-      <div className="flex items-start sm:items-center gap-4 justify-between mb-6 sm:flex-row flex-col">
-        <h1 className="text-2xl font-bold text-center mx-auto uppercase">
-          Quick Shop
-        </h1>
+    <section className="flex flex-col gap-4  w-full m-auto space-y-10">
+      <div className="bg-forest text-white py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="font-dream-orphans text-6xl md:text-7xl tracking-[4px] mb-4">
+            Quick Shop
+          </h1>
+          <p className=" text-[#edefea] text-lg max-w-2xl mx-auto">
+            Browse by category and add fresh, handpicked farm products to your
+            cart instantly for a seamless shopping experience.
+          </p>
+        </div>
       </div>
-      <div className="">
+
+      <div className="px-4 md:px-12 lg:px-18 pb-5 space-y-4">
         {categpries.map((ele) => (
           <QuickShopCard key={ele.slug} {...ele} />
         ))}
