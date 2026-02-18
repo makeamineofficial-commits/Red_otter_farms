@@ -27,6 +27,7 @@ export function ProductCard(product: ProductPreview) {
     availableInStock,
     stockLimit,
     variants,
+    hasSubscription,
     inStock,
   } = product;
   const { update, cart, remove, discount } = useCart();
@@ -101,14 +102,25 @@ export function ProductCard(product: ProductPreview) {
           <p className=" font-medium line-clamp-1 text-base capitalize md:text-lg">
             {displayName.toLowerCase()}
           </p>
-          <div className="flex gap-1 items-center">
-            <Badge className="bg-maroon">{variantOption.join("|")}</Badge>
-            {variants > 1 && (
-              <Badge variant="outline" className="text-xs capitalize">
-                +{variants - 1}
-              </Badge>
-            )}
-          </div>
+          {hasSubscription ? (
+            <>
+              {" "}
+              <div className="flex gap-1 items-center">
+                <Badge className="bg-maroon">Subscription</Badge>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex gap-1 items-center">
+                <Badge className="bg-maroon">{variantOption.join("|")}</Badge>
+                {variants > 1 && (
+                  <Badge variant="outline" className="text-xs capitalize">
+                    +{variants - 1}
+                  </Badge>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         <p className="text-sm font-semibold">

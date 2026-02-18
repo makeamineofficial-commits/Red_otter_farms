@@ -55,9 +55,16 @@ function ProductCard(item: CartItem) {
       </button>
 
       <div className="relative">
-        <Badge className="absolute bottom-1 right-1 z-10">
-          {item.variant.options.join("|")}
+        <Badge
+          className="absolute bottom-1 right-1 z-10 
+             max-w-[50px]  cursor-pointer
+             overflow-hidden whitespace-nowrap text-ellipsis 
+             block text-left"
+          title={item.variant.options.join(" | ")}
+        >
+          {item.variant.options.join(" | ")}
         </Badge>
+
         <div className="relative h-24 w-24 rounded-lg border overflow-hidden bg-muted">
           {product.assets?.[0]?.url && (
             <Image

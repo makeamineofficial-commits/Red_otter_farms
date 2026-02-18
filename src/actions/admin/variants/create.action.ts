@@ -74,6 +74,8 @@ export const createVariant = async (
       const newVariant = await tx.variant.create({
         data: {
           ...rest,
+          mrp: rest.mrp * 100,
+          price: rest.price * 100,
           productId: product.id,
         },
       });

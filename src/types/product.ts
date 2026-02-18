@@ -14,6 +14,7 @@ export interface ProductPropsBase {
   isFeatured: boolean;
   isPublished: boolean;
   isDryStore: boolean;
+  hasSubscription: boolean;
   faqs: { question: string; answer: string }[];
   minPrice: number;
   maxPrice: number;
@@ -65,6 +66,7 @@ export interface ProductPreview {
   price: number;
   variantOption: string[];
   inStock: boolean;
+  hasSubscription: boolean;
   stockLimit: number;
   availableInStock: number;
 }

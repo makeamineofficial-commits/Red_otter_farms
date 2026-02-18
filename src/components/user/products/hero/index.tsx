@@ -13,6 +13,7 @@ import { Product, Variant } from "@/types/product";
 import VariantSelector from "./variants";
 import { useCart } from "@/provider/cart.provider";
 import { Badge } from "@/components/ui/badge";
+import SubscriptionSelector from "./subscription";
 
 export default function Hero({
   product,
@@ -24,7 +25,8 @@ export default function Hero({
 }) {
   const { selectedVariant } = useProduct();
   const { discount } = useCart();
-  const { type, displayName, description, options, variants } = product;
+  const { type, displayName, summary, options, variants, hasSubscription } =
+    product;
 
   const hasMultipleVariants = variants.length > 1;
 
@@ -41,14 +43,15 @@ export default function Hero({
           {displayName}
         </h1>
 
-        <p className="text-[1.125rem] font-light">{description}</p>
+        <p className="text-[1.125rem] font-light">{summary}</p>
       </div>
 
       <Benefit {...product} />
 
-      {hasMultipleVariants && options.length > 0 && (
+      {hasMultipleVariants && !hasSubscription && options.length > 0 && (
         <VariantSelector {...product} />
       )}
+      {hasSubscription && <SubscriptionSelector {...product} />}
       {selectedVariant ? (
         <>
           <div className="mt-9">
@@ -74,15 +77,15 @@ export default function Hero({
                   )}
                 </p>
               )}
-            {discount < 1 ? (
-              <>
-                <Badge className="ml-2 bg-forest!">
-                  Extra {100 - discount * 100}% Off
-                </Badge>
-              </>
-            ) : (
-              <></>
-            )}
+              {discount < 1 ? (
+                <>
+                  <Badge className="ml-2 bg-forest!">
+                    Extra {100 - discount * 100}% Off
+                  </Badge>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
           </div>
           <Count product={product} />

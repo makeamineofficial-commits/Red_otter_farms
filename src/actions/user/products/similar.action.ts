@@ -45,6 +45,7 @@ export async function getSimilarProducts(slug: string) {
       nutritionalInfo: true,
       slug: true,
       healthBenefits: true,
+      hasSubscription: true,
       assets: {
         where: {
           isPrimary: true,
@@ -104,6 +105,7 @@ export async function getSimilarProducts(slug: string) {
       nutritionalInfo: product.nutritionalInfo,
       healthBenefits: product.healthBenefits,
       assets: product.assets,
+      hasSubscription: product.hasSubscription,
       presentInWishlist: false,
       sku: defaultVariant?.sku ?? null,
       mrp: defaultVariant?.mrp ?? null,

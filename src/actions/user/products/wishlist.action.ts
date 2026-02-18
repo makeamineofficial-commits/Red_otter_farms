@@ -37,6 +37,7 @@ export async function getWishlist(): Promise<{ products: ProductPreview[] }> {
         summary: true,
         type: true,
         nutritionalInfo: true,
+        hasSubscription: true,
         slug: true,
         healthBenefits: true,
         assets: {
@@ -106,6 +107,7 @@ export async function getWishlist(): Promise<{ products: ProductPreview[] }> {
         variants: product._count.variants,
         stockLimit: product.variants[0].stockLimit,
         availableInStock: product.variants[0].availableInStock,
+        hasSubscription: product.hasSubscription,
         variantOption: defaultVariant.options.map(
           (ele) => ele.value.displayName,
         ),

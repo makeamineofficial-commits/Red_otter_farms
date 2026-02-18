@@ -48,6 +48,7 @@ export default function CreateProductForm() {
       faqs: [],
       isFeatured: false,
       isDryStore: false,
+      hasSubscription: false,
       // @ts-ignore
       nutritionalInfo: {
         carbs: "0g",
@@ -336,6 +337,7 @@ export default function CreateProductForm() {
                 { label: "Is Published", key: "isPublished" },
                 { label: "Is Featured", key: "isFeatured" },
                 { label: "Is Drystore Product", key: "isDryStore" },
+                { label: "Has Subscription", key: "hasSubscription" },
               ].map((key) => (
                 <FormField
                   key={key.key}

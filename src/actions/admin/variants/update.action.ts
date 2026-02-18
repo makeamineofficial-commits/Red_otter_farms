@@ -110,6 +110,8 @@ export const updateVariant = async (
         },
         data: {
           ...rest,
+          mrp: rest.mrp * 100,
+          price: rest.price * 100,
           productId: product.id,
         },
       });

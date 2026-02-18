@@ -32,8 +32,8 @@ export default function UpdateVariantForm({ variant }: { variant: Variant }) {
       name: variant.name,
       sku: variant.sku,
 
-      mrp: variant.mrp,
-      price: variant.price,
+      mrp: variant.mrp / 100,
+      price: variant.price / 100,
 
       availableInStock: variant.availableInStock,
       stockLimit: variant.stockLimit,

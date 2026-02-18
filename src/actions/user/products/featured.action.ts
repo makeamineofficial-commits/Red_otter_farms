@@ -25,6 +25,7 @@ export const listFeaturedProducts = async (): Promise<ProductPreview[]> => {
       type: true,
       publicId: true,
       healthBenefits: true,
+      hasSubscription: true,
       assets: {
         where: {
           isPrimary: true,
@@ -81,6 +82,7 @@ export const listFeaturedProducts = async (): Promise<ProductPreview[]> => {
       summary: product.summary ?? "",
       nutritionalInfo: product.nutritionalInfo,
       healthBenefits: product.healthBenefits,
+      hasSubscription: product.hasSubscription,
       assets: product.assets,
       presentInWishlist: false,
       inStock: defaultVariant.inStock,

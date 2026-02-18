@@ -121,7 +121,7 @@ export const listProducts = async (
         nutritionalInfo: true,
         slug: true,
         healthBenefits: true,
-
+        hasSubscription: true,
         assets: {
           where: { isPrimary: true },
           take: 1,
@@ -193,6 +193,7 @@ export const listProducts = async (
         variants: product._count.variants,
         stockLimit: defaultVariant.stockLimit,
         availableInStock: defaultVariant.availableInStock,
+        hasSubscription: product.hasSubscription,
         variantOption: defaultVariant.options.map(
           (ele) => ele.value.displayName,
         ),

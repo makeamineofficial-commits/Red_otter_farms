@@ -61,6 +61,7 @@ export async function getOrders() {
             publicId: true,
             displayName: true,
             nutritionalInfo: true,
+            hasSubscription: true,
             slug: true,
             healthBenefits: true,
             assets: {
@@ -85,6 +86,7 @@ export async function getOrders() {
       const formatedProduct: ProductPreview = {
         ...product,
         ...details,
+        hasSubscription: product.hasSubscription,
         variantOption: options.map((ele) => ele.value.displayName),
         summary: product.summary ?? "",
         variantId: details.publicId,
