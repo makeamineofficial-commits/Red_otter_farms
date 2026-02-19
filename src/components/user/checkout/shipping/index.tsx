@@ -9,17 +9,27 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+} from "@/components/ui/command";
+
+import { ChevronsUpDown, Check } from "lucide-react";
+
 import { Textarea } from "@/components/ui/textarea";
 
 import { useCheckout } from "@/provider/checkout.provider";
+import { states } from "@/types/account";
 
 export default function Shipping() {
   const { shipping, setShipping, setSameAsBilling } = useCheckout();
@@ -89,11 +99,20 @@ export default function Shipping() {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground">Street Address *</Label>
+            <Label className="text-muted-foreground">Address *</Label>
             <Input
               className="h-12!"
               value={shipping?.address || ""}
               onChange={(e) => handleChange("address", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-muted-foreground">Street *</Label>
+            <Input
+              className="h-12!"
+              value={shipping?.street || ""}
+              onChange={(e) => handleChange("street", e.target.value)}
             />
           </div>
 
@@ -106,22 +125,55 @@ export default function Shipping() {
             />
           </div>
 
+          {/* State */}
           <div className="space-y-1">
             <Label className="text-muted-foreground">State *</Label>
-            <Select
-              value={shipping?.state}
-              onValueChange={(value) => handleChange("state", value)}
-            >
-              <SelectTrigger className="w-full h-12!">
-                <SelectValue placeholder="Select state" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="DL">Delhi</SelectItem>
-                <SelectItem value="PN">Punjab</SelectItem>
-                <SelectItem value="HR">Haryana</SelectItem>
-                <SelectItem value="UP">Uttar Pradesh</SelectItem>
-              </SelectContent>
-            </Select>
+            <Popover>
+              <PopoverTrigger asChild className="w-full">
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="justify-between"
+                >
+                  {shipping?.stateCode
+                    ? states.find((s) => s.code === shipping.stateCode)?.name
+                    : "Select State"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent className="p-0 w-(--radix-popover-trigger-width)">
+                <Command>
+                  <CommandInput placeholder="Search state..." />
+
+                  <CommandList>
+                    <CommandEmpty>No state found.</CommandEmpty>
+
+                    <CommandGroup>
+                      {states.map((state) => (
+                        <CommandItem
+                          key={state.code}
+                          value={state.name}
+                          onSelect={() => {
+                            handleChange("state", state.name);
+                            handleChange("state_code", state.code);
+                          }}
+                        >
+                          {state.name}
+                          <Check
+                            className={`ml-auto h-4 w-4 ${
+                              state.code === shipping?.stateCode
+                                ? "opacity-100"
+                                : "opacity-0"
+                            }`}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="space-y-1">

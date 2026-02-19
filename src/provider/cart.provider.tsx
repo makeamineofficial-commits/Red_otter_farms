@@ -7,6 +7,8 @@ import {
   ReactNode,
   useEffect,
   useMemo,
+  SetStateAction,
+  Dispatch,
 } from "react";
 import { getCart } from "@/actions/user/cart/get.action";
 import { updateCart } from "@/actions/user/cart/update.action";
@@ -31,6 +33,9 @@ type ContextType = {
   cart: Cart | null;
   isUpdating: boolean;
   isLoading: boolean;
+
+  lockCart: boolean;
+  setLockCart: Dispatch<SetStateAction<boolean>>;
   refetch: Function;
 };
 
@@ -41,6 +46,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<Cart | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [isUpdating, setUpdating] = useState(false);
+  const [lockCart, setLockCart] = useState(false);
   const { data: user, isLoading: userLoading, isFetching } = useAccountStore();
   const refetch = async () => {
     try {
@@ -58,7 +64,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const toggle = () => setIsOpen((prev) => !prev);
 
   const remove = async ({ variantId }: { variantId: string }) => {
-    if (!cart) return;
+    if (!cart || lockCart) return;
 
     const previousCart = cart;
     const updatedCart: Cart = {
@@ -88,7 +94,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     quantity: number;
     toggle?: boolean;
   }) => {
-    if (!cart) return;
+    if (!cart || lockCart) return;
 
     const previousCart = cart;
 
@@ -137,7 +143,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     items: { item: Item; quantity: number }[];
     toggle?: boolean;
   }) => {
-    if (!cart) return;
+    if (!cart || lockCart) return;
 
     const previousCart = cart;
 
@@ -206,6 +212,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         updateMany,
         cart,
         refetch,
+        lockCart,
+        setLockCart,
       }}
     >
       {children}

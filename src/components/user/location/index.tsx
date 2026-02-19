@@ -48,7 +48,7 @@ export default function LocationPicker() {
   useEffect(() => {
     (async () => {
       const ask = await askForLocation();
-      console.log(ask);
+
       if (ask) setOpen(true);
     })();
   }, []);

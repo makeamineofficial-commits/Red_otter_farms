@@ -15,7 +15,7 @@ declare global {
 }
 
 export default function Pay() {
-  const { isFetching, isCheckingOut } = useCheckout();
+  const { isFetching, isCheckingOut, shipping, billing } = useCheckout();
   const paymentSuccessRef = useRef(false);
 
   const { cart, isLoading, isUpdating } = useCart();

@@ -11,11 +11,11 @@ import { Address } from "@/types/account";
 import { useDeleteAddress } from "@/hooks/user/use-address";
 import { Button } from "@/components/ui/button";
 
-export default function DeleteAddress({ address_id }: Address) {
+export default function DeleteAddress({ publicId }: Address) {
   const { mutateAsync, isPending } = useDeleteAddress();
 
   async function onSubmit() {
-    await mutateAsync({ address_id });
+    await mutateAsync({ publicId });
   }
 
   return (

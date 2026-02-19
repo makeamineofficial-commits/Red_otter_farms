@@ -15,8 +15,8 @@ export const useCheckoutHandler = () => {
 
   const { billing, shipping, paymentMethod } = useCheckout();
   const [orderId, setOrderId] = useState<string | null>(null);
-  const { cart } = useCart();
-  const { isCheckingOut, setCheckingOut } = useCheckout();
+  const { cart, setLockCart } = useCart();
+  const { setCheckingOut } = useCheckout();
   const validateBilling = (billing: BillingDetails) => {
     if (!billing) return false;
 
@@ -78,6 +78,7 @@ export const useCheckoutHandler = () => {
 
     try {
       setCheckingOut(true);
+      setLockCart(true);
       const res = await getCheckout({
         paymentMethod,
         billing,
@@ -115,6 +116,7 @@ export const useCheckoutHandler = () => {
         message: "Failed to create order. Please try again.",
       };
     } catch (error) {
+      setLockCart(false);
       return {
         success: false,
         message: "Failed to create order. Please try again.",

@@ -474,13 +474,6 @@ enum AddressLabelEnum{
   WORK
   CUSTOM
 }
-model AddressLabel{
-  id String @id @default(uuid())
-  addressId String @unique
-  label AddressLabelEnum @default(HOME)
-  customLabel String?
-
-}
 
 enum AddressTagEnum{
   BILLING
@@ -488,14 +481,30 @@ enum AddressTagEnum{
   NONE
 }
 
-model AddressTag{
+model Address{
   id String @id @default(uuid())
-  addressId String @unique
-  tag AddressTagEnum
-  customerId String
+  publicId String @unique  @default(dbgenerated("concat('post_', gen_random_uuid())"))
+ 
+  attention String? @db.Text
+  address String 
+  street String
+  city String
+  stateCode String
+  state String
+  zip String
+  country String
+  county String?
+  countryCode String
+  userIdentifier String
 
-  @@unique([addressId,customerId])
+  label AddressLabelEnum
+  customLabel String?
+
+  tag AddressTagEnum @default(NONE)
 }
+
+
+
 
 
 model Testimonial{

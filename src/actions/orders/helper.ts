@@ -33,10 +33,10 @@ export function buildNormalAddress(addr: any) {
     state: addr.state,
     county: "",
     address: addr.address,
-    country: "IN",
-    street2: "",
-    attention: "",
-    state_code: addr.state,
+    country: "India",
+    street2: addr.street,
+    attention: addr.notes,
+    state_code: addr.stateCode,
     country_code: "IN",
   };
 }
@@ -47,11 +47,11 @@ export function buildDrystoreAddress(addr: any) {
     last_name: addr.lastName,
     company: "",
     address_1: addr.address,
-    address_2: "",
+    address_2: addr.street,
     city: addr.city,
     state: addr.state,
     postcode: addr.zip,
-    country: "IN",
+    country: "India",
     phone: (addr.phone as string).startsWith("+91")
       ? addr.phone
       : "+91" + addr.phone,

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge } from "@/components/ui/badge";
+
 import {
   Form,
   FormControl,
@@ -14,6 +15,22 @@ import {
 } from "@/components/ui/form";
 
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+} from "@/components/ui/command";
+
+import { ChevronsUpDown, Check, Pencil } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,88 +41,56 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Pencil, Plus } from "lucide-react";
-import { Address } from "@/types/account";
-import { useEditAddress } from "@/hooks/user/use-address";
-
-const LABELS = [
-  { value: "HOME", label: "Home" },
-  { value: "WORK", label: "Work" },
-  { value: "CUSTOM", label: "Other" },
-];
-const TAGS = [
-  { value: "BILLING", label: "Billing" },
-  { value: "SHIPPING", label: "Shipping" },
-  { value: "NONE", label: "None" },
-];
-const addressSchema = z
-  .object({
-    address: z.string().min(10),
-    street: z.string().min(10),
-    zip_code: z.string().regex(/^[0-9]{6}$/),
-    city: z.string().min(2),
-    state: z.string().min(2),
-    country: z.string().min(2),
-    labelType: z.enum(["HOME", "WORK", "CUSTOM"]),
-    tag: z.enum(["SHIPPING", "BILLING", "NONE"]),
-    customLabel: z.string().optional(),
-    attention: z.string(),
-  })
-  .refine((data) => data.labelType !== "CUSTOM" || !!data.customLabel?.trim(), {
-    path: ["customLabel"],
-    message: "Please enter a custom label",
-  });
+import { Plus, Tag } from "lucide-react";
+import { addressSchema } from "../schema";
+import { useAddAddress, useEditAddress } from "@/hooks/user/use-address";
+import { useState } from "react";
+import { Address, AddressLabels, AddressTags, states } from "@/types/account";
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+} from "@/components/ui/select";
 
 type AddressFormValues = z.infer<typeof addressSchema>;
 
-export default function UpdateAddressForm({
-  address,
-  street,
-  attention,
-  zip,
-  city,
-  state,
-  customLabel,
-  label,
-  address_id,
-  tag,
-}: Address) {
+export default function AddressForm({ address }: { address: Address }) {
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      address,
-      street: street,
-      attention,
-      zip_code: zip,
-      city,
-      state,
-      tag,
-      labelType: label,
-      customLabel: customLabel ?? undefined,
-      country: "India",
+      address: address.address,
+      street: address.street,
+      attention: address.attention,
+      zip: address.zip,
+      city: address.city,
+      stateCode: address.stateCode,
+      tag: address.tag,
+      label: address.label,
+      customLabel: address.customLabel,
+      countryCode: address.countryCode,
     },
   });
 
   const { mutateAsync } = useEditAddress();
 
   async function onSubmit(values: AddressFormValues) {
-    await mutateAsync({ address_id, ...values });
+    await mutateAsync({ publicId: address.publicId, ...values });
+    form.reset();
   }
-
+  const [isOpen, setOpen] = useState(false);
   return (
-    <Dialog>
+    <Dialog onOpenChange={setOpen} open={isOpen}>
       <DialogTrigger asChild>
-        <button>
-          <Pencil size={15} className="stroke-1 "></Pencil>
-        </button>
+        <Pencil size={15} className="stroke-1 text-muted-foreground"></Pencil>
       </DialogTrigger>
       <DialogContent className="max-h-[90%] overflow-auto">
         <div className="flex flex-col gap-2 sm:gap-4">
           <div>
-            <h2 className="text-lg font-semibold">Update Address</h2>
+            <h2 className="text-lg font-semibold">Edit Address</h2>
             <p className="text-sm text-muted-foreground">
-              Update this address to ensure deliveries continue without
-              interruption.
+              Use a permanent address where you can receive deliveries
             </p>
           </div>
 
@@ -145,10 +130,10 @@ export default function UpdateAddressForm({
                 />
 
                 {/* Pincode / City / State */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2  gap-2 sm:gap-4">
                   <FormField
                     control={form.control}
-                    name="zip_code"
+                    name="zip"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Pincode</FormLabel>
@@ -176,26 +161,74 @@ export default function UpdateAddressForm({
 
                   <FormField
                     control={form.control}
-                    name="state"
+                    name="stateCode"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>State</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Uttar Pradesh" {...field} />
-                        </FormControl>
+
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className="justify-between"
+                              >
+                                {field.value
+                                  ? states.find((s) => s.code === field.value)
+                                      ?.name
+                                  : "Select State"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+
+                          <PopoverContent className="p-0 w-(--radix-popover-trigger-width)">
+                            <Command>
+                              <CommandInput placeholder="Search state..." />
+
+                              <CommandList>
+                                <CommandEmpty>No state found.</CommandEmpty>
+
+                                <CommandGroup>
+                                  {states.map((state) => (
+                                    <CommandItem
+                                      key={state.code}
+                                      value={state.name}
+                                      onSelect={() => {
+                                        field.onChange(state.code);
+                                      }}
+                                    >
+                                      {state.name}
+                                      <Check
+                                        className={`ml-auto h-4 w-4 ${
+                                          state.code === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        }`}
+                                      />
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
-                    name="country"
+                    name="countryCode"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Country</FormLabel>
                         <FormControl>
                           <Input
-                            value={field.value || "India"}
+                            value={"India"}
                             readOnly
                             className="bg-muted"
                           />
@@ -219,6 +252,7 @@ export default function UpdateAddressForm({
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="tag"
@@ -227,7 +261,7 @@ export default function UpdateAddressForm({
                       <FormLabel>Set address as</FormLabel>
 
                       <div className="flex gap-3 flex-wrap">
-                        {TAGS.map((item) => {
+                        {AddressTags.map((item) => {
                           const isActive = field.value === item.value;
 
                           return (
@@ -253,15 +287,16 @@ export default function UpdateAddressForm({
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
-                  name="labelType"
+                  name="label"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Save address as</FormLabel>
 
                       <div className="flex gap-3 flex-wrap">
-                        {LABELS.map((item) => {
+                        {AddressLabels.map((item) => {
                           const isActive = field.value === item.value;
 
                           return (
@@ -288,7 +323,7 @@ export default function UpdateAddressForm({
                   )}
                 />
 
-                {form.watch("labelType") === "CUSTOM" && (
+                {form.watch("label") === "CUSTOM" && (
                   <FormField
                     control={form.control}
                     name="customLabel"

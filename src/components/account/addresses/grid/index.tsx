@@ -11,8 +11,6 @@ export default function AddressGrid() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-4">
-      <AddressForm></AddressForm>
-
       {isLoading || isFetching || !data ? (
         <>
           {Array.from([1, 2, 3, 4]).map((ele) => (
@@ -22,7 +20,7 @@ export default function AddressGrid() {
       ) : (
         <>
           {data?.addresses?.map((ele) => (
-            <AddressCard key={ele.address_id} {...ele}></AddressCard>
+            <AddressCard key={ele.publicId} {...ele}></AddressCard>
           ))}
         </>
       )}

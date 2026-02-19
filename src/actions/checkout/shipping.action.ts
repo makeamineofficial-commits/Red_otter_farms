@@ -4,11 +4,6 @@ const PICKUP_PINCODE = (process.env.PICKUP_PINCODE as string) ?? "110001";
 const SHIPROCKET_EMAIL = process.env.SHIPROCKET_EMAIL as string;
 const SHIPROCKET_PASSWORD = process.env.SHIPROCKET_PASSWORD as string;
 
-import {
-  ShiprocketCreateOrderInput,
-  ShiprocketOrderResponse,
-} from "@/types/common";
-
 const BASE_URL = "https://apiv2.shiprocket.in/v1/external";
 
 import { getCart } from "../user/cart/get.action";
@@ -32,14 +27,14 @@ export async function getShippingRate({
     if (user && user.phone) {
       const profile = await getUser(user.phone);
       if (profile && profile.otter_pass)
-        return { success: true, rate: 0, courier: "Free Shipping" };
+        return { success: true, rate: 0, courier: "Otter Pass Free Shipping" };
     }
 
     if (isNCRPincode(deliveryPincode)) {
       return {
         success: true,
         rate: 9900,
-        courier: "Local NCR Delivery",
+        courier: "Red Otter Delivery",
       };
     }
 

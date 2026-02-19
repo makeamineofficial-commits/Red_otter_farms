@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { MultiSelect } from "@/components/common/multiSelect";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,7 @@ import { Product } from "@/types/product";
 import { OptionsField } from "@/components/common/optionField";
 import { FormProvider } from "react-hook-form";
 import { FaqArrayField } from "@/components/common/faq";
+import Link from "next/link";
 type FormValues = z.infer<typeof updateProductSchema>;
 
 export default function UpdateProductForm({ product }: { product: Product }) {
@@ -80,8 +81,13 @@ export default function UpdateProductForm({ product }: { product: Product }) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="space-y-4"
       >
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-lg">Update Product</h2>
+        <div className="flex items-center justify-between ">
+          <div className="flex items-center justify-center gap-1">
+            <Link href={`/admin/dashboard/product`}>
+              <ChevronLeft></ChevronLeft>
+            </Link>
+            <h2 className="font-semibold text-lg">Update Product</h2>
+          </div>
           <div className="flex gap-2">
             {/* <Button
               size={"sm"}

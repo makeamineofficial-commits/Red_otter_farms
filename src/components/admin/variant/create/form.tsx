@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,6 +22,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useProductDetailsStore } from "@/store/admin/productDetail.store";
 import { VariantOptionSelector } from "@/components/common/variantOptionSelector";
 import { useEffect } from "react";
+import Link from "next/link";
 
 type FormValues = z.infer<typeof variantSchema>;
 
@@ -92,7 +93,12 @@ export default function CreateVariantForm() {
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-lg">Create Variant</h2>
+          <div className="flex items-center justify-center gap-1">
+            <Link href={`/admin/dashboard/product/${productId}/variant`}>
+              <ChevronLeft></ChevronLeft>
+            </Link>
+            <h2 className="font-semibold text-lg">Create Variant</h2>
+          </div>
           <div className="flex gap-2">
             <Button size={"sm"} type="submit" disabled={isPending}>
               {isPending ? (

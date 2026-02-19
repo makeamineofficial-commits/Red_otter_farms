@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { MultiSelect } from "@/components/common/multiSelect";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,7 @@ import { FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { numberField } from "@/lib/utils";
 import { FaqArrayField } from "@/components/common/faq";
+import Link from "next/link";
 
 type FormValues = z.infer<typeof productSchema>;
 
@@ -85,7 +86,12 @@ export default function CreateProductForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-lg">Create Product</h2>
+            <h2 className="font-semibold text-lg flex items-center justify-center gap-1">
+              <Link href="/admin/dashboard/product">
+                <ChevronLeft></ChevronLeft>
+              </Link>
+              Create Product
+            </h2>
             <div className="flex gap-2">
               {/* <Button
               size={"sm"}

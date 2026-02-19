@@ -52,6 +52,7 @@ export default function Footer() {
           >
             Contact
           </Link>
+          <Link href="/loyality">Loyality Program</Link>
           <Link href="/terms-conditions">Terms & Conditions</Link>
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/refund">Return & Refund Policy</Link>

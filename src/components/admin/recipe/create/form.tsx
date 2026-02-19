@@ -14,7 +14,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import FileUpload from "@/components/common/fileUpload";
 import { AssetType } from "@/types/common";
 import { useCreateRecipe } from "@/hooks/admin/recipe.hook";
@@ -23,6 +23,7 @@ import { ArrayField } from "@/components/common/arrayField";
 import { ProductMultiSelect } from "@/components/common/productMultiSelect";
 import { useAdminStore } from "@/store/admin/admin.store";
 import { TagInput } from "@/components/common/tagInput";
+import Link from "next/link";
 export const recipeSchema = z.object({
   title: z.string().trim().min(5).max(120),
   summary: z.string().trim().min(5).max(120),
@@ -94,7 +95,12 @@ export default function CreateRecipeForm() {
         className="space-y-4 "
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-lg">Create Recipe</h2>
+          <div className="flex items-center justify-start gap-1">
+            <Link href="/admin/dashboard/recipe">
+              <ChevronLeft></ChevronLeft>
+            </Link>
+            <h2 className="font-semibold text-lg">Create Recipe</h2>
+          </div>
           <Button type="submit" disabled={isPending}>
             {isPending ? (
               <Loader2 className="animate-spin duration-200" />

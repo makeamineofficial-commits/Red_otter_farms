@@ -8,7 +8,6 @@ import {
   Dispatch,
   SetStateAction,
   useEffect,
-  useMemo,
 } from "react";
 import { getShippingRate } from "@/actions/checkout/shipping.action";
 import { useCart } from "./cart.provider";
@@ -42,73 +41,80 @@ const CheckoutContext = createContext<ContextType | undefined>(undefined);
 
 export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
   const { data: user } = useAccountStore();
-  const { data: address } = useAddressStore();
+  const { data: addressDetails } = useAddressStore();
   const [createAccount, setCreateAccount] = useState(false);
   const [sameAsBilling, setSameAsBilling] = useState(false);
   const [isCheckingOut, setCheckingOut] = useState(false);
   const [billing, setBilling] = useState<BillingDetails | undefined>();
   const [shipping, setShipping] = useState<ShippingDetails | undefined>();
 
+  const { shippingAddress, billingAddress } = addressDetails ?? {};
+
   useEffect(() => {
-    // if (!user) return;
-    const shippingAddress = address?.addresses?.find(
-      (ele) => ele.tag === "SHIPPING",
-    );
-    const billingAddress = address?.addresses?.find(
-      (ele) => ele.tag === "BILLING",
-    );
     const DEFAULT_ADDRESS = {
       address: "123 Test Street",
+      street: "Test Street",
       city: "New Delhi",
       zip: "110001",
-      state_code: "DL",
-      country_code: "IN",
+      state: "Delhi",
+      country: "India",
+      stateCode: "DL",
+      countryCode: "IN",
       attention: "",
     };
     const finalShipping = shippingAddress ?? DEFAULT_ADDRESS;
     const finalBilling = billingAddress ?? DEFAULT_ADDRESS;
-    const phone = user?.phone.replace("+91", "");
+    const phone = user?.mobile?.replace("+91", "");
 
     setShipping({
       phone: phone ?? "9999999999",
       firstName: user?.first_name ?? "Test",
       lastName: user?.last_name ?? "User",
       address: finalShipping.address ?? "",
+      street: finalShipping.street ?? "",
       zip: finalShipping.zip ?? "",
       city: finalShipping.city ?? "",
-      state: finalShipping.state_code ?? "",
-      country: finalShipping.country_code ?? "",
+      state: finalShipping.state ?? "",
+      country: finalShipping.country ?? "",
+      stateCode: finalShipping.stateCode,
+      countryCode: finalShipping.countryCode,
       notes: finalShipping.attention,
-      courier: "",
+      courier: "Red Otter",
     });
 
     setBilling({
+      phone: phone ?? "9999999999",
+      firstName: user?.first_name ?? "Test",
+      lastName: user?.last_name ?? "User",
+      address: finalBilling.address ?? "",
+      street: finalBilling.street ?? "",
       zip: finalBilling.zip ?? "",
       city: finalBilling.city ?? "",
-      phone: phone ?? "9999999999",
-      firstName: user?.first_name ?? "Test2",
-      lastName: user?.last_name ?? "User2",
-      email: "test123@example.com",
-      address: finalBilling.address ?? "",
-      state: finalBilling.state_code ?? "",
-      country: finalBilling.country_code ?? "",
+      state: finalBilling.state ?? "",
+      country: finalBilling.country ?? "",
+      stateCode: finalBilling.stateCode,
+      countryCode: finalBilling.countryCode,
       createAccount,
     });
-  }, [user, address, createAccount]);
+  }, [user, addressDetails, createAccount]);
 
   useEffect(() => {
     if (!sameAsBilling || !billing) return;
+    const phone = user?.mobile?.replace("+91", "");
     setShipping((prev) => ({
-      phone: billing.phone ?? "",
-      firstName: user?.first_name ?? "",
-      lastName: user?.last_name ?? "",
+      phone,
+      firstName: user?.first_name ?? "Test",
+      lastName: user?.last_name ?? "User",
       address: billing.address ?? "",
+      street: billing.street ?? "",
       zip: billing.zip ?? "",
       city: billing.city ?? "",
       state: billing.state ?? "",
       country: billing.country ?? "",
-      notes: prev?.notes,
-      courier: prev?.courier,
+      stateCode: billing.stateCode,
+      countryCode: billing.countryCode,
+      notes: prev?.notes ?? "",
+      courier: prev?.courier ?? "",
     }));
   }, [sameAsBilling, billing, user]);
 
@@ -125,6 +131,9 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
         deliveryPincode: pincode,
       });
       if (res.success) {
+        setShipping((prev) =>
+          prev ? { ...prev, courier: res.courier } : prev,
+        );
         setShippingRate(res.rate);
       }
     } catch (error) {
@@ -146,7 +155,7 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     const isNCR = isNCRPincode(pincode);
     setShowEstimate(!isNCR);
     resolveShippingRate(pincode);
-  }, [shipping?.zip, cart]);
+  }, [shipping?.zip, cart, user]);
 
   return (
     <CheckoutContext.Provider

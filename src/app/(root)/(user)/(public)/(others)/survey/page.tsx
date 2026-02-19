@@ -115,10 +115,10 @@ export default function page() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 rounded-full mb-6">
             <Leaf className="w-8 h-8 text-[#edefea]" />
           </div>
-          <h1 className="font-['Dream_Orphans',sans-serif] text-5xl md:text-6xl tracking-[4px] mb-4">
+          <h1 className="font-dream-orphans text-5xl md:text-6xl tracking-[4px] mb-4">
             Your Nutrition Journey
           </h1>
-          <p className="font-['Inter',sans-serif] text-[#edefea] text-lg max-w-2xl mx-auto">
+          <p className=" text-[#edefea] text-lg max-w-2xl mx-auto">
             Help us personalize your Red Otter Farms experience
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function page() {
             ))}
           </div>
           <div className="text-center">
-            <span className="font-['Inter',sans-serif] text-[#1b1a21] text-sm uppercase tracking-[2px]">
+            <span className=" text-[#1b1a21] text-sm uppercase tracking-[2px]">
               Step {currentStep} of {totalSteps}
             </span>
           </div>
@@ -169,13 +169,13 @@ export default function page() {
         {currentStep === 1 && (
           <div className="space-y-8">
             <div className="text-center mb-12">
-              <div className="font-['Inter',sans-serif] text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
+              <div className=" text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
                 Getting Started
               </div>
-              <h2 className="font-['Dream_Orphans',sans-serif] text-[#004b1a] text-5xl tracking-[3px] mb-4">
+              <h2 className="font-dream-orphans text-[#004b1a] text-5xl tracking-[3px] mb-4">
                 Tell Us About You
               </h2>
-              <p className="font-['Inter',sans-serif] text-[#1b1a21] text-lg">
+              <p className=" text-[#1b1a21] text-lg">
                 Basic information to get started
               </p>
             </div>
@@ -189,7 +189,7 @@ export default function page() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => updateFormData("name", e.target.value)}
-                  className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4 font-['Inter',sans-serif] text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
+                  className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -203,7 +203,7 @@ export default function page() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => updateFormData("email", e.target.value)}
-                    className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4 font-['Inter',sans-serif] text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
+                    className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -216,7 +216,7 @@ export default function page() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => updateFormData("phone", e.target.value)}
-                    className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4 font-['Inter',sans-serif] text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
+                    className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
                     placeholder="+91 XXXXX XXXXX"
                   />
                 </div>
@@ -231,7 +231,7 @@ export default function page() {
                     <button
                       key={age}
                       onClick={() => updateFormData("age", age)}
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                         formData.age === age
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -253,13 +253,13 @@ export default function page() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-[#004b1a]/10 rounded-full mb-6">
                 <Apple className="w-8 h-8 text-[#004b1a]" />
               </div>
-              <div className="font-['Inter',sans-serif] text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
+              <div className=" text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
                 Your Diet
               </div>
-              <h2 className="font-['Dream_Orphans',sans-serif] text-[#004b1a] text-5xl tracking-[3px] mb-4">
+              <h2 className="font-dream-orphans text-[#004b1a] text-5xl tracking-[3px] mb-4">
                 Dietary Preferences
               </h2>
-              <p className="font-['Inter',sans-serif] text-[#1b1a21] text-lg">
+              <p className=" text-[#1b1a21] text-lg">
                 Help us understand your dietary needs
               </p>
             </div>
@@ -284,7 +284,7 @@ export default function page() {
                     <button
                       key={diet}
                       onClick={() => handleMultiSelect("dietType", diet)}
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
                         formData.dietType.includes(diet)
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -316,7 +316,7 @@ export default function page() {
                     <button
                       key={allergy}
                       onClick={() => handleMultiSelect("allergies", allergy)}
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
                         formData.allergies.includes(allergy)
                           ? "bg-[#d7262d] border-[#d7262d] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -341,7 +341,7 @@ export default function page() {
                     updateFormData("customAllergy", e.target.value)
                   }
                   rows={3}
-                  className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4 font-['Inter',sans-serif] text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors resize-none"
+                  className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors resize-none"
                   placeholder="Please specify any other dietary restrictions..."
                 />
               </div>
@@ -356,13 +356,13 @@ export default function page() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-[#004b1a]/10 rounded-full mb-6">
                 <ShoppingBag className="w-8 h-8 text-[#004b1a]" />
               </div>
-              <div className="font-['Inter',sans-serif] text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
+              <div className=" text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
                 Your Habits
               </div>
-              <h2 className="font-['Dream_Orphans',sans-serif] text-[#004b1a] text-5xl tracking-[3px] mb-4">
+              <h2 className="font-dream-orphans text-[#004b1a] text-5xl tracking-[3px] mb-4">
                 Shopping Preferences
               </h2>
-              <p className="font-['Inter',sans-serif] text-[#1b1a21] text-lg">
+              <p className=" text-[#1b1a21] text-lg">
                 Tell us about your grocery shopping routine
               </p>
             </div>
@@ -382,7 +382,7 @@ export default function page() {
                     <button
                       key={freq}
                       onClick={() => updateFormData("frequency", freq)}
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                         formData.frequency === freq
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -408,7 +408,7 @@ export default function page() {
                     <button
                       key={budget}
                       onClick={() => updateFormData("budget", budget)}
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                         formData.budget === budget
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -438,7 +438,7 @@ export default function page() {
                     <button
                       key={priority}
                       onClick={() => handleMultiSelect("priorities", priority)}
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
                         formData.priorities.includes(priority)
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -463,13 +463,13 @@ export default function page() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-[#004b1a]/10 rounded-full mb-6">
                 <Heart className="w-8 h-8 text-[#d7262d]" />
               </div>
-              <div className="font-['Inter',sans-serif] text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
+              <div className=" text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
                 Your Health
               </div>
-              <h2 className="font-['Dream_Orphans',sans-serif] text-[#004b1a] text-5xl tracking-[3px] mb-4">
+              <h2 className="font-dream-orphans text-[#004b1a] text-5xl tracking-[3px] mb-4">
                 Nutritional Goals
               </h2>
-              <p className="font-['Inter',sans-serif] text-[#1b1a21] text-lg">
+              <p className=" text-[#1b1a21] text-lg">
                 Share your wellness objectives
               </p>
             </div>
@@ -493,7 +493,7 @@ export default function page() {
                     <button
                       key={goal}
                       onClick={() => handleMultiSelect("goals", goal)}
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
                         formData.goals.includes(goal)
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -526,7 +526,7 @@ export default function page() {
                       onClick={() =>
                         handleMultiSelect("healthConditions", condition)
                       }
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all text-left flex items-center gap-3 ${
                         formData.healthConditions.includes(condition)
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -551,7 +551,7 @@ export default function page() {
                     updateFormData("customCondition", e.target.value)
                   }
                   rows={3}
-                  className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4 font-['Inter',sans-serif] text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors resize-none"
+                  className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors resize-none"
                   placeholder="Any other health information you'd like to share..."
                 />
               </div>
@@ -566,13 +566,13 @@ export default function page() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-[#004b1a]/10 rounded-full mb-6">
                 <Salad className="w-8 h-8 text-[#004b1a]" />
               </div>
-              <div className="font-['Inter',sans-serif] text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
+              <div className=" text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
                 Final Step
               </div>
-              <h2 className="font-['Dream_Orphans',sans-serif] text-[#004b1a] text-5xl tracking-[3px] mb-4">
+              <h2 className="font-dream-orphans text-[#004b1a] text-5xl tracking-[3px] mb-4">
                 Lifestyle & Preferences
               </h2>
-              <p className="font-['Inter',sans-serif] text-[#1b1a21] text-lg">
+              <p className=" text-[#1b1a21] text-lg">
                 Almost done! Just a few more questions
               </p>
             </div>
@@ -587,7 +587,7 @@ export default function page() {
                     <button
                       key={size}
                       onClick={() => updateFormData("familySize", size)}
-                      className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all ${
+                      className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                         formData.familySize === size
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -609,7 +609,7 @@ export default function page() {
                       <button
                         key={freq}
                         onClick={() => updateFormData("cookingFrequency", freq)}
-                        className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all ${
+                        className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                           formData.cookingFrequency === freq
                             ? "bg-[#004b1a] border-[#004b1a] text-white"
                             : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -632,7 +632,7 @@ export default function page() {
                       <button
                         key={time}
                         onClick={() => updateFormData("mealPrepTime", time)}
-                        className={`border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all ${
+                        className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                           formData.mealPrepTime === time
                             ? "bg-[#004b1a] border-[#004b1a] text-white"
                             : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -673,7 +673,7 @@ export default function page() {
                       onClick={() =>
                         updateFormData("organicImportance", option.value)
                       }
-                      className={`w-full border-2 rounded-lg px-6 py-4 font-['Inter',sans-serif] font-bold uppercase tracking-wide text-sm transition-all text-left ${
+                      className={`w-full border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all text-left ${
                         formData.organicImportance === option.value
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
                           : "border-[#004b1a] text-[#004b1a] hover:bg-[#004b1a]/5"
@@ -693,7 +693,7 @@ export default function page() {
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
-            className={`border-2 border-[#004b1a] text-[#004b1a] font-['Inter',sans-serif] font-bold uppercase tracking-[1.5px] px-10 py-4 rounded-[10px] transition-all ${
+            className={`border-2 border-[#004b1a] text-[#004b1a]  font-bold uppercase tracking-[1.5px] px-10 py-4 rounded-[10px] transition-all ${
               currentStep === 1
                 ? "opacity-40 cursor-not-allowed"
                 : "hover:bg-[#004b1a] hover:text-white"
@@ -705,7 +705,7 @@ export default function page() {
           {currentStep < totalSteps ? (
             <button
               onClick={nextStep}
-              className="bg-[#d7262d] text-white font-['Inter',sans-serif] font-bold uppercase tracking-[1.5px] px-10 py-4 rounded-[10px] border-2 border-[#d7262d] hover:bg-[#b81f25] transition-colors flex items-center gap-3"
+              className="bg-[#d7262d] text-white  font-bold uppercase tracking-[1.5px] px-10 py-4 rounded-[10px] border-2 border-[#d7262d] hover:bg-[#b81f25] transition-colors flex items-center gap-3"
             >
               Next Step
               <ChevronRight className="w-5 h-5" />
@@ -713,7 +713,7 @@ export default function page() {
           ) : (
             <button
               onClick={handleSubmit}
-              className="bg-linear-to-r from-[#004b1a] to-[#d7262d] text-white font-['Inter',sans-serif] font-bold uppercase tracking-[1.5px] px-12 py-4 rounded-[10px] border-2 border-transparent hover:scale-105 transition-transform flex items-center gap-3"
+              className="bg-linear-to-r from-[#004b1a] to-[#d7262d] text-white  font-bold uppercase tracking-[1.5px] px-12 py-4 rounded-[10px] border-2 border-transparent hover:scale-105 transition-transform flex items-center gap-3"
             >
               <Sparkles className="w-5 h-5" />
               Complete Survey
@@ -726,7 +726,7 @@ export default function page() {
       {/* Footer CTA */}
       <div className="bg-[#edefea] py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="font-['Inter',sans-serif] text-[#1b1a21]/60 text-sm">
+          <p className=" text-[#1b1a21]/60 text-sm">
             Your responses help us curate the perfect selection of products for
             your needs
           </p>

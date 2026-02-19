@@ -11,15 +11,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+} from "@/components/ui/command";
+
+import { ChevronsUpDown, Check } from "lucide-react";
 
 import { useCheckout } from "@/provider/checkout.provider";
 import { useAccountStore } from "@/store/user/account.store";
+import { Button } from "@/components/ui/button";
+import { states } from "@/types/account";
 
 export default function Billing() {
   const { billing, setBilling, setCreateAccount } = useCheckout();
@@ -55,12 +66,12 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Mobile Number *</Label>
             <div className="flex gap-2">
-              <Input value="+91" disabled className="w-20 h-12!" />
+              <Input value="+91" disabled className="w-14 h-12!" />
               <Input
                 className="h-12!"
                 placeholder="Enter mobile number"
                 name="mobile"
-                value={billing?.phone || ""}
+                value={billing?.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
               />
             </div>
@@ -100,11 +111,20 @@ export default function Billing() {
 
           {/* Address */}
           <div className="space-y-1">
-            <Label className="text-muted-foreground">Street Address *</Label>
+            <Label className="text-muted-foreground">Address *</Label>
             <Input
               className="h-12!"
               value={billing?.address || ""}
               onChange={(e) => handleChange("address", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-muted-foreground">Street *</Label>
+            <Input
+              className="h-12!"
+              value={billing?.street || ""}
+              onChange={(e) => handleChange("street", e.target.value)}
             />
           </div>
 
@@ -121,17 +141,52 @@ export default function Billing() {
           {/* State */}
           <div className="space-y-1">
             <Label className="text-muted-foreground">State *</Label>
-            <Select
-              value={billing?.state}
-              onValueChange={(value) => handleChange("state", value)}
-            >
-              <SelectTrigger className="w-full h-12!">
-                <SelectValue placeholder="Select state" />
-              </SelectTrigger>
-              <SelectContent className="w-full">
-                <SelectItem value="DL">Delhi</SelectItem>
-              </SelectContent>
-            </Select>
+            <Popover>
+              <PopoverTrigger asChild className="w-full">
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="justify-between"
+                >
+                  {billing?.stateCode
+                    ? states.find((s) => s.code === billing.stateCode)?.name
+                    : "Select State"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent className="p-0 w-(--radix-popover-trigger-width)">
+                <Command>
+                  <CommandInput placeholder="Search state..." />
+
+                  <CommandList>
+                    <CommandEmpty>No state found.</CommandEmpty>
+
+                    <CommandGroup>
+                      {states.map((state) => (
+                        <CommandItem
+                          key={state.code}
+                          value={state.name}
+                          onSelect={() => {
+                            handleChange("state", state.name);
+                            handleChange("stateCode", state.code);
+                          }}
+                        >
+                          {state.name}
+                          <Check
+                            className={`ml-auto h-4 w-4 ${
+                              state.code === billing?.stateCode
+                                ? "opacity-100"
+                                : "opacity-0"
+                            }`}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* ZIP */}
@@ -147,7 +202,7 @@ export default function Billing() {
           {/* Country */}
           <div className="space-y-1">
             <Label className="text-muted-foreground">Country</Label>
-            <Input className="h-12!" value="IN" readOnly />
+            <Input className="h-12!" value="India" readOnly disabled />
           </div>
 
           <div className="space-y-1 flex gap-2 items-center">

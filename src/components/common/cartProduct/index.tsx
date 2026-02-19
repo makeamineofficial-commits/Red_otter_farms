@@ -9,12 +9,13 @@ import { Badge } from "@/components/ui/badge";
 
 function ProductCard(item: CartItem) {
   const { quantity, product } = item;
-  const { update, isUpdating, remove } = useCart();
+  const { update, isUpdating, remove, lockCart } = useCart();
   const [localQty, setLocalQty] = useState(item.quantity);
 
   // Debounced server update
   const debouncedUpdate = useDebouncedCallback(
     (qty: number) => {
+      if (lockCart) return;
       update({
         item,
         quantity: qty,
@@ -25,6 +26,7 @@ function ProductCard(item: CartItem) {
   );
 
   const increase = () => {
+    if (lockCart) return;
     setLocalQty((q) => {
       const next = q + 1;
       debouncedUpdate(next);
@@ -33,6 +35,7 @@ function ProductCard(item: CartItem) {
   };
 
   const decrease = () => {
+    if (lockCart) return;
     setLocalQty((q) => {
       if (q <= 1) return q;
       const next = q - 1;
@@ -53,6 +56,7 @@ function ProductCard(item: CartItem) {
       ></Link>
       <button
         className="absolute top-2 right-2 z-60"
+        disabled={lockCart}
         onClick={() => remove({ variantId: item.variant.publicId })}
       >
         <Trash2 size={15} className="text-destructive" />
@@ -96,7 +100,7 @@ function ProductCard(item: CartItem) {
           <div className="flex items-center gap-2 px-2 py-1 rounded-md border">
             <button
               onClick={decrease}
-              disabled={localQty <= 1 || product.hasSubscription}
+              disabled={localQty <= 1 || lockCart || product.hasSubscription}
               className="disabled:opacity-40"
             >
               <Minus size={14} />
@@ -108,7 +112,7 @@ function ProductCard(item: CartItem) {
 
             <button
               onClick={increase}
-              disabled={isUpdating || product.hasSubscription}
+              disabled={isUpdating || lockCart || product.hasSubscription}
               className="disabled:opacity-40"
             >
               <Plus size={14} />

@@ -96,14 +96,14 @@ export default function Sidebar() {
         >
           Recipe
         </NavItem>
-
+        {/* 
         <NavItem
           icon={<ShoppingCart size={18} />}
           href="/admin/dashboard/order"
           active={isActive("/admin/dashboard/order")}
         >
           Order
-        </NavItem>
+        </NavItem> */}
 
         <NavItem
           icon={<ShoppingCart size={18} />}
