@@ -34,6 +34,7 @@ export const getCart = async (): Promise<Cart | null> => {
                   summary: true,
                   displayName: true,
                   nutritionalInfo: true,
+                  hasSubscription: true,
                   slug: true,
                   assets: {
                     where: {
@@ -113,6 +114,7 @@ export const getCartById = async ({
                   displayName: true,
                   nutritionalInfo: true,
                   slug: true,
+                  hasSubscription: true,
                   assets: {
                     where: {
                       isPrimary: true,

@@ -118,12 +118,25 @@ export function ProductCard(product: ProductPreview & { isLast: boolean }) {
             <Button
               onClick={() => {
                 update({
+                  toggle: false,
                   item: convertToCartItem(product),
                   quantity: count,
                 });
               }}
               variant="outline"
-              className="bg-transparent! rounded-lg! border-maroon! text-maroon!"
+              className="bg-transparent! flex sm:hidden rounded-lg! border-maroon! text-maroon!"
+            >
+              Add to cart
+            </Button>
+            <Button
+              onClick={() => {
+                update({
+                  item: convertToCartItem(product),
+                  quantity: count,
+                });
+              }}
+              variant="outline"
+              className="bg-transparent! hidden sm:flex rounded-lg! border-maroon! text-maroon!"
             >
               Add to cart
             </Button>

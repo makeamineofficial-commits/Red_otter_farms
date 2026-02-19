@@ -7,10 +7,12 @@ import Cart from "../cart";
 import { Handbag, Heart, Menu, Search } from "lucide-react";
 import LocationPicker from "../location";
 const pages = [
-  { slug: "salads", href: "/about", label: "Founder's Note" },
+  { slug: "none", href: "/about", label: "Shop" },
+  { slug: "none", href: "/recipes", label: "Our Range" },
   { slug: "none", href: "/recipes", label: "Recipes" },
-  { slug: "soup", href: "#", label: "Gifting" },
-  { slug: "flour-grains", href: "#", label: "Blogs" },
+  { slug: "none", href: "#", label: "Thoughtful Gifting" },
+  { slug: "none", href: "#", label: "OtterWays" },
+  { slug: "none", href: "/about", label: "Founder's Note" },
 ];
 
 export default function Header() {
@@ -35,7 +37,7 @@ export default function Header() {
                   <Link
                     key={ele.slug}
                     href={ele.href}
-                    className="uppercase text-nowrap text-[1.25rem]"
+                    className="uppercase text-nowrap text-[1rem]"
                   >
                     {ele.label}
                   </Link>

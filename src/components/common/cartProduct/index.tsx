@@ -94,7 +94,7 @@ function ProductCard(item: CartItem) {
           <div className="flex items-center gap-2 px-2 py-1 rounded-md border">
             <button
               onClick={decrease}
-              disabled={localQty <= 1}
+              disabled={localQty <= 1 || product.hasSubscription}
               className="disabled:opacity-40"
             >
               <Minus size={14} />
@@ -106,7 +106,7 @@ function ProductCard(item: CartItem) {
 
             <button
               onClick={increase}
-              disabled={isUpdating}
+              disabled={isUpdating || product.hasSubscription}
               className="disabled:opacity-40"
             >
               <Plus size={14} />

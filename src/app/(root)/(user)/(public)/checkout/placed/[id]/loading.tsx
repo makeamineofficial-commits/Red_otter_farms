@@ -3,7 +3,7 @@ export default function Loading() {
     <div className="bg-white animate-pulse">
       {/* Header Skeleton */}
       <div className="bg-[#004b1a] py-16 px-4">
-        <div className="max-w-7xl mx-auto text-center space-y-6">
+        <div className=" mx-auto text-center space-y-6">
           <div className="w-20 h-20 bg-white/20 rounded-full mx-auto" />
 
           <div className="h-10 w-80 bg-white/20 mx-auto rounded" />
@@ -15,7 +15,7 @@ export default function Loading() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 md:px-16 py-16">
+      <div className=" mx-auto px-4 md:px-16 py-16">
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Left Section */}
           <div className="lg:col-span-2 space-y-10">

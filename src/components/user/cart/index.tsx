@@ -4,7 +4,7 @@ import { Handbag, X } from "lucide-react";
 import { Suspense, useEffect } from "react";
 import Products from "@/components/common/cartProduct";
 import { useCart } from "@/provider/cart.provider";
-import NutritionMeter from "./nutritionMeter";
+import { NutritionMeterAccordion } from "./nutritionMeter";
 import Checkout from "./checkout";
 import Floater from "./floater";
 function _Cart() {
@@ -57,7 +57,7 @@ function _Cart() {
           <Products></Products>
         </div>
         <div className=" z-50 shadow-xl">
-          <NutritionMeter></NutritionMeter>
+          <NutritionMeterAccordion></NutritionMeterAccordion>
           <Checkout></Checkout>
         </div>
       </div>

@@ -18,6 +18,7 @@ interface PageProps {
 
 export default async function OrderPage({ params }: PageProps) {
   const { id } = await params;
+
   const featuredProducts = await listFeaturedProducts();
   const data = await getOrder({
     orderId: id,

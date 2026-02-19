@@ -5,8 +5,9 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger2,
+  AccordionTrigger3,
 } from "@/components/ui/accordion";
-import { ChevronUp, Flame, Beef, Wheat, Droplets } from "lucide-react";
+import { ChevronUp, Flame, Beef, Wheat, Droplets, X } from "lucide-react";
 import { useCart } from "@/provider/cart.provider";
 
 function NutritionSkeleton() {
@@ -32,20 +33,43 @@ function NutritionRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
 function NutritionContent() {
+  const { cart } = useCart();
+
+  // Normalize nutrient keys to avoid duplicates
+  function normalizeKey(key: string) {
+    key = key.toLowerCase().replace(/\s|_/g, "");
+    const map: Record<string, string> = {
+      carbs: "carbohydrates",
+      carbohydrate: "carbohydrates",
+      protein: "protein",
+      fat: "fat",
+      fiber: "fiber",
+      sodium: "sodium",
+      potassium: "potassium",
+      calories: "calories",
+      sugar: "sugar",
+    };
+    return map[key] || key;
+  }
+
+  // Parse string like "100mg", "2 g", "0.5g", "176 kcal"
   function parseNutrition(value?: string) {
     if (!value) return { amount: 0, unit: "" };
-
-    const match = value.match(/([\d.]+)\s*(\D+)/);
-
+    const match = value.match(/([\d.]+)\s*([a-zA-Z]+)/);
     if (!match) return { amount: 0, unit: "" };
-
     return {
       amount: parseFloat(match[1]),
-      unit: match[2].trim(),
+      unit: match[2].trim().toLowerCase(),
     };
   }
+
+  // Convert mg → g automatically for consistency
+  function convertUnit(amount: number, unit: string) {
+    if (unit === "mg") return { amount: amount / 1000, unit: "g" };
+    return { amount, unit };
+  }
+
   function formatLabel(key: string) {
     return key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   }
@@ -56,56 +80,110 @@ function NutritionContent() {
     return value.toFixed(2);
   }
 
-  const { cart } = useCart();
-
   const totals = cart?.items.reduce(
     (acc, item) => {
       const info = item.product.nutritionalInfo;
       if (!info) return acc;
 
       Object.entries(info).forEach(([key, value]) => {
-        //   @ts-ignore
-        const parsed = parseNutrition(value);
+        const parsed = parseNutrition(value as string);
+        if (parsed.amount === 0) return;
 
-        if (!acc[key]) {
-          acc[key] = { amount: 0, unit: parsed.unit };
+        const normalizedKey = normalizeKey(key);
+        const converted = convertUnit(parsed.amount, parsed.unit);
+
+        if (!acc[normalizedKey]) {
+          acc[normalizedKey] = {
+            amount: 0,
+            unit: converted.unit,
+            originalKey: normalizedKey,
+          };
         }
 
-        acc[key].amount += parsed.amount * item.quantity;
-        acc[key].unit ||= parsed.unit;
+        // Sum amounts
+        acc[normalizedKey].amount += converted.amount * item.quantity;
       });
 
       return acc;
     },
-    {} as Record<string, { amount: number; unit: string }>,
+    {} as Record<string, { amount: number; unit: string; originalKey: string }>,
   );
 
-  if (!totals) return null;
+  const entries = Object.values(totals || {});
+
+  if (entries.length === 0) {
+    return (
+      <div className="my-2 text-muted-foreground text-sm text-center uppercase">
+        No Information
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {Object.entries(totals).length === 0 ? (
-        <>
-          <div className="my-2 text-muted-foreground text-sm text-center uppercase">
-            No Information
-          </div>
-        </>
-      ) : (
-        <>
-          {Object.entries(totals).map(([key, data]) => (
-            <NutritionRow
-              key={key}
-              label={formatLabel(key)}
-              value={`${formatAmount(data.amount)} ${data.unit}`}
-            />
-          ))}
-        </>
-      )}
+      {entries.map((data) => (
+        <NutritionRow
+          key={data.originalKey}
+          label={formatLabel(data.originalKey)}
+          value={`${formatAmount(data.amount)} ${data.unit}`}
+        />
+      ))}
     </div>
   );
 }
 
-export default function NutritionMeter() {
+type NutritionMeterDrawerProps = {
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+};
+
+export function NutritionMeterDrawer({
+  isOpen,
+  setIsOpen,
+}: NutritionMeterDrawerProps) {
+  const { isLoading } = useCart();
+
+  return (
+    <>
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 bg-black/40 z-50"
+        />
+      )}
+
+      {/* Drawer */}
+      <div
+        className={`
+          fixed bottom-0 left-0 right-0 z-60
+          bg-background rounded-t-2xl w-full
+          transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-y-0" : "translate-y-full"}
+        `}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b">
+          <div className="flex items-center gap-2 font-semibold text-base">
+            <Flame className="h-5 w-5" />
+            <span>Nutrition Meter</span>
+          </div>
+
+          <button onClick={() => setIsOpen(false)}>
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="px-5 pb-14 pt-4 max-h-[70vh] overflow-y-auto">
+          {isLoading ? <NutritionSkeleton /> : <NutritionContent />}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export function NutritionMeterAccordion() {
   const { isLoading } = useCart(); // assuming nutrition depends on cart
 
   return (
@@ -116,20 +194,17 @@ export default function NutritionMeter() {
           className="border-t bg-background rounded-t-2xl "
         >
           {/* Trigger */}
-          <AccordionTrigger2
+          <AccordionTrigger3
             className="
               flex items-center justify-between
               px-5 py-4 text-base font-semibold
-              [&[data-state=open]>svg]:rotate-180
             "
           >
             <div className="flex items-center gap-2">
               <Flame className="h-5 w-5 " />
               <span>Nutrition Meter</span>
             </div>
-
-            <ChevronUp className="h-5 w-5 transition-transform duration-200" />
-          </AccordionTrigger2>
+          </AccordionTrigger3>
 
           {/* Content */}
           <AccordionContent className="px-5 pb-5">

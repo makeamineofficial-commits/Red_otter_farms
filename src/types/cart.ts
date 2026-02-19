@@ -18,6 +18,7 @@ export interface Item {
     displayName: string;
     summary: string;
     nutritionalInfo: any;
+    hasSubscription: boolean;
     assets: Asset[];
     slug: string;
   };
