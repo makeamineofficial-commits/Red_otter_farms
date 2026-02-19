@@ -16,8 +16,15 @@ export default function Footer() {
           >
             Contact Us
           </Link>
-          <Link href="https://www.instagram.com/redotterfarms/">Instagram</Link>
-          <Link href="https://www.facebook.com/redotterfarms">Facebook</Link>
+          <Link
+            target="__blank"
+            href="https://www.instagram.com/redotterfarms/"
+          >
+            Instagram
+          </Link>
+          <Link target="__blank" href="https://www.facebook.com/redotterfarms">
+            Facebook
+          </Link>
           <Link href="#">X</Link>
         </ul>
       </div>

@@ -47,8 +47,12 @@ function ProductCard(item: CartItem) {
 
   return (
     <div className="border-b last:border-b-0 pb-2 flex gap-3 items-end relative ">
+      <Link
+        href={`/products/${product.slug}`}
+        className="hover:underline  absolute h-full w-full z-40"
+      ></Link>
       <button
-        className="absolute top-2 right-2"
+        className="absolute top-2 right-2 z-60"
         onClick={() => remove({ variantId: item.variant.publicId })}
       >
         <Trash2 size={15} className="text-destructive" />
@@ -78,11 +82,9 @@ function ProductCard(item: CartItem) {
       </div>
 
       <div className="flex-1 flex flex-col ">
-        <Link href={`/products/${product.slug}`} className="hover:underline">
-          <span className="font-medium text-sm  w-[90%] overflow-clip capitalize">
-            {product.displayName.trim().toLowerCase()}
-          </span>
-        </Link>
+        <span className="font-medium text-sm  w-[90%] overflow-clip capitalize">
+          {product.displayName.trim().toLowerCase()}
+        </span>
 
         {product.summary && (
           <span className="text-xs text-muted-foreground line-clamp-2 w-[90%]">
@@ -90,7 +92,7 @@ function ProductCard(item: CartItem) {
           </span>
         )}
 
-        <div className="flex items-center justify-between mt-1">
+        <div className="flex items-center justify-between mt-1 z-60">
           <div className="flex items-center gap-2 px-2 py-1 rounded-md border">
             <button
               onClick={decrease}

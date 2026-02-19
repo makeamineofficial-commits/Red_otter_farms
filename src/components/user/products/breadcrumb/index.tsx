@@ -23,7 +23,7 @@ export default function ProductBreadcrumb({ product }: { product: Product }) {
 
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <Link className="hover:underline" href="#">
+          <Link className="hover:underline" href={`/categories`}>
             Products
           </Link>
         </BreadcrumbItem>

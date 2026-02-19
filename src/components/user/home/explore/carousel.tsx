@@ -154,11 +154,22 @@ export default function ProductCarousel() {
     <section className="w-full overflow-hidden bg-herbal">
       <Carousel opts={{ align: "start" }} className="overflow-visible">
         <CarouselContent className="">
-          {products.map((p, i) => (
+          {products.length > 0 && (
+            <>
+              <CarouselItem
+                key={0}
+                className="
+  basis-0
+          "
+              ></CarouselItem>
+            </>
+          )}
+
+          {products.slice(0).map((p, i) => (
             <CarouselItem
               key={i}
               className="
-                pl-0! pt-0!
+                pl-0!
                 basis-[85%]
                 md:basis-1/2
                 lg:basis-1/3

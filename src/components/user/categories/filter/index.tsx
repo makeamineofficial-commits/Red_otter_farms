@@ -85,7 +85,7 @@ function FilterSection({ children }: { children?: ReactNode }) {
       }
     });
 
-    router.push(`${pathname}?${search.toString()}`);
+    router.push(`${pathname}?${search.toString()}`, { scroll: false });
   };
 
   const debouncedPriceUpdate = useDebouncedCallback((val: number[]) => {
@@ -105,7 +105,7 @@ function FilterSection({ children }: { children?: ReactNode }) {
   const handleCategoryClick = (slug: string) => {
     setPrice(DEFAULT_PRICE);
     setSelectedCategories([slug]);
-    router.push(`/categories/${slug}`);
+    router.push(`/categories/${slug}`, { scroll: false });
   };
 
   const toggleBenefit = (benefit: string) => {
