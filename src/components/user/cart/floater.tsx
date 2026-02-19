@@ -16,10 +16,10 @@ export default function Floater() {
 
   if (!items.length) return null;
 
-  if (pathname === "/checkout") return <></>;
   const previewItems = items.slice(0, 3);
   const extraCount = items.length - 3;
   const [isOpen, setOpen] = useState(false);
+  if (pathname === "/checkout") return <></>;
   return (
     <>
       <NutritionMeterDrawer

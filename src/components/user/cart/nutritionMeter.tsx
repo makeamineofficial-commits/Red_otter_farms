@@ -22,6 +22,65 @@ function NutritionSkeleton() {
     </div>
   );
 }
+export function NutritionSummaryRow() {
+  const { cart } = useCart();
+
+  function parseNutrition(value?: string) {
+    if (!value) return { amount: 0, unit: "" };
+    const match = value.match(/([\d.]+)\s*([a-zA-Z]+)/);
+    if (!match) return { amount: 0, unit: "" };
+    return {
+      amount: parseFloat(match[1]),
+      unit: match[2].trim().toLowerCase(),
+    };
+  }
+
+  function convertUnit(amount: number, unit: string) {
+    if (unit === "mg") return { amount: amount / 1000, unit: "g" };
+    return { amount, unit };
+  }
+
+  let totalCalories = 0;
+  let totalProtein = 0;
+
+  cart?.items.forEach((item) => {
+    const info = item.product.nutritionalInfo;
+    if (!info) return;
+
+    Object.entries(info).forEach(([key, value]) => {
+      const lowerKey = key.toLowerCase();
+
+      const parsed = parseNutrition(value as string);
+      const converted = convertUnit(parsed.amount, parsed.unit);
+
+      if (lowerKey.includes("calorie") || lowerKey.includes("energy")) {
+        totalCalories += converted.amount * item.quantity;
+      }
+
+      if (lowerKey.includes("protein")) {
+        totalProtein += converted.amount * item.quantity;
+      }
+    });
+  });
+
+  if (!totalCalories && !totalProtein) return null;
+
+  return (
+    <div className="flex items-center justify-between px-4 gap-4 py-2 rounded-xl">
+      {/* Energy */}
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <Flame className="h-4 w-4 text-orange-500" />
+        <span>{Math.round(totalCalories)} kcal</span>
+      </div>
+
+      {/* Protein */}
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <Beef className="h-4 w-4 text-rose-500" />
+        <span>{totalProtein.toFixed(1)} g</span>
+      </div>
+    </div>
+  );
+}
 
 function NutritionRow({ label, value }: { label: string; value: string }) {
   return (

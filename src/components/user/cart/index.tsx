@@ -7,6 +7,7 @@ import { useCart } from "@/provider/cart.provider";
 import { NutritionMeterAccordion } from "./nutritionMeter";
 import Checkout from "./checkout";
 import Floater from "./floater";
+import Bar from "./bar";
 function _Cart() {
   const { isOpen, toggle, cart } = useCart();
   return (
@@ -68,7 +69,8 @@ function _Cart() {
 export default function Cart() {
   return (
     <Suspense fallback={<></>}>
-      <Floater></Floater>
+      {/* <Floater></Floater> */}
+      <Bar></Bar>
       <_Cart />
     </Suspense>
   );
