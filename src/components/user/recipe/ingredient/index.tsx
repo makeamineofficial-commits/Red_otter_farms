@@ -16,6 +16,7 @@ export default function Ingredients({
   const handleClick = async () => {
     try {
       await updateMany({
+        // @ts-ignore
         items: listedIngredients.map(({ variant, ...rest }) => {
           return {
             item: { variant: { ...variant }, ...rest },

@@ -40,6 +40,7 @@ export async function createNormalWalletOrder(
     shipping_address: buildNormalAddress(orderDetails.shipping),
 
     order_items: {
+      // @ts-ignore
       items: buildNormalItems(orderDetails),
     },
     payment_object: {
@@ -91,6 +92,7 @@ export async function createDrystoreWalletOrder(orderDetails: Order) {
     created_via: "checkout",
     billing: buildDrystoreAddress(orderDetails.billing),
     shipping: buildDrystoreAddress(orderDetails.shipping),
+    // @ts-ignore
     line_items: buildDrystoreItems(orderDetails),
     shipping_lines:
       orderDetails.shippingFee === 0

@@ -172,6 +172,7 @@ export function ProductCard(product: Product & { variants: Variant[] }) {
                     publicId: selectedVariant.publicId,
                   },
                   product: {
+                    hasSubscription: product.hasSubscription,
                     displayName: product.displayName,
                     summary: product.summary,
                     nutritionalInfo: product.nutritionalInfo,
@@ -201,6 +202,7 @@ export function ProductCard(product: Product & { variants: Variant[] }) {
                     publicId: selectedVariant.publicId,
                   },
                   product: {
+                    hasSubscription: product.hasSubscription,
                     displayName: product.displayName,
                     summary: product.summary,
                     nutritionalInfo: product.nutritionalInfo,

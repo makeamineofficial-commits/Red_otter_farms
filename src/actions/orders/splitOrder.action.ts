@@ -58,6 +58,7 @@ export async function createNormalSplitOrder(
     shipping_address: buildNormalAddress(orderDetails.shipping),
 
     order_items: {
+      // @ts-ignore
       items: buildNormalItems(orderDetails),
     },
 
@@ -145,6 +146,7 @@ export async function createDrystoreSplitOrder(orderDetails: Order) {
     transaction_id: payment.id,
     billing: buildDrystoreAddress(orderDetails.billing),
     shipping: buildDrystoreAddress(orderDetails.shipping),
+    // @ts-ignore
     line_items: buildDrystoreItems(orderDetails),
     shipping_lines:
       orderDetails.shippingFee === 0

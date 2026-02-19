@@ -91,6 +91,7 @@ export const convertToCartItem = (product: ProductPreview): Item => {
       options: product.variantOption,
     },
     product: {
+      hasSubscription: product.hasSubscription,
       displayName: product.displayName,
       summary: product.summary,
       nutritionalInfo: product.nutritionalInfo,
