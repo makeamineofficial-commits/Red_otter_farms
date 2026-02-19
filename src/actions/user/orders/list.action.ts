@@ -101,9 +101,11 @@ export async function getOrders() {
       orderList.map((order) => {
         return {
           ...order,
-          products: order.line_items.map(
-            (ele) => productMap.get(ele.sku) as ProductPreview,
-          ),
+          products: order.line_items
+            .map((ele) => productMap.get(ele.sku))
+            .filter(
+              (product): product is ProductPreview => product !== undefined,
+            ),
         };
       });
 

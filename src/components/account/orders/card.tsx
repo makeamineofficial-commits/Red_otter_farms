@@ -51,19 +51,19 @@ function ProductCard({
           <div className="h-12 w-12 bg-muted rounded-md relative overflow-hidden">
             <Image
               fill
-              src={product.assets[0].url}
-              alt={product.displayName}
+              src={product?.assets[0].url}
+              alt={product?.displayName}
             ></Image>
           </div>
           <div>
             <p className="text-xs md:text-sm font-medium flex gap-2 ">
-              {product.displayName} <span>{quantity}x</span>
+              {product?.displayName} <span>{quantity}x</span>
             </p>
             <p></p>
           </div>
         </div>
         <span className="text-xs text-muted-foreground flex md:text-sm">
-          ₹{formatPrice(product.price)}
+          ₹{formatPrice(product?.price)}
         </span>
       </div>
     </>

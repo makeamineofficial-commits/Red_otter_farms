@@ -51,10 +51,7 @@ export default function OrderItems({ products }: { products: Product[] }) {
 
               <p className="text-sm mt-1">
                 {" "}
-                ₹{((item.price / 100) * discount * item.quantity).toFixed(
-                  2,
-                )}{" "}
-                each
+                ₹{((item.price / 100) * discount).toFixed(2)} each
               </p>
             </div>
           </div>
