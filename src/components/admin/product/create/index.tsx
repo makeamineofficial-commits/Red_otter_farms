@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function CreateProduct() {
   return (
     <Link href="/admin/dashboard/product/create">
-      <Button>Create Product</Button>;
+      <Button>Create Product</Button>
     </Link>
   );
 }
