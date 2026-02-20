@@ -239,23 +239,22 @@ const createAccount = async ({
   lastName: string;
   email?: string;
 }) => {
-  const account = await getUser(phone);
-  let customerId = account?.customer_id ?? null;
-
-  if (!customerId) {
-    await axios.post(
-      "https://automation.redotterfarms.com/webhook/b40a9035-c8c3-4267-bc9e-144b89c2ab55",
-      {
-        mobile: phone.startsWith("+91") ? phone : "+91" + phone,
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-      },
-      {
-        headers: { api_key: process.env.BACKEND_API_KEY as string },
-      },
-    );
-  }
+  const res = await axios.post(
+    "https://automation.redotterfarms.com/webhook/b40a9035-c8c3-4267-bc9e-144b89c2ab55",
+    {
+      mobile: phone.startsWith("+91") ? phone : "+91" + phone,
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+    },
+    {
+      headers: { api_key: process.env.BACKEND_API_KEY as string },
+    },
+  );
+  return {
+    customerId: res.data.zoho_inv_customer_id as string,
+    accountId: res.data.zoho_crm_account_id as string,
+  };
 };
 
 const getUser = async (_phone: string): Promise<Account | undefined> => {

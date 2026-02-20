@@ -2,35 +2,24 @@
 
 import { isNCRPincode } from "@/lib/utils";
 
-import {
-  createNormalRazorpayOrder,
-  createDrystoreRazorpayOrder,
-} from "./razorpayOrder";
-import {
-  createNormalWalletOrder,
-  createDrystoreWalletOrder,
-} from "./walletOrder";
+import { createRazorpayOrder } from "./razorpayOrder";
+import { createWalletOrder } from "./walletOrder";
+import { createSplitOrder } from "./splitOrder.action";
 
 import {
   BillingDetails,
   PaymentMethod,
   ShippingDetails,
 } from "@/types/payment";
-import {
-  createDrystoreSplitOrder,
-  createNormalSplitOrder,
-} from "./splitOrder.action";
 import { getCartById } from "../user/cart/get.action";
 import { getOrder } from "./utils";
 import { Order } from "@/types/order";
 export const handleOrder = async ({
   cartSessionId,
   paymentMethod,
-  customerId,
 }: {
   cartSessionId: string;
   paymentMethod: PaymentMethod;
-  customerId?: string;
 }) => {
   const cart = await getCartById({ sessionId: cartSessionId });
   if (!cart) {
@@ -64,37 +53,22 @@ export const handleOrder = async ({
       }) ?? [],
   };
 
-  const normalOrder = isNCRPincode(revisedOrder.shipping.zip);
+  const ncr = isNCRPincode(revisedOrder.shipping.zip);
   if (paymentMethod === PaymentMethod.RAZORPAY) {
-    // @ts-ignore
-    if (normalOrder) {
-      await createNormalRazorpayOrder({
-        ...revisedOrder,
-        customerId: customerId ?? null,
-      });
-    } else {
-      await createDrystoreRazorpayOrder(revisedOrder);
-    }
+    await createRazorpayOrder({
+      orderDetails: revisedOrder,
+      ncr,
+    });
   } else if (paymentMethod === PaymentMethod.OTTER) {
-    // @ts-ignore
-    if (normalOrder) {
-      await createNormalWalletOrder({
-        ...revisedOrder,
-        customerId: customerId ?? null,
-      });
-    } else {
-      await createDrystoreWalletOrder(revisedOrder);
-    }
+    await createWalletOrder({
+      orderDetails: revisedOrder,
+      ncr,
+    });
   } else {
-    // @ts-ignore
-    if (normalOrder) {
-      await createNormalSplitOrder({
-        ...revisedOrder,
-        customerId: customerId ?? null,
-      });
-    } else {
-      await createDrystoreSplitOrder(revisedOrder);
-    }
+    await createSplitOrder({
+      orderDetails: revisedOrder,
+      ncr,
+    });
 
     return { orderId: order.publicId };
   }

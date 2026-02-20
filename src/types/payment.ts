@@ -15,8 +15,6 @@ export interface BillingDetails {
   stateCode: string;
   country: string;
   countryCode: string;
-
-  createAccount: boolean;
 }
 
 export interface ShippingDetails {

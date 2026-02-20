@@ -1,43 +1,48 @@
 "use server";
 
-import {
-  finalizeOrder,
-  saveOrderToFile,
-  sendNormalOrder,
-  sendDryStoreOrder,
-} from "./utils";
-import {
-  buildNormalItems,
-  buildDrystoreAddress,
-  buildDrystoreItems,
-  buildNormalAddress,
-} from "./helper";
+import { finalizeOrder, saveOrderToFile, sendOrder, syncUser } from "./utils";
+import { buildNormalItems, buildNormalAddress } from "./helper";
 
 import { afterCheckout } from "../checkout/checkout.action";
 import { PaymentStatus } from "@/lib/db";
 import { Order } from "@/types/order";
 
-export async function createNormalWalletOrder(
-  orderDetails: Order & { customerId: string | null },
-) {
+export async function createWalletOrder({
+  ncr,
+  orderDetails,
+}: {
+  ncr: boolean;
+  orderDetails: Order;
+}) {
+  console.log("[WALLET] Order sent", orderDetails.id);
   await afterCheckout();
-
+  const { billingAddressId, shippingAddressId, phone, customerId } =
+    await syncUser({
+      billing: orderDetails.billing,
+      shipping: orderDetails.shipping,
+    });
+  const { addressId: _shippingAddressId, ...billing } = orderDetails.billing;
+  const { addressId: _billingAddressId, ...shipping } = orderDetails.shipping;
   const order = {
     id: orderDetails.id,
 
     order_date: new Date().toISOString().slice(0, 10),
 
-    customer_id: orderDetails.customerId,
+    customer_id: customerId,
 
-    mobile: orderDetails.billing.phone.startsWith("+91")
-      ? orderDetails.billing.phone
-      : "+91" + orderDetails.billing.phone,
+    mobile: phone,
 
     payment_status: "PAID",
 
-    billing_address: buildNormalAddress(orderDetails.billing),
+    billing_address: buildNormalAddress({
+      addressId: _billingAddressId ? _billingAddressId : billingAddressId,
+      ...billing,
+    }),
 
-    shipping_address: buildNormalAddress(orderDetails.shipping),
+    shipping_address: buildNormalAddress({
+      addressId: _shippingAddressId ? _shippingAddressId : shippingAddressId,
+      ...shipping,
+    }),
 
     order_items: {
       // @ts-ignore
@@ -65,57 +70,12 @@ export async function createNormalWalletOrder(
       total_order_value: orderDetails.total,
     },
 
-    source: "Website - NCR",
+    source: ncr ? "Website - NCR" : "Website - Non NCR",
 
-    place_of_supply: orderDetails.shipping.state,
+    place_of_supply: orderDetails.shipping.stateCode,
   };
-  if (process.env.NODE_ENV === "production") await sendNormalOrder(order);
+  await sendOrder(order);
   await finalizeOrder(orderDetails.sessionId, PaymentStatus.VERIFIED);
-  await saveOrderToFile(`order_${orderDetails.sessionId}_normal_wallet`, order);
-  return order;
-}
-
-export async function createDrystoreWalletOrder(orderDetails: Order) {
-  await afterCheckout();
-  const order = {
-    id: orderDetails.id,
-    number: orderDetails.sessionId,
-    status: "paid",
-    currency: "INR",
-    version: "9.9.5",
-    date_created_utc: new Date().toISOString(),
-    date_paid_utc: new Date().toISOString(),
-    total: orderDetails.total,
-    shipping_total: orderDetails.shippingFee,
-    payment_method: "wallet",
-    payment_method_title: "Otter Wallet",
-    created_via: "checkout",
-    billing: buildDrystoreAddress(orderDetails.billing),
-    shipping: buildDrystoreAddress(orderDetails.shipping),
-    // @ts-ignore
-    line_items: buildDrystoreItems(orderDetails),
-    shipping_lines:
-      orderDetails.shippingFee === 0
-        ? [
-            {
-              method_title: "Free Shipping",
-              total: "0.00",
-            },
-          ]
-        : [
-            {
-              method_title: "ShipRocket",
-              total: orderDetails.shippingFee.toFixed(2),
-            },
-          ],
-
-    fee_lines: [],
-  };
-  if (process.env.NODE_ENV === "production") await sendDryStoreOrder(order);
-  await finalizeOrder(orderDetails.sessionId, PaymentStatus.VERIFIED);
-  await saveOrderToFile(
-    `order_${orderDetails.sessionId}_drystore_wallet`,
-    order,
-  );
+  await saveOrderToFile(`order_${orderDetails.id}`, order);
   return order;
 }

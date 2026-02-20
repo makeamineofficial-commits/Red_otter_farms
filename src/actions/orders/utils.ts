@@ -1,7 +1,10 @@
 "use server";
 
+import { createAddress } from "../user/address/utils";
+import { createAccount } from "../auth/user.action";
 import { CartStatus, OrderStatus, PaymentStatus } from "@/lib/db";
 import { db } from "@/lib/db";
+import { BillingDetails, ShippingDetails } from "@/types/payment";
 import axios from "axios";
 import fs from "fs/promises";
 import path from "path";
@@ -72,35 +75,21 @@ export async function saveOrderToFile(prefix: string, orderData: unknown) {
   }
 }
 
-export async function sendNormalOrder(payload: any) {
-  try {
-    await axios.post(
-      "https://automation.redotterfarms.com/webhook/7a3574f2-2373-40f5-bb58-16e38c8ea72c",
-      payload,
-      {
-        headers: { api_key: process.env.BACKEND_API_KEY as string },
-      },
-    );
-    return { success: true, message: "Order sent successfully" };
-  } catch (err) {
-    console.log(err);
-    return { success: false, message: "Failed to send order" };
-  }
-}
-
-export async function sendDryStoreOrder(payload: any) {
-  try {
-    await axios.post(
-      "https://automation.redotterfarms.com/webhook/9bb9613a-bbec-4ffb-b562-6ba7cdee3461",
-      payload,
-      {
-        headers: { api_key: process.env.BACKEND_API_KEY as string },
-      },
-    );
-    return { success: true, message: "DryStore Order sent successfully" };
-  } catch (err) {
-    console.log(err);
-    return { success: false, message: "Failed to send drystore order" };
+export async function sendOrder(payload: any) {
+  if (process.env.NODE_ENV === "production") {
+    try {
+      await axios.post(
+        "https://automation.redotterfarms.com/webhook/7a3574f2-2373-40f5-bb58-16e38c8ea72c",
+        payload,
+        {
+          headers: { api_key: process.env.BACKEND_API_KEY as string },
+        },
+      );
+      return { success: true, message: "Order sent successfully" };
+    } catch (err) {
+      console.log(err);
+      return { success: false, message: "Failed to send order" };
+    }
   }
 }
 
@@ -141,4 +130,60 @@ export const updateOrderPayment = async ({
   return {
     success: true,
   };
+};
+
+export const syncUser = async ({
+  billing,
+  shipping,
+}: {
+  billing: BillingDetails;
+  shipping: ShippingDetails;
+}) => {
+  const phone = billing.phone.startsWith("+91")
+    ? billing.phone
+    : "+91" + billing.phone;
+  const customer = await createAccount({
+    firstName: billing.firstName,
+    lastName: billing.lastName,
+    phone,
+    email: billing.email,
+  });
+
+  if (billing.addressId && shipping.addressId) {
+    return {
+      ...customer,
+      billingAddressId: shipping.addressId!,
+      shippingAddressId: billing.addressId!,
+      phone,
+    };
+  }
+
+  const billingAddressId = (
+    await createAddress({
+      address: {
+        ...billing,
+        label: "HOME",
+        tag: "BILLING",
+      },
+      phone,
+      customerId: customer.customerId,
+    })
+  ).addressId;
+
+  const shippingAddressId = (
+    await createAddress({
+      address: {
+        ...shipping,
+        label: "HOME",
+        tag: "SHIPPING",
+      },
+      phone,
+      customerId: customer.customerId,
+    })
+  ).addressId;
+
+  if (!shippingAddressId || !billingAddressId) {
+    throw new Error("Failed to sync address on order");
+  }
+  return { phone, billingAddressId, ...customer, shippingAddressId };
 };

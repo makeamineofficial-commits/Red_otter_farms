@@ -11,7 +11,7 @@ export default function page() {
         <Billing></Billing>
         <Shipping></Shipping>
       </article>
-      <article className="col-span-1 flex flex-col gap-4">
+      <article className="col-span-1 flex flex-col gap-4 lg:sticky lg:top-50 h-fit">
         <Summary></Summary>
         <Payment></Payment>
         <Pay></Pay>

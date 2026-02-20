@@ -9,8 +9,6 @@ import { buySubscription } from "@/actions/purchase/nutrition.action";
 import { buyOtterPass } from "@/actions/purchase/otterpass.action";
 import { addToFund } from "@/actions/purchase/wallet.action";
 
-
-
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
@@ -38,8 +36,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
-    const { purpose, paymentId, customerId, isPartial } =
-      await handleRazorpayWebhook(JSON.parse(rawBody));
+    const { purpose, paymentId, isPartial } = await handleRazorpayWebhook(
+      JSON.parse(rawBody),
+    );
 
     if (purpose === PaymentPurpose.ORDER) {
       const payment = await db.payment.findUnique({
@@ -71,7 +70,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true }, { status: 200 });
       }
       await handleOrder({
-        customerId,
         cartSessionId: cart.sessionId,
         paymentMethod: isPartial ? PaymentMethod.SPLIT : PaymentMethod.RAZORPAY,
       });
@@ -85,7 +83,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {
     console.error("Razorpay webhook error:", error.message);
-
     return NextResponse.json(
       {
         success: false,

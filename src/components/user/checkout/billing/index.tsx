@@ -6,7 +6,6 @@ import {
   AccordionItem,
   AccordionTrigger2,
 } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -28,12 +27,11 @@ import {
 import { ChevronsUpDown, Check } from "lucide-react";
 
 import { useCheckout } from "@/provider/checkout.provider";
-import { useAccountStore } from "@/store/user/account.store";
 import { Button } from "@/components/ui/button";
 import { states } from "@/types/account";
 
 export default function Billing() {
-  const { billing, setBilling, setCreateAccount } = useCheckout();
+  const { billing, setBilling } = useCheckout();
   const handleChange = (name: string, value: string | boolean) => {
     setBilling((prev: any) => ({
       ...prev,
@@ -203,15 +201,6 @@ export default function Billing() {
           <div className="space-y-1">
             <Label className="text-muted-foreground">Country</Label>
             <Input className="h-12!" value="India" readOnly disabled />
-          </div>
-
-          <div className="space-y-1 flex gap-2 items-center">
-            <Checkbox
-              onCheckedChange={(e) => {
-                setCreateAccount(e.valueOf() as boolean);
-              }}
-            ></Checkbox>
-            <Label className="text-muted-foreground">Create Account</Label>
           </div>
         </AccordionContent>
       </AccordionItem>

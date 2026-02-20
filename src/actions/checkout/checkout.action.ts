@@ -3,13 +3,10 @@
 import { BillingDetails, ShippingDetails } from "@/types/payment";
 import { getCart } from "../user/cart/get.action";
 import { CartStatus, db, OrderStatus, PaymentStatus } from "@/lib/db";
-import { syncOrder, updateCartStatus } from "../user/cart/update.action";
-
+import { syncOrder } from "../user/cart/update.action";
 import { PaymentMethod } from "@/types/payment";
 import { cookies } from "next/headers";
-import { createAccount } from "../auth/user.action";
 import { handleOrder } from "../orders/order.action";
-
 import { getOrder } from "../orders/utils";
 import { getAccount } from "../user/account/get.action";
 import { getRazorpayCheckout } from "./razorpay.action";
@@ -50,10 +47,6 @@ export async function getCheckout({
   cookieStore.set("checkout_cart_id", cart.sessionId as string);
   cookieStore.set("checkout_order_id", orderId as string);
 
-  if (billing.createAccount && process.env.NODE_ENV === "production") {
-    await createAccount(billing);
-  }
-
   try {
     if (paymentMethod === PaymentMethod.RAZORPAY) {
       const res = await getRazorpayCheckout({
@@ -89,7 +82,6 @@ export async function getCheckout({
         await handleOrder({
           cartSessionId: cart?.sessionId,
           paymentMethod: PaymentMethod.OTTER,
-          customerId: user.account?.customer_id,
         });
       }
 

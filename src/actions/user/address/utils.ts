@@ -37,7 +37,7 @@ export const createAddress = async ({
         params: { customer_id: customerId },
       },
     );
-    return { success: true, addressId: res.data[0].address_id };
+    return { success: true, addressId: res.data[0].address_id as string };
   } catch (err) {
     console.warn("Failed to sync address with backend");
     return { success: false, addressId: null };

@@ -31,7 +31,6 @@ type ContextType = {
   showEstimate: boolean;
   paymentMethod: PaymentMethod;
   setPaymentMethod: Dispatch<SetStateAction<PaymentMethod>>;
-  setCreateAccount: Dispatch<SetStateAction<boolean>>;
   setSameAsBilling: Dispatch<SetStateAction<boolean>>;
   isCheckingOut: boolean;
   setCheckingOut: Dispatch<SetStateAction<boolean>>;
@@ -42,7 +41,6 @@ const CheckoutContext = createContext<ContextType | undefined>(undefined);
 export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
   const { data: user } = useAccountStore();
   const { data: addressDetails } = useAddressStore();
-  const [createAccount, setCreateAccount] = useState(false);
   const [sameAsBilling, setSameAsBilling] = useState(false);
   const [isCheckingOut, setCheckingOut] = useState(false);
   const [billing, setBilling] = useState<BillingDetails | undefined>();
@@ -98,9 +96,8 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
       country: finalBilling.country ?? "",
       stateCode: finalBilling.stateCode,
       countryCode: finalBilling.countryCode,
-      createAccount,
     });
-  }, [user, addressDetails, createAccount]);
+  }, [user, addressDetails]);
 
   useEffect(() => {
     if (!sameAsBilling || !billing) return;
@@ -174,7 +171,6 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
         isCheckingOut,
         setCheckingOut,
         showEstimate,
-        setCreateAccount,
         setSameAsBilling,
         paymentMethod,
         setPaymentMethod,

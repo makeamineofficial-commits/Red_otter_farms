@@ -50,7 +50,7 @@ const registerSchema = z.object({
 
 export default function LoginForm({ close }: { close: () => void }) {
   const { refetch } = useAccountStore();
-  const [step, setStep] = useState<"phone" | "otp" | "register">("register");
+  const [step, setStep] = useState<"phone" | "otp" | "register">("phone");
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
   const action = searchParams.get("action");

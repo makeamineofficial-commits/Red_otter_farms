@@ -24,6 +24,7 @@ export function buildDrystoreItems(cart: Cart) {
 
 export function buildNormalAddress(addr: any) {
   return {
+    address_id: addr.addressId,
     fax: "",
     zip: addr.zip,
     city: addr.city,
