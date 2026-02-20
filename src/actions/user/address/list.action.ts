@@ -11,10 +11,10 @@ export const listAddress = async () => {
         success: false,
         message: "Failed to authenticate user",
       };
-    const { phone } = user;
+    const { customerId } = user;
 
     const addresses = await db.address.findMany({
-      where: { userIdentifier: phone },
+      where: { customerId },
     });
 
     const shippingAddress =

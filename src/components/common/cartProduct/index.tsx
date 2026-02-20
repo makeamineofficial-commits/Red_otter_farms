@@ -65,7 +65,7 @@ function ProductCard(item: CartItem) {
       <div className="relative">
         <Badge
           className="absolute bottom-1 right-1 z-10 
-             max-w-[50px]  cursor-pointer
+             max-w-12.5  cursor-pointer
              overflow-hidden whitespace-nowrap text-ellipsis 
              block text-left"
           title={item.variant.options.join(" | ")}
@@ -77,7 +77,7 @@ function ProductCard(item: CartItem) {
           {product.assets?.[0]?.url && (
             <Image
               fill
-              src={product.assets[0].url}
+              src={product.assets[0]?.url}
               alt={product.displayName}
               className="object-cover"
             />

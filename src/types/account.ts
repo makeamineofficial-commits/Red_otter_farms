@@ -17,7 +17,8 @@ export interface Account {
 
 export interface Address extends AddressProps {
   publicId: string;
-  userIdentifier: string;
+  addressId: string;
+  phone: string;
   state: string;
   country: string;
 }

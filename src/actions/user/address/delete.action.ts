@@ -2,21 +2,22 @@
 import axios from "axios";
 import { validateUser } from "@/actions/auth/user.action";
 import { db } from "@/lib/db";
+import { delAddress } from "./utils";
 export const deleteAddress = async ({ publicId }: { publicId: string }) => {
   try {
     const user = await validateUser();
-    if (!user)
+    if (!user || !user.phone)
       return {
         success: false,
         message: "Failed to authenticate user",
       };
 
-    const { phone } = user;
+    const { phone, customerId } = user;
 
-    await db.address.delete({
-      where: { publicId, userIdentifier: phone },
+    const address = await db.address.delete({
+      where: { publicId, phone },
     });
-
+    await delAddress({ customerId, addressId: address.addressId });
     return { success: true, message: "Address deleted successfully" };
   } catch (err: any) {
     console.log(err.response.data);

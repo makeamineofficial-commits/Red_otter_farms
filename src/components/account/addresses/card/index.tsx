@@ -1,6 +1,6 @@
 "use client";
 
-import { Address, AddressLabels, AddressTag } from "@/types/account";
+import { Address, AddressTag } from "@/types/account";
 import UpdateAddressForm from "../update";
 import DeleteAddress from "../delete";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,7 @@ export default function AddressCard(details: Address & { tag: AddressTag }) {
     country,
     state,
     zip,
-    userIdentifier,
+    phone,
     label,
     tag,
     street,
@@ -37,9 +37,7 @@ export default function AddressCard(details: Address & { tag: AddressTag }) {
 
         <p>
           Phone number:{" "}
-          <span className="text-muted-foreground line-clamp-1">
-            {userIdentifier}
-          </span>
+          <span className="text-muted-foreground line-clamp-1">{phone}</span>
         </p>
       </div>
       <div className="flex items-center justify-end gap-2 capitalize">

@@ -484,7 +484,8 @@ enum AddressTagEnum{
 model Address{
   id String @id @default(uuid())
   publicId String @unique  @default(dbgenerated("concat('post_', gen_random_uuid())"))
- 
+  addressId String @unique
+  customerId String 
   attention String? @db.Text
   address String 
   street String
@@ -495,7 +496,7 @@ model Address{
   country String
   county String?
   countryCode String
-  userIdentifier String
+  phone String
 
   label AddressLabelEnum
   customLabel String?

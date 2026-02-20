@@ -1,4 +1,5 @@
 export interface BillingDetails {
+  addressId: string | null;
   phone: string;
 
   firstName: string;
@@ -19,6 +20,7 @@ export interface BillingDetails {
 }
 
 export interface ShippingDetails {
+  addressId: string | null;
   firstName?: string;
   lastName?: string;
   phone?: string;

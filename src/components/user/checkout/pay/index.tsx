@@ -88,8 +88,8 @@ export default function Pay() {
       variant="outline"
       onClick={async () => {
         if (isDisabled) return;
-
-        await checkout();
+        console.log(shipping, billing);
+        // await checkout();
       }}
       className="w-full py-4 h-auto! rounded-2xl! text-base border-forest
                  flex items-center gap-1.5"

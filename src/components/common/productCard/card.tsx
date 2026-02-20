@@ -73,7 +73,7 @@ export function ProductCard(product: ProductPreview) {
           <></>
         )}
         <Image
-          src={assets[0].url}
+          src={assets[0]?.url}
           alt={displayName}
           fill
           className="object-cover"

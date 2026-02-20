@@ -2,24 +2,27 @@
 import { AddressProps, states } from "@/types/account";
 import { validateUser } from "@/actions/auth/user.action";
 import { AddressTagEnum, db } from "@/lib/db";
+import { updateAddress } from "./utils";
 export const editAddress = async ({
   publicId,
   ...rest
 }: AddressProps & { publicId: string }) => {
   try {
     const user = await validateUser();
-    if (!user)
+    if (!user || !user.phone || !user.customerId)
       return {
         success: false,
         message: "Failed to authenticate user",
       };
-    const { phone } = user;
+    const { phone, customerId } = user;
 
-    await db.$transaction(async (tx) => {
+    const state = states.find((ele) => ele.code === rest.stateCode)?.name ?? "";
+
+    const address = await db.$transaction(async (tx) => {
       if (rest.tag !== AddressTagEnum.NONE) {
         await tx.address.updateMany({
           where: {
-            userIdentifier: phone,
+            phone,
             tag: rest.tag,
           },
           data: {
@@ -29,13 +32,24 @@ export const editAddress = async ({
       }
       const state =
         states.find((ele) => ele.code === rest.stateCode)?.name ?? "";
-      await tx.address.update({
+      return await tx.address.update({
         where: { publicId: publicId },
         data: {
           state,
           ...rest,
         },
       });
+    });
+
+    await updateAddress({
+      customerId,
+      phone,
+      address: {
+        ...rest,
+        state,
+        country: "India",
+        addressId: address.addressId,
+      },
     });
 
     return { success: true, message: "Address update successfully" };

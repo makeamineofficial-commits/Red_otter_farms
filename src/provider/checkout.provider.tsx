@@ -52,6 +52,7 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const DEFAULT_ADDRESS = {
+      addressId: "",
       address: "123 Test Street",
       street: "Test Street",
       city: "New Delhi",
@@ -67,6 +68,8 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     const phone = user?.mobile?.replace("+91", "");
 
     setShipping({
+      addressId:
+        finalShipping.addressId === "" ? null : finalShipping.addressId,
       phone: phone ?? "9999999999",
       firstName: user?.first_name ?? "Test",
       lastName: user?.last_name ?? "User",
@@ -83,6 +86,7 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     });
 
     setBilling({
+      addressId: finalBilling.addressId === "" ? null : finalBilling.addressId,
       phone: phone ?? "9999999999",
       firstName: user?.first_name ?? "Test",
       lastName: user?.last_name ?? "User",
@@ -103,6 +107,7 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
     const phone = user?.mobile?.replace("+91", "");
     setShipping((prev) => ({
       phone,
+      addressId: billing.addressId === "" ? null : billing.addressId,
       firstName: user?.first_name ?? "Test",
       lastName: user?.last_name ?? "User",
       address: billing.address ?? "",
