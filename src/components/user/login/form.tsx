@@ -7,7 +7,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { loginUser, verifyUser } from "@/actions/auth/user.action";
+import {
+  loginUser,
+  verifyUser,
+  registerAccount,
+} from "@/actions/auth/user.action";
 
 import {
   Form,
@@ -38,9 +42,15 @@ const otpSchema = z.object({
   otp: z.string().min(6, "Enter valid OTP"),
 });
 
+const registerSchema = z.object({
+  firstName: z.string().min(1, "First name required"),
+  lastName: z.string().min(1, "Last name required"),
+  email: z.string().email("Enter valid email"),
+});
+
 export default function LoginForm({ close }: { close: () => void }) {
   const { refetch } = useAccountStore();
-  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [step, setStep] = useState<"phone" | "otp" | "register">("register");
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
   const action = searchParams.get("action");
@@ -67,6 +77,14 @@ export default function LoginForm({ close }: { close: () => void }) {
     resolver: zodResolver(otpSchema),
     defaultValues: { otp: "" },
   });
+  const registerForm = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+    },
+  });
 
   const onVerifyOTP = (values: z.infer<typeof otpSchema>) => {
     startTransition(async () => {
@@ -76,8 +94,31 @@ export default function LoginForm({ close }: { close: () => void }) {
         toast.error(res?.message || "OTP verification failed");
         return;
       }
-
+      if (res.accountExist === false) {
+        setStep("register");
+        return;
+      }
       toast.success("Login successful");
+      window.location.reload();
+      close();
+    });
+  };
+
+  const onRegister = (values: z.infer<typeof registerSchema>) => {
+    startTransition(async () => {
+      const phone = phoneForm.getValues("phone");
+
+      const res = await registerAccount({
+        phone,
+        ...values,
+      });
+
+      if (!res?.success) {
+        toast.error(res?.message || "Registration failed");
+        return;
+      }
+
+      toast.success("Account created successfully");
       window.location.reload();
       close();
     });
@@ -173,6 +214,76 @@ export default function LoginForm({ close }: { close: () => void }) {
         </Form>
       )}
 
+      {step === "register" && (
+        <Form {...registerForm}>
+          <form
+            onSubmit={registerForm.handleSubmit(onRegister)}
+            className="space-y-4 sm:space-y-6"
+          >
+            <p className="text-sm text-muted-foreground text-center">
+              Complete your profile
+            </p>
+
+            {/* First Name */}
+            <FormField
+              control={registerForm.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} placeholder="First Name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Last Name */}
+            <FormField
+              control={registerForm.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} placeholder="Last Name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Email */}
+            <FormField
+              control={registerForm.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Email Address"
+                      type="email"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              className="w-full bg-maroon rounded-full py-4 sm:py-6 text-xs sm:text-sm font-semibold hover:bg-maroon/90"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <Loader2 className="animate-spin duration-300" />
+              ) : (
+                "CREATE ACCOUNT"
+              )}
+            </Button>
+          </form>
+        </Form>
+      )}
       {step === "otp" && (
         <Form {...otpForm}>
           <form

@@ -119,15 +119,11 @@ const verifyUser = async ({ otp }: { otp: string }) => {
     const account = await getUser(phone);
     let customerId = account?.customer_id ?? null;
     if (!customerId) {
-      // creating account if not found
-      const account = await axios.post(
-        "https://automation.redotterfarms.com/webhook/b40a9035-c8c3-4267-bc9e-144b89c2ab55",
-        { mobile: phone },
-        {
-          headers: { api_key: process.env.BACKEND_API_KEY as string },
-        },
-      );
-      customerId = account.data.zoho_inv_customer_id;
+      return {
+        success: true,
+        message: "Your phone no has been verified",
+        accountExist: false,
+      };
     }
 
     const accessToken = await generateJWT({
@@ -162,13 +158,74 @@ const verifyUser = async ({ otp }: { otp: string }) => {
     return {
       success: true,
       message: "Your phone no has been verified",
+      accountExist: true,
     };
   } catch (err: any) {
     return {
       success: false,
       message: err.message,
+      accountExist: false,
     };
   }
+};
+
+const registerAccount = async ({
+  phone,
+  firstName,
+  lastName,
+  email,
+}: {
+  phone: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+}) => {
+  const res = await axios.post(
+    "https://automation.redotterfarms.com/webhook/b40a9035-c8c3-4267-bc9e-144b89c2ab55",
+    {
+      mobile: phone.startsWith("+91") ? phone : "+91" + phone,
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+    },
+    {
+      headers: { api_key: process.env.BACKEND_API_KEY as string },
+    },
+  );
+  const customerId = res.data.zoho_inv_customer_id;
+  const cookieStore = await cookies();
+  const accessToken = await generateJWT({
+    type: "access",
+    phone,
+    customerId,
+  });
+  const refreshToken = await generateJWT(
+    {
+      type: "refresh",
+      phone,
+      customerId,
+    },
+    "30d",
+  );
+  cookieStore.set("access-token", accessToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: true,
+    maxAge: 60 * 15,
+    path: "/",
+  });
+  cookieStore.set("refresh-token", refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: true,
+    maxAge: 60 * 60 * 24 * 30,
+    path: "/",
+  });
+  return {
+    success: true,
+    message: "User profile completed",
+    accountExist: true,
+  };
 };
 
 const createAccount = async ({
@@ -237,6 +294,7 @@ export {
   validateUser,
   loginUser,
   verifyUser,
+  registerAccount,
   createAccount,
   getUser,
 };
