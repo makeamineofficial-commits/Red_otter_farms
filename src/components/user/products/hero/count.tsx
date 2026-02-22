@@ -93,6 +93,7 @@ export default function Count({
           update({
             item: convertToCartItem({
               ...data,
+              isDrystore: data.isDryStore,
               variantOption,
               productId: data.publicId,
               variantId: selectedVariant.publicId,

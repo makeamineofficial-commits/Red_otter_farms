@@ -283,6 +283,12 @@ const getUser = async (_phone: string): Promise<Account | undefined> => {
       otter_pass: true,
       nutrition_meter: false,
       otter_n: true,
+      email: "",
+      family_members: [],
+      family_size: "",
+      age: "",
+      gender: "",
+      profile_pic: "",
     };
   }
 };

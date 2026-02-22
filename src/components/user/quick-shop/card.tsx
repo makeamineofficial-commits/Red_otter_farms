@@ -164,6 +164,8 @@ export function ProductCard(product: Product & { variants: Variant[] }) {
                 toggle: false,
                 item: {
                   variant: {
+                    availableInStock: selectedVariant.availableInStock,
+
                     options: selectedVariant.options.map(
                       (ele) => ele.optionValue,
                     ),
@@ -172,6 +174,7 @@ export function ProductCard(product: Product & { variants: Variant[] }) {
                     publicId: selectedVariant.publicId,
                   },
                   product: {
+                    isDrystore: product.isDryStore,
                     hasSubscription: product.hasSubscription,
                     displayName: product.displayName,
                     summary: product.summary,
@@ -197,11 +200,13 @@ export function ProductCard(product: Product & { variants: Variant[] }) {
                     options: selectedVariant.options.map(
                       (ele) => ele.optionValue,
                     ),
+                    availableInStock: selectedVariant.availableInStock,
                     sku: selectedVariant.sku,
                     price: selectedVariant.price,
                     publicId: selectedVariant.publicId,
                   },
                   product: {
+                    isDrystore: product.isDryStore,
                     hasSubscription: product.hasSubscription,
                     displayName: product.displayName,
                     summary: product.summary,
