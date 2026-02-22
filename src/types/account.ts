@@ -13,6 +13,13 @@ export interface Account {
   otter_pass: boolean;
   nutrition_meter: boolean;
   otter_n: boolean;
+
+  email: string;
+  family_members: string[];
+  family_size: string;
+  age: string;
+  gender: string;
+  profile_pic: string | null;
 }
 
 export interface Address extends AddressProps {

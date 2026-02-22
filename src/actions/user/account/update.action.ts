@@ -1,8 +1,14 @@
 "use server";
 import { validateUser } from "@/actions/auth/user.action";
-import { Account } from "@/types/account";
 import axios from "axios";
-export async function updateAccount() {
+export async function updateAccount(data: {
+  family_members: string[];
+  family_size: string;
+  age: string;
+  gender: string;
+  profile_pic?: string;
+  email: string;
+}) {
   try {
     const user = await validateUser();
     if (!user)
@@ -10,21 +16,19 @@ export async function updateAccount() {
         success: false,
         message: "Failed to authenticate user",
       };
-    const { phone } = user;
+    const { customerId } = user;
 
-    const res = await axios.post(
-      "https://automation.redotterfarms.com/webhook/0b38de6f-5560-4396-8204-a1874e419a2d",
-      { phone },
+    await axios.post(
+      "https://automation.redotterfarms.com/webhook/44cf592b-5711-4da3-a69f-1a5e57b490f3",
+      { ...data, customer_id: customerId },
       {
         headers: { api_key: process.env.BACKEND_API_KEY as string },
       },
     );
 
-    const account = res.data;
     return {
       success: true,
-      message: "User details found",
-      account: account[0] as Account,
+      message: "User details updated",
     };
   } catch (err) {
     return {
