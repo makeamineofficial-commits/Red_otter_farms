@@ -38,8 +38,24 @@ export async function PATCH(
       { status: 401 },
     );
   }
+  let body;
 
-  const { price, inStock, availableInStock, stockLimit } = await req.json();
+  try {
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, message: "Invalid or empty JSON body" },
+      { status: 400 },
+    );
+  }
+
+  if (!body)
+    return NextResponse.json(
+      {
+        message: "Body is required",
+      },
+      { status: 400 },
+    );
 
   const { sku } = await context.params;
 
@@ -58,10 +74,25 @@ export async function PATCH(
         },
         { status: 404 },
       );
+    const {
+      price = check.price / 100,
+      inStock,
+      availableInStock,
+      stockLimit,
+      mrp = check.mrp / 100,
+      isPublished,
+    } = body;
     const updatedProduct = await db.$transaction(
       async (tx: Prisma.TransactionClient) => {
         const updatedProduct = await tx.variant.update({
-          data: { inStock, price: price * 100, availableInStock, stockLimit },
+          data: {
+            price: price * 100,
+            mrp: mrp * 100,
+            inStock,
+            availableInStock,
+            stockLimit,
+            isPublished,
+          },
           where: { id: check.id },
         });
         return updatedProduct;
@@ -76,7 +107,7 @@ export async function PATCH(
       },
       { status: 200 },
     );
-  } catch (err) {
+  } catch (err: any) {
     return NextResponse.json(
       { success: false, message: "Failed to update product" },
       { status: 500 },
@@ -135,7 +166,7 @@ export async function GET(
       },
       { status: 200 },
     );
-  } catch (err) {
+  } catch (err: any) {
     return NextResponse.json(
       { success: false, message: "Failed to fetch product details" },
       { status: 500 },
