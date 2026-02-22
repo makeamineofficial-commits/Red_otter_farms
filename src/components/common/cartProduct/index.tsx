@@ -2,13 +2,20 @@ import { useCart } from "@/provider/cart.provider";
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { CartItem } from "@/types/cart";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Info, Minus, Plus, Trash2 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-
-function ProductCard(item: CartItem) {
-  const { quantity, product } = item;
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useCheckout } from "@/provider/checkout.provider";
+import { isNCRPincode } from "@/lib/utils";
+function ProductCard(item: CartItem & { availability?: boolean }) {
+  const { quantity, product, variant, availability = true } = item;
   const { update, isUpdating, remove, lockCart } = useCart();
   const [localQty, setLocalQty] = useState(item.quantity);
 
@@ -50,6 +57,25 @@ function ProductCard(item: CartItem) {
 
   return (
     <div className="border-b last:border-b-0 pb-2 flex gap-3 items-end relative ">
+      {!availability && (
+        <>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="absolute bottom-1 right-1 z-80 cursor-help text-xs underline decoration-dotted">
+                  <Info className="size-4 text-red-500"></Info>
+                </span>
+              </TooltipTrigger>
+
+              <TooltipContent className="max-w-75 text-xs leading-relaxed">
+                This product is not available for delivery to the selected
+                shipping location. Please change the address or remove the item
+                to proceed.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </>
+      )}
       <Link
         href={`/products/${product.slug}`}
         className="hover:underline  absolute h-full w-full z-40"
@@ -106,7 +132,9 @@ function ProductCard(item: CartItem) {
               <Minus size={14} />
             </button>
 
-            <span className="min-w-6 text-center text-sm font-medium">
+            <span
+              className={`min-w-6 text-center text-sm font-medium ${localQty > variant.availableInStock ? "text-red-500" : ""} `}
+            >
               {localQty}
             </span>
 
@@ -141,7 +169,7 @@ function CartProductSkeleton() {
   );
 }
 
-export default function Products() {
+export function Products() {
   const { cart, isLoading } = useCart();
   return (
     <div className=" flex flex-col pb-10 gap-2 flex-1  no-scrollbar overflow-y-auto ">
@@ -162,6 +190,44 @@ export default function Products() {
           )}
           {cart?.items.map((ele, idx) => (
             <ProductCard key={ele.variant.publicId} {...ele} />
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+export function CheckoutProducts() {
+  const { cart, isLoading } = useCart();
+  const { shipping } = useCheckout();
+  const isNCR = useMemo(() => {
+    if (!shipping) return true;
+    return isNCRPincode(shipping.zip);
+  }, [shipping]);
+
+  return (
+    <div className=" flex flex-col pb-10 gap-2 flex-1  no-scrollbar overflow-y-auto ">
+      {isLoading || !cart ? (
+        <>
+          {[1, 2, 3, 4].map((ele) => (
+            <CartProductSkeleton key={ele} />
+          ))}
+        </>
+      ) : (
+        <>
+          {cart?.items.length === 0 ? (
+            <span className="uppercase text-muted-foreground text-sm text-center py-4">
+              Cart is Empty
+            </span>
+          ) : (
+            <></>
+          )}
+          {cart?.items.map((ele, idx) => (
+            <ProductCard
+              availability={isNCR || ele.product.isDrystore}
+              key={ele.variant.publicId}
+              {...ele}
+            />
           ))}
         </>
       )}

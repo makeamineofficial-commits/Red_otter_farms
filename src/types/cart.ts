@@ -11,6 +11,7 @@ export interface Item {
   variant: {
     sku: string;
     price: number;
+    availableInStock: number;
     publicId: string;
     options: string[];
   };
@@ -18,6 +19,7 @@ export interface Item {
     displayName: string;
     summary: string;
     nutritionalInfo: any;
+    isDrystore: boolean;
     hasSubscription: boolean;
     assets: Asset[];
     slug: string;

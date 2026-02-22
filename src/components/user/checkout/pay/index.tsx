@@ -15,7 +15,8 @@ declare global {
 }
 
 export default function Pay() {
-  const { isFetching, isCheckingOut } = useCheckout();
+  const { isFetching, isCheckingOut, availabilityConflict, quantityConflict } =
+    useCheckout();
   const paymentSuccessRef = useRef(false);
 
   const { cart, isLoading, isUpdating } = useCart();
@@ -27,7 +28,9 @@ export default function Pay() {
     isFetching ||
     isCheckingOut ||
     !cart ||
-    cart.items.length === 0;
+    cart.items.length === 0 ||
+    availabilityConflict ||
+    quantityConflict;
 
   useEffect(() => {
     const script = document.createElement("script");

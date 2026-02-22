@@ -89,8 +89,10 @@ export const convertToCartItem = (product: ProductPreview): Item => {
       price: product.price,
       publicId: product.variantId,
       options: product.variantOption,
+      availableInStock: product.availableInStock,
     },
     product: {
+      isDrystore: product.isDrystore,
       hasSubscription: product.hasSubscription,
       displayName: product.displayName,
       summary: product.summary,

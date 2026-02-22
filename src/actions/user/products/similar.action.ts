@@ -46,6 +46,7 @@ export async function getSimilarProducts(slug: string) {
       slug: true,
       healthBenefits: true,
       hasSubscription: true,
+      isDryStore: true,
       assets: {
         where: {
           isPrimary: true,
@@ -111,6 +112,7 @@ export async function getSimilarProducts(slug: string) {
       mrp: defaultVariant?.mrp ?? null,
       price: defaultVariant?.price ?? null,
       inStock: defaultVariant.inStock,
+      isDrystore: product.isDryStore,
       variants: product._count.variants,
       stockLimit: product.variants[0].stockLimit,
       availableInStock: product.variants[0].availableInStock,

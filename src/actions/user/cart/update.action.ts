@@ -100,7 +100,7 @@ export const syncOrder = async ({
         where: { sessionId: cart.sessionId },
         include: { order: true },
       });
-
+      
       if (!cartRecord) {
         throw new Error("Cart not found");
       }

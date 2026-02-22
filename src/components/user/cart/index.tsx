@@ -2,11 +2,10 @@
 
 import { Handbag, X } from "lucide-react";
 import { Suspense, useEffect } from "react";
-import Products from "@/components/common/cartProduct";
+import { Products } from "@/components/common/cartProduct";
 import { useCart } from "@/provider/cart.provider";
 import { NutritionMeterAccordion } from "./nutritionMeter";
 import Checkout from "./checkout";
-import Floater from "./floater";
 import Bar from "./bar";
 function _Cart() {
   const { isOpen, toggle, cart } = useCart();

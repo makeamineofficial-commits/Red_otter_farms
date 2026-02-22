@@ -122,6 +122,7 @@ export const listProducts = async (
         slug: true,
         healthBenefits: true,
         hasSubscription: true,
+        isDryStore: true,
         assets: {
           where: { isPrimary: true },
           take: 1,
@@ -190,6 +191,7 @@ export const listProducts = async (
         inStock: defaultVariant.inStock,
         mrp: defaultVariant.mrp,
         price: defaultVariant.price,
+        isDrystore: product.isDryStore,
         variants: product._count.variants,
         stockLimit: defaultVariant.stockLimit,
         availableInStock: defaultVariant.availableInStock,

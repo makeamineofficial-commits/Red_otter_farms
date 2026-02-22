@@ -10,6 +10,7 @@ import { handleOrder } from "../orders/order.action";
 import { getOrder } from "../orders/utils";
 import { getAccount } from "../user/account/get.action";
 import { getRazorpayCheckout } from "./razorpay.action";
+import { isNCRPincode } from "@/lib/utils";
 
 export async function getCheckout({
   paymentMethod,
@@ -29,6 +30,33 @@ export async function getCheckout({
   const cart = await getCart();
   if (!cart) {
     throw new Error("Cart not found");
+  }
+
+  const isNCR = isNCRPincode(shipping.zip);
+  const hasNonDryStoreItem = cart.items.some(
+    (item) => !item.product.isDrystore,
+  );
+
+  if (!isNCR && hasNonDryStoreItem) {
+    return {
+      success: false,
+      message:
+        "One or more products are not available in the requested quantity. Please reduce the quantity to proceed.",
+      paymentMethod,
+    };
+  }
+  const quantityConflict = cart.items.reduce(
+    (prev, cur) => prev || cur.quantity > cur.variant.availableInStock,
+    false,
+  );
+
+  if (quantityConflict) {
+    return {
+      success: false,
+      message:
+        "One or more products are not available in the requested quantity. Please reduce the quantity to proceed.",
+      paymentMethod,
+    };
   }
   const { total, success, orderId } = await syncOrder({
     cart,

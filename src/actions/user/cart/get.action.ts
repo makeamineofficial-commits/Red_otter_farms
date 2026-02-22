@@ -24,6 +24,7 @@ export const getCart = async (): Promise<Cart | null> => {
               sku: true,
               price: true,
               publicId: true,
+              availableInStock: true,
               options: {
                 select: {
                   value: { select: { displayName: true } },
@@ -34,6 +35,7 @@ export const getCart = async (): Promise<Cart | null> => {
                   summary: true,
                   displayName: true,
                   nutritionalInfo: true,
+                  isDryStore: true,
                   hasSubscription: true,
                   slug: true,
                   assets: {
@@ -67,13 +69,17 @@ export const getCart = async (): Promise<Cart | null> => {
     items:
       cart.items?.map(({ variant, quantity }) => {
         const { product, options, ...details } = variant;
-        const { summary, ...productDetails } = product;
+        const { summary, isDryStore, ...productDetails } = product;
         return {
           variant: {
             options: options.map((ele) => ele.value.displayName),
             ...details,
           },
-          product: { summary: summary ?? "", ...productDetails },
+          product: {
+            summary: summary ?? "",
+            isDrystore: isDryStore,
+            ...productDetails,
+          },
           quantity,
         };
       }) ?? [],
@@ -103,6 +109,7 @@ export const getCartById = async ({
               sku: true,
               price: true,
               publicId: true,
+              availableInStock: true,
               options: {
                 select: {
                   value: { select: { displayName: true } },
@@ -115,6 +122,7 @@ export const getCartById = async ({
                   nutritionalInfo: true,
                   slug: true,
                   hasSubscription: true,
+                  isDryStore: true,
                   assets: {
                     where: {
                       isPrimary: true,
@@ -146,13 +154,17 @@ export const getCartById = async ({
     items:
       cart.items?.map(({ variant, quantity }) => {
         const { product, options, ...details } = variant;
-        const { summary, ...productDetails } = product;
+        const { summary, isDryStore, ...productDetails } = product;
         return {
           variant: {
             options: options.map((ele) => ele.value.displayName),
             ...details,
           },
-          product: { summary: summary ?? "", ...productDetails },
+          product: {
+            isDrystore: isDryStore,
+            summary: summary ?? "",
+            ...productDetails,
+          },
           quantity,
         };
       }) ?? [],

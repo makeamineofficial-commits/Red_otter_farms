@@ -24,6 +24,7 @@ export const listFeaturedProducts = async (): Promise<ProductPreview[]> => {
       summary: true,
       type: true,
       publicId: true,
+      isDryStore: true,
       healthBenefits: true,
       hasSubscription: true,
       assets: {
@@ -86,6 +87,7 @@ export const listFeaturedProducts = async (): Promise<ProductPreview[]> => {
       assets: product.assets,
       presentInWishlist: false,
       inStock: defaultVariant.inStock,
+      isDrystore: product.isDryStore,
       sku: defaultVariant?.sku ?? null,
       mrp: defaultVariant?.mrp ?? null,
       price: defaultVariant?.price ?? null,

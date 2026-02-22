@@ -38,6 +38,7 @@ export async function getWishlist(): Promise<{ products: ProductPreview[] }> {
         type: true,
         nutritionalInfo: true,
         hasSubscription: true,
+        isDryStore: true,
         slug: true,
         healthBenefits: true,
         assets: {
@@ -101,6 +102,7 @@ export async function getWishlist(): Promise<{ products: ProductPreview[] }> {
         assets: product.assets,
         presentInWishlist: false,
         sku: defaultVariant?.sku ?? null,
+        isDrystore: product.isDryStore,
         mrp: defaultVariant?.mrp ?? null,
         price: defaultVariant?.price ?? null,
         inStock: defaultVariant.inStock,

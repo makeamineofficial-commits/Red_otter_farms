@@ -34,6 +34,9 @@ type ContextType = {
   setSameAsBilling: Dispatch<SetStateAction<boolean>>;
   isCheckingOut: boolean;
   setCheckingOut: Dispatch<SetStateAction<boolean>>;
+
+  availabilityConflict: boolean;
+  quantityConflict: boolean;
 };
 
 const CheckoutContext = createContext<ContextType | undefined>(undefined);
@@ -45,8 +48,25 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
   const [isCheckingOut, setCheckingOut] = useState(false);
   const [billing, setBilling] = useState<BillingDetails | undefined>();
   const [shipping, setShipping] = useState<ShippingDetails | undefined>();
-
+  const [availabilityConflict, setAvailabilityConflict] = useState(false);
+  const [quantityConflict, setQuantityConflict] = useState(false);
   const { shippingAddress, billingAddress } = addressDetails ?? {};
+  const { cart } = useCart();
+
+  useEffect(() => {
+    if (!cart) return;
+    const quantityConflict = cart.items.reduce(
+      (prev, cur) => prev || cur.quantity > cur.variant.availableInStock,
+      false,
+    );
+    setQuantityConflict(quantityConflict);
+    if (!shipping || !shipping.zip) return;
+    const hasNonDryStoreItem = cart.items.some(
+      (item) => !item.product.isDrystore,
+    );
+    const isNCR = isNCRPincode(shipping.zip);
+    setAvailabilityConflict(!isNCR && hasNonDryStoreItem);
+  }, [shipping?.zip, cart]);
 
   useEffect(() => {
     const DEFAULT_ADDRESS = {
@@ -124,7 +144,6 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
   const [isFetching, setFetching] = useState<boolean>(false);
   const [showEstimate, setShowEstimate] = useState<boolean>(false);
   const [paymentMethod, setPaymentMethod] = useState(PaymentMethod.RAZORPAY);
-  const { cart } = useCart();
 
   const resolveShippingRate = async (pincode: string) => {
     try {
@@ -174,6 +193,8 @@ export const CheckoutProvider = ({ children }: { children: ReactNode }) => {
         setSameAsBilling,
         paymentMethod,
         setPaymentMethod,
+        availabilityConflict,
+        quantityConflict,
       }}
     >
       {children}

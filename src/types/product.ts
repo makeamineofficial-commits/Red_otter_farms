@@ -66,6 +66,7 @@ export interface ProductPreview {
   price: number;
   variantOption: string[];
   inStock: boolean;
+  isDrystore: boolean;
   hasSubscription: boolean;
   stockLimit: number;
   availableInStock: number;
