@@ -578,3 +578,39 @@ model Purchase{
   updatedAt DateTime @updatedAt
 
 }
+
+
+
+model Survey {
+  id                String   @id @default(cuid())
+  
+  name              String
+  email             String  
+  phone             String
+  age               String?
+
+  dietType          String[]      // ["Vegetarian", "Keto"]
+  allergies         String[]      // ["Peanuts", "Dairy"]
+  customAllergy     String?
+
+  frequency         String?       // Ordering frequency
+  budget            String?       // Budget preference
+
+  priorities        String[]      // ["Protein", "Low Carb"]
+  goals             String[]      // ["Weight Loss"]
+  
+  healthConditions  String[]      // ["Diabetes"]
+  customCondition   String?
+
+  familySize        String?
+  cookingFrequency  String?
+  mealPrepTime      String?
+
+  favoriteProducts  String[]
+  avoidProducts     String[]
+
+  organicImportance String?       // "High", "Medium", "Low"
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

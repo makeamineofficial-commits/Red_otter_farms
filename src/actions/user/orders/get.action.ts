@@ -40,6 +40,7 @@ export async function getOrder({ orderId }: { orderId: string }) {
     });
     if (!order)
       return {
+        surveySubmitted: false,
         success: false,
         message: "Order details not found",
         order: null,
@@ -47,9 +48,28 @@ export async function getOrder({ orderId }: { orderId: string }) {
 
     const { cart, ...rest } = order;
 
+    let surveySubmitted = false;
+    try {
+      surveySubmitted =
+        (await db.survey.findFirst({
+          where: {
+            OR: [
+              {
+                // @ts-ignore
+                phone: order.shipping?.phone,
+              },
+              {
+                // @ts-ignore
+                email: order.shipping?.email,
+              },
+            ],
+          },
+        })) != null;
+    } catch (err) {}
     return {
       success: true,
       message: "Order details found",
+      surveySubmitted,
       order: {
         ...rest,
         products: cart.items.map((ele) => {
@@ -65,6 +85,7 @@ export async function getOrder({ orderId }: { orderId: string }) {
     };
   } catch (err) {
     return {
+      surveySubmitted: false,
       success: false,
       message: "Order details not found",
       order: null,

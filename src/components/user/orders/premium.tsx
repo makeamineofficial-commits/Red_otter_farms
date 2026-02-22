@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export function Premium() {
+export function Premium({ surveySubmitted }: { surveySubmitted: boolean }) {
   return (
     <section className="mb-20">
       {/* Header */}
@@ -82,24 +82,28 @@ export function Premium() {
         />
       </div>
 
-      {/* Survey Section */}
-      <div className="border-2 border-[#004b1a] rounded-lg p-10 bg-white text-center mx-auto">
-        <ClipboardList size={48} className="text-[#d7262d] mx-auto mb-4" />
+      {surveySubmitted && (
+        <>
+          {/* Survey Section */}
+          <div className="border-2 border-[#004b1a] rounded-lg p-10 bg-white text-center mx-auto">
+            <ClipboardList size={48} className="text-[#d7262d] mx-auto mb-4" />
 
-        <h3 className="font-['Dream_Orphans'] text-3xl text-[#004b1a] mb-3">
-          Help Us Personalize Your Experience
-        </h3>
+            <h3 className="font-['Dream_Orphans'] text-3xl text-[#004b1a] mb-3">
+              Help Us Personalize Your Experience
+            </h3>
 
-        <p className="max-w-xl mx-auto mb-6">
-          Take a quick 2-minute survey to get better recommendations and
-          exclusive offers.
-        </p>
-        <Link href="/survey">
-          <button className="bg-[#004b1a] uppercase text-white px-8 py-3 rounded-[10px] font-bold hover:bg-[#003814] transition">
-            Take Survey
-          </button>
-        </Link>
-      </div>
+            <p className="max-w-xl mx-auto mb-6">
+              Take a quick 2-minute survey to get better recommendations and
+              exclusive offers.
+            </p>
+            <Link href="/survey">
+              <button className="bg-[#004b1a] uppercase text-white px-8 py-3 rounded-[10px] font-bold hover:bg-[#003814] transition">
+                Take Survey
+              </button>
+            </Link>
+          </div>
+        </>
+      )}
     </section>
   );
 }

@@ -64,7 +64,7 @@ export default async function OrderPage({ params }: PageProps) {
           />
         </div>
 
-        <Premium />
+        <Premium surveySubmitted={data.surveySubmitted} />
 
         <RecommendedProducts products={featuredProducts} />
 

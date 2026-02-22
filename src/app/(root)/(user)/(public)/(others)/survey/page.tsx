@@ -12,8 +12,9 @@ import {
   Apple,
   Salad,
 } from "lucide-react";
+import Link from "next/link";
 
-interface FormData {
+export interface SurveyFormData {
   // Personal Info
   name: string;
   email: string;
@@ -48,7 +49,8 @@ interface FormData {
 
 export default function page() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>({
+  const [showThankyou, setThankyou] = useState(false);
+  const [formData, setSurveyFormData] = useState<SurveyFormData>({
     name: "",
     email: "",
     phone: "",
@@ -72,20 +74,20 @@ export default function page() {
 
   const totalSteps = 5;
 
-  const handleMultiSelect = (field: keyof FormData, value: string) => {
+  const handleMultiSelect = (field: keyof SurveyFormData, value: string) => {
     const currentValues = formData[field] as string[];
     if (currentValues.includes(value)) {
-      updateFormData(
+      updateSurveyFormData(
         field,
         currentValues.filter((v) => v !== value),
       );
     } else {
-      updateFormData(field, [...currentValues, value]);
+      updateSurveyFormData(field, [...currentValues, value]);
     }
   };
 
-  const updateFormData = (field: keyof FormData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const updateSurveyFormData = (field: keyof SurveyFormData, value: any) => {
+    setSurveyFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const nextStep = () => {
@@ -104,7 +106,7 @@ export default function page() {
 
   const handleSubmit = () => {
     console.log("Form submitted:", formData);
-    // Handle form submission
+    setThankyou(true);
   };
 
   return (
@@ -123,6 +125,33 @@ export default function page() {
           </p>
         </div>
       </div>
+
+      {showThankyou && (
+        <>
+          <div className="space-y-8 py-10">
+            <div className="text-center mb-12">
+              <div className="text-[#1b1a21] text-xs uppercase tracking-[4px] mb-2">
+                Survey Completed
+              </div>
+
+              <h2 className="font-dream-orphans text-[#004b1a] text-5xl tracking-[3px] mb-4">
+                Thank You for Sharing!
+              </h2>
+
+              <p className="text-[#1b1a21] text-lg mb-8">
+                Your nutrition preferences have been saved successfully. We’ll
+                use this information to personalize your shopping experience.
+              </p>
+
+              <Link href="/categories">
+                <button className="bg-[#004b1a] text-white px-8 py-3 rounded-lg hover:opacity-90 transition">
+                  Back to Shopping
+                </button>
+              </Link>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Progress Bar */}
       <div className="bg-[#edefea] py-8 px-4">
@@ -188,7 +217,7 @@ export default function page() {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => updateFormData("name", e.target.value)}
+                  onChange={(e) => updateSurveyFormData("name", e.target.value)}
                   className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
                   placeholder="Enter your full name"
                 />
@@ -202,7 +231,9 @@ export default function page() {
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => updateFormData("email", e.target.value)}
+                    onChange={(e) =>
+                      updateSurveyFormData("email", e.target.value)
+                    }
                     className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
                     placeholder="your.email@example.com"
                   />
@@ -215,7 +246,9 @@ export default function page() {
                   <input
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => updateFormData("phone", e.target.value)}
+                    onChange={(e) =>
+                      updateSurveyFormData("phone", e.target.value)
+                    }
                     className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors"
                     placeholder="+91 XXXXX XXXXX"
                   />
@@ -230,7 +263,7 @@ export default function page() {
                   {["18-25", "26-35", "36-50", "50+"].map((age) => (
                     <button
                       key={age}
-                      onClick={() => updateFormData("age", age)}
+                      onClick={() => updateSurveyFormData("age", age)}
                       className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                         formData.age === age
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
@@ -291,7 +324,7 @@ export default function page() {
                       }`}
                     >
                       {formData.dietType.includes(diet) && (
-                        <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                        <CheckCircle className="w-5 h-5 shrink-0" />
                       )}
                       <span className="flex-1">{diet}</span>
                     </button>
@@ -323,7 +356,7 @@ export default function page() {
                       }`}
                     >
                       {formData.allergies.includes(allergy) && (
-                        <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                        <CheckCircle className="w-5 h-5 shrink-0" />
                       )}
                       <span className="flex-1">{allergy}</span>
                     </button>
@@ -338,7 +371,7 @@ export default function page() {
                 <textarea
                   value={formData.customAllergy}
                   onChange={(e) =>
-                    updateFormData("customAllergy", e.target.value)
+                    updateSurveyFormData("customAllergy", e.target.value)
                   }
                   rows={3}
                   className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors resize-none"
@@ -381,7 +414,7 @@ export default function page() {
                   ].map((freq) => (
                     <button
                       key={freq}
-                      onClick={() => updateFormData("frequency", freq)}
+                      onClick={() => updateSurveyFormData("frequency", freq)}
                       className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                         formData.frequency === freq
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
@@ -407,7 +440,7 @@ export default function page() {
                   ].map((budget) => (
                     <button
                       key={budget}
-                      onClick={() => updateFormData("budget", budget)}
+                      onClick={() => updateSurveyFormData("budget", budget)}
                       className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                         formData.budget === budget
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
@@ -445,7 +478,7 @@ export default function page() {
                       }`}
                     >
                       {formData.priorities.includes(priority) && (
-                        <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                        <CheckCircle className="w-5 h-5 shrink-0" />
                       )}
                       <span className="flex-1">{priority}</span>
                     </button>
@@ -500,7 +533,7 @@ export default function page() {
                       }`}
                     >
                       {formData.goals.includes(goal) && (
-                        <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                        <CheckCircle className="w-5 h-5 shrink-0" />
                       )}
                       <span className="flex-1">{goal}</span>
                     </button>
@@ -533,7 +566,7 @@ export default function page() {
                       }`}
                     >
                       {formData.healthConditions.includes(condition) && (
-                        <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                        <CheckCircle className="w-5 h-5 shrink-0" />
                       )}
                       <span className="flex-1">{condition}</span>
                     </button>
@@ -548,7 +581,7 @@ export default function page() {
                 <textarea
                   value={formData.customCondition}
                   onChange={(e) =>
-                    updateFormData("customCondition", e.target.value)
+                    updateSurveyFormData("customCondition", e.target.value)
                   }
                   rows={3}
                   className="w-full border-2 border-[#004b1a] rounded-lg px-6 py-4  text-[#1b1a21] focus:outline-none focus:border-[#d7262d] transition-colors resize-none"
@@ -586,7 +619,7 @@ export default function page() {
                   {["1", "2", "3-4", "5+"].map((size) => (
                     <button
                       key={size}
-                      onClick={() => updateFormData("familySize", size)}
+                      onClick={() => updateSurveyFormData("familySize", size)}
                       className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                         formData.familySize === size
                           ? "bg-[#004b1a] border-[#004b1a] text-white"
@@ -608,7 +641,9 @@ export default function page() {
                     (freq) => (
                       <button
                         key={freq}
-                        onClick={() => updateFormData("cookingFrequency", freq)}
+                        onClick={() =>
+                          updateSurveyFormData("cookingFrequency", freq)
+                        }
                         className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                           formData.cookingFrequency === freq
                             ? "bg-[#004b1a] border-[#004b1a] text-white"
@@ -631,7 +666,9 @@ export default function page() {
                     (time) => (
                       <button
                         key={time}
-                        onClick={() => updateFormData("mealPrepTime", time)}
+                        onClick={() =>
+                          updateSurveyFormData("mealPrepTime", time)
+                        }
                         className={`border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all ${
                           formData.mealPrepTime === time
                             ? "bg-[#004b1a] border-[#004b1a] text-white"
@@ -671,7 +708,7 @@ export default function page() {
                     <button
                       key={option.value}
                       onClick={() =>
-                        updateFormData("organicImportance", option.value)
+                        updateSurveyFormData("organicImportance", option.value)
                       }
                       className={`w-full border-2 rounded-lg px-6 py-4  font-bold uppercase tracking-wide text-sm transition-all text-left ${
                         formData.organicImportance === option.value
@@ -689,11 +726,11 @@ export default function page() {
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between mt-16 pt-8 border-t-2 border-[#004b1a]/20">
+        <div className="flex items-center justify-between mt-16 pt-8 border-t-2 border-[#004b1a]/20 md:flex-row flex-col gap-4">
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
-            className={`border-2 border-[#004b1a] text-[#004b1a]  font-bold uppercase tracking-[1.5px] px-10 py-4 rounded-[10px] transition-all ${
+            className={`border-2 border-[#004b1a] text-[#004b1a]  md:w-auto w-full  md:text-left text-center  font-bold uppercase tracking-[1.5px] px-10 py-4 rounded-[10px] transition-all ${
               currentStep === 1
                 ? "opacity-40 cursor-not-allowed"
                 : "hover:bg-[#004b1a] hover:text-white"
@@ -705,7 +742,7 @@ export default function page() {
           {currentStep < totalSteps ? (
             <button
               onClick={nextStep}
-              className="bg-[#d7262d] text-white  font-bold uppercase tracking-[1.5px] px-10 py-4 rounded-[10px] border-2 border-[#d7262d] hover:bg-[#b81f25] transition-colors flex items-center gap-3"
+              className="bg-[#d7262d] text-white  md:w-auto w-full  justify-center font-bold uppercase tracking-[1.5px] px-10 py-4 rounded-[10px] border-2 border-[#d7262d] hover:bg-[#b81f25] transition-colors flex gap-3"
             >
               Next Step
               <ChevronRight className="w-5 h-5" />
@@ -713,7 +750,7 @@ export default function page() {
           ) : (
             <button
               onClick={handleSubmit}
-              className="bg-linear-to-r from-[#004b1a] to-[#d7262d] text-white  font-bold uppercase tracking-[1.5px] px-12 py-4 rounded-[10px] border-2 border-transparent hover:scale-105 transition-transform flex items-center gap-3"
+              className="bg-linear-to-r from-[#004b1a] md:w-auto w-full  justify-center   to-[#d7262d] text-white  font-bold uppercase tracking-[1.5px] px-12 py-4 rounded-[10px] border-2 border-transparent hover:scale-105 transition-transform flex  gap-3"
             >
               <Sparkles className="w-5 h-5" />
               Complete Survey
